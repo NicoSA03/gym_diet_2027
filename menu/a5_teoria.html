@@ -1,0 +1,193 @@
+<style>
+.veredicto{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--clay);
+  border-radius:3px;padding:24px;display:flex;flex-direction:column;gap:13px}
+.veredicto .tit{font-family:var(--sans);font-size:clamp(20px,4.2vw,26px);font-weight:700;
+  letter-spacing:-.015em;line-height:1.22}
+.veredicto .tit b{color:var(--clay)}
+.veredicto p{font-size:16px;color:var(--ink-2);max-width:64ch}
+
+.vg{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.vg div{background:var(--surface);padding:14px 14px 15px;display:flex;flex-direction:column;gap:2px}
+.vg .v{font-family:var(--mono);font-size:21px;font-weight:600;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;color:var(--accent-ink)}
+.vg .l{font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+@media (max-width:640px){.vg{grid-template-columns:repeat(2,1fr)}}
+
+.bloque-hd{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:18px 20px;background:var(--accent-soft);border:1px solid var(--line);border-radius:3px 3px 0 0}
+.bloque-hd h3{font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--accent-ink)}
+.bloque-hd .meta{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+  font-variant-numeric:tabular-nums;text-align:right;white-space:pre-line;line-height:1.5}
+@media (max-width:560px){.bloque-hd .meta{text-align:left}}
+.bloque-bd{background:var(--surface);border:1px solid var(--line);border-top:none;
+  border-radius:0 0 3px 3px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.bloque-bd .lema{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--clay)}
+.bloque-bd p{font-size:15.5px;color:var(--ink-2);max-width:66ch}
+
+.ejcard{background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  margin-bottom:10px;overflow:hidden}
+.ejcard summary{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  font-family:var(--sans);font-weight:700;font-size:16.5px;list-style:none}
+.ejcard summary::-webkit-details-marker{display:none}
+.ejcard summary::after{content:"+";font-family:var(--mono);font-size:19px;color:var(--accent-ink)}
+.ejcard[open] summary::after{content:"–"}
+.ejcard summary .pat{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3);border:1px solid var(--line-2);border-radius:999px;
+  padding:3px 9px;white-space:nowrap;margin-left:auto;margin-right:8px}
+.ejcard .cuerpo{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px}
+.ejcard .tec{font-size:15.5px;color:var(--ink-2);max-width:66ch}
+.ejcard .sus{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.ejcard .musc{display:flex;gap:6px;flex-wrap:wrap}
+.ejcard .musc span{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  background:var(--accent-soft);color:var(--accent-ink);border-radius:999px;padding:3px 9px}
+.ejcard .series{display:flex;flex-direction:column;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.ejcard .serie{background:var(--surface);padding:12px 14px;display:grid;
+  grid-template-columns:78px 1fr;gap:12px;align-items:start}
+.ejcard .serie .g{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--clay);padding-top:2px;line-height:1.35;white-space:pre-line}
+.ejcard .serie h5{font-family:var(--sans);font-size:14.5px;font-weight:700;margin-bottom:2px}
+.ejcard .serie p{font-size:14.5px;color:var(--ink-2)}
+@media (max-width:520px){.ejcard .serie{grid-template-columns:1fr;gap:3px}}
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <p class="eyebrow">La teoría · el porqué de cada decisión</p>
+  <h1>Por qué el plan es <em>así</em></h1>
+  <p class="dek">Todo lo que no hace falta leer un martes a las siete de la mañana: qué se puede conseguir y qué no, cómo está construido cada bloque, el desglose de los dieciocho ejercicios y qué mirar cada semana.</p>
+  <div class="hermanos">
+    <a class="hermano" href="https://claude.ai/artifact/RqGzzc6vLLoseYuJYQgjNr" target="_top">El entreno</a>
+    <span class="hermano yo">La teoría</span>
+    <a class="hermano" href="https://claude.ai/artifact/S9WiFnMkqmqLgYucuWMgV9" target="_top">Cómo funciona</a>
+    <a class="hermano" href="https://claude.ai/artifact/JZPFMRu2xADNwA9sZiKkJo" target="_top">Menús</a>
+    <a class="hermano" href="https://claude.ai/artifact/4qgvgmpPLgZtqEuXXpY8fe" target="_top">La compra</a>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>Lo que sí y lo que no</h2></div>
+  <div class="stack">
+    <div class="veredicto">
+      <p class="tit">Con cinco días y hora y veinte de tope puedes tener <b>un cuerpo funcional y vistoso</b>. Lo que no cabe entero es <b>la media maratón</b>.</p>
+      <p>Cinco sesiones a la semana dan de sobra para hipertrofiar, ganar fuerza y tener un motor aeróbico decente. Donde el presupuesto se queda corto es en carrera: con dos salidas semanales y un tope de ochenta minutos, la tirada larga se queda en unos trece kilómetros. Eso te deja capaz de <em>acabar</em> una media maratón sobre las dos horas, pasándolo mal a partir del kilómetro dieciséis. No te deja capaz de correrla bien.</p>
+      <p>Hay una salida y está en tu propio horario: los jueves entras a la universidad a las 12:30. Si en el último bloque estiras esa tirada de ochenta minutos a una hora cuarenta y cinco, el kilometraje sube a treinta por semana, la tirada llega a casi diecisiete kilómetros y la media pasa de «la acabo» a «la corro». Es la única sesión del plan que se sale del tope que me diste, y por eso te la dejo como decisión tuya y no como parte del plan.</p>
+      <p>El resto llega sin peros. El tenis, el pádel, el fútbol sala y el baloncesto salen gratis: quien tiene fuerza, capacidad aeróbica y algo de trabajo de salto los juega bien sin entrenarlos. Y la parte estética —volumen con definición, no delgadez— es exactamente lo que persigue esta periodización: nueve meses construyendo y doce semanas de déficit suave al final.</p>
+    </div>
+    <div class="vg">
+      <div><span class="v" id="v-peso">—</span><span class="l">Peso de partida</span></div>
+      <div><span class="v">39</span><span class="l">Semanas de plan</span></div>
+      <div><span class="v" id="v-vdot">—</span><span class="l">VO₂máx estimado hoy</span></div>
+      <div><span class="v" id="v-vdotf">—</span><span class="l">Objetivo en junio</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>Los seis bloques</h2></div>
+  <div class="stack">
+    <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
+    <div>
+      <div class="bloque-hd"><h3 id="b-n">—</h3><span class="meta" id="b-meta">—</span></div>
+      <div class="bloque-bd">
+        <p class="lema" id="b-lema">—</p>
+        <p id="b-foco">—</p>
+      </div>
+    </div>
+    <div class="tscroll">
+      <table>
+        <caption>Cómo cambian las series en el bloque elegido</caption>
+        <thead><tr><th>Escalón</th><th>Qué entra ahí</th><th class="num">Series</th><th class="num">Reps</th><th class="num">Esfuerzo</th></tr></thead>
+        <tbody id="t-esquema"></tbody>
+      </table>
+    </div>
+    <p class="nota">RIR es «repeticiones en reserva»: las que te quedarían si siguieras hasta no poder más. RIR 2 significa parar cuando te quedan dos. En el bloque de rearranque vas a RIR 4, que parece poquísimo y es justo lo que toca.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>Con cuánto peso empiezas</h2></div>
+  <div class="stack">
+    <div class="tscroll">
+      <table>
+        <caption>Estimación a partir de tus marcas y de dos meses parado</caption>
+        <thead><tr><th>Ejercicio</th><th class="num">1RM antes</th><th class="num">1RM hoy</th><th class="num">Semana 1</th><th class="num">Semana 4</th></tr></thead>
+        <tbody id="t-cargas"></tbody>
+      </table>
+    </div>
+    <div class="rules">
+      <div class="rule"><span class="i">01</span><p><b>Esos kilos de la semana 1 te van a parecer una broma y no lo son.</b> Después de ocho semanas parado se pierde entre un 10 y un 15 % de fuerza, pero lo que se pierde de verdad es la tolerancia del tendón. Vas al 60 % de lo que podrías mover porque el objetivo de las cuatro primeras semanas es llegar a la quinta sin molestias, no impresionar a nadie un martes de septiembre.</p></div>
+      <div class="rule"><span class="i">02</span><p><b>Vas a recuperar tus marcas alrededor de la semana 6.</b> La memoria muscular es real: los núcleos que ganaste entrenando siguen ahí. Volver a 70 de banca y 80 de sentadilla te va a costar seis semanas, no seis meses. A partir de ahí es terreno nuevo.</p></div>
+      <div class="rule"><span class="i">03</span><p><b>Progresión doble: primero repeticiones, luego kilos.</b> Cuando completes el extremo alto del rango en todas las series con el RIR que marca el bloque, sube el peso lo mínimo que permita el gimnasio y vuelve al extremo bajo. Nunca subas las dos cosas a la vez: es la forma más rápida de quedarte atascado.</p></div>
+      <div class="rule"><span class="i">04</span><p><b>Recalcula cada cuatro semanas.</b> Apunta kilos y repeticiones de la última serie buena de sentadilla, banca y peso muerto. Con eso sacas el 1RM estimado y sabes si el superávit está yendo a músculo. Si el peso sube y el 1RM no se mueve en dos mediciones seguidas, el superávit es demasiado grande.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">04</span><h2>Los dieciocho ejercicios, uno a uno</h2></div>
+  <div class="stack">
+    <p class="prose">Cada uno con su técnica, su sustituto si la máquina está ocupada y —lo que faltaba— cómo se organizan las series en cada tipo de bloque. Porque cuatro series de dominadas no significan lo mismo en octubre que en diciembre.</p>
+    <div id="ejercicios"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Los abdominales</h2></div>
+  <div class="stack">
+    <div class="veredicto" style="border-left-color:var(--amber)">
+      <p class="tit">Ocho rondas, <b>cinco minutos y veinte</b>, y ni un minuto más.</p>
+      <p id="tab-regla">—</p>
+      <p>El formato es el tuyo: tabata 20-20 con una isometría y un giro ruso con balón. Lo único que he cambiado es que en vez de una tabla única hay tres, una por día de fuerza, y cada una ataca una función distinta del core. La razón es que el abdominal se adapta rapidísimo a un estímulo repetido: con tres tablas rotando, la misma inversión de tiempo rinde bastante más durante bastante más tiempo.</p>
+      <p>El orden importa: los abdominales van siempre al final. Si los pones antes de la sentadilla o del peso muerto, el core llega fatigado al ejercicio que más lo necesita como estabilizador, y eso es exactamente al revés de lo que interesa.</p>
+    </div>
+    <div id="tablas"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">06</span><h2>Carrera: zonas y por qué</h2></div>
+  <div class="stack">
+    <div class="tscroll">
+      <table>
+        <caption>Ritmos a partir de tu 5k actual · recalcula después del test de la semana 4</caption>
+        <thead><tr><th>Zona</th><th class="num">Ritmo</th><th>Cómo se reconoce</th></tr></thead>
+        <tbody id="t-zonas"></tbody>
+      </table>
+    </div>
+    <div class="rules">
+      <div class="rule"><span class="i">01</span><p><b>El test de la semana 4 es lo que pone el plan en tu escala.</b> El último domingo del bloque de rearranque, 5 km a tope con el Garmin. Ese tiempo fija todas las zonas de los nueve meses siguientes. Repítelo al final de cada bloque: cinco tests en total.</p></div>
+      <div class="rule"><span class="i">02</span><p><b>El 80 % de tus kilómetros van en Z2 y te va a costar creerlo.</b> A 7:00 el kilómetro vas a sentir que pierdes el tiempo. No lo pierdes: la base aeróbica se construye a intensidad baja y volumen alto, y correr todo a ritmo medio es el error que hace que la gente se estanque durante años con el 5k en veintisiete minutos.</p></div>
+      <div class="rule"><span class="i">03</span><p><b>La regla del 10 % es la que te salva de la periostitis.</b> Nunca subas el volumen semanal más de un 10 % respecto a la semana anterior, aunque te encuentres perfecto. Cuando el volumen es bajo, el tope práctico es kilómetro y medio. Es la lesión que más planes de nueve meses ha roto y aparece justo cuando empiezas a ir bien.</p></div>
+      <div class="rule"><span class="i">04</span><p><b>Correr en ayunas está bien para la Z2 y mal para las series.</b> La tirada del jueves la puedes hacer en ayunas sin problema. El martes, con las series duras, necesitas el plátano y el batido de antes de salir: sin carbohidrato disponible no vas a alcanzar las intensidades que hacen que esa sesión sirva de algo.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">07</span><h2>Qué mirar cada semana</h2></div>
+  <div class="stack">
+    <p class="prose">Con Garmin, Strava y Hevy el seguimiento no te cuesta tiempo: solo hay que saber qué seis números importan y cuáles hay que ignorar. Diez minutos el domingo por la noche.</p>
+    <div class="tscroll">
+      <table>
+        <caption>Los seis números</caption>
+        <thead><tr><th>Qué</th><th>De dónde</th><th>Qué significa</th></tr></thead>
+        <tbody id="t-seguimiento"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">08</span><h2>Las siete reglas</h2></div>
+  <div class="rules" id="reglas"></div>
+</section>
+
+<footer>
+  La teoría del macrociclo de Abraham · 182 cm · 39 semanas · septiembre 2026<br>
+  Estimaciones de 1RM con la media de Epley y Brzycki; pérdida por desentrenamiento del 12 % sobre ocho semanas sin entrenar. VO₂máx estimado con las ecuaciones de Daniels y Gilbert. Todas son estimaciones poblacionales: el test de la semana 4 y las mediciones cada cuatro semanas son lo que las convierte en tus números.<br>
+  Esto es planificación deportiva, no consejo médico. Dolor articular que persiste más de una semana: para y consulta.
+</footer>
+</div>

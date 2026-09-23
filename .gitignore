@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+salida/
+fuente_junio2027.txt
+menu/pay_*.json

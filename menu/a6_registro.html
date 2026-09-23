@@ -1,0 +1,154 @@
+<style>
+.r-tabs{margin-top:20px}
+.r-vista{display:flex;flex-direction:column;gap:16px;margin-top:18px}
+.r-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;
+  display:flex;flex-direction:column;gap:12px}
+.r-card h3{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.r-card h4{font-size:16px;font-weight:700}
+.r-btn{font-family:var(--sans);font-weight:700;font-size:15px;border:none;border-radius:10px;
+  padding:11px 16px;background:var(--accent);color:#F2F4F1;cursor:pointer;white-space:nowrap}
+.r-btn.sec{background:var(--surface-2);color:var(--ink)}
+.r-btn.peligro{background:transparent;color:var(--clay);border:1px solid var(--line-2);font-size:13px;padding:8px 12px}
+.r-btn.full{width:100%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .r-btn:not(.sec):not(.peligro){color:#0D1211}}
+:root[data-theme="dark"] .r-btn:not(.sec):not(.peligro){color:#0D1211}
+.r-dos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.r-dias{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.r-prev{display:flex;flex-direction:column;gap:4px;background:var(--surface-2);border-radius:8px;padding:11px 14px}
+.r-prev div{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.r-prev b{font-family:var(--mono);font-size:13.5px;font-weight:600;white-space:nowrap}
+
+/* --- sesión en curso, al estilo Hevy --- */
+.r-top{position:sticky;top:56px;z-index:30;background:var(--ground);border-bottom:1px solid var(--line);
+  margin:0 -20px;padding:10px 20px;display:grid;grid-template-columns:1fr 1fr .8fr auto auto;
+  gap:10px;align-items:center}
+.r-top .k{font-family:var(--sans);font-size:11.5px;color:var(--ink-3)}
+.r-top .v{font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.r-top .v.acc{color:var(--accent-ink)}
+.r-x{width:36px;height:36px;border-radius:50%;border:none;background:var(--surface-2);color:var(--ink-2);
+  font-size:15px;cursor:pointer}
+.r-tit{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.r-ej{padding:18px 0 20px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.r-ej h3{font-size:19px;font-weight:700;color:var(--accent-ink);letter-spacing:-.01em}
+.r-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.r-tier{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent-ink)}
+.r-obj{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.r-cue{font-size:14px;color:var(--ink-3);line-height:1.4}
+.r-notas{width:100%;border:none;background:transparent;font-family:var(--serif);font-size:15px;
+  color:var(--ink-2);padding:2px 0;resize:none;outline:none}
+.r-notas::placeholder{color:var(--ink-3)}
+.r-desc{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--accent-ink);
+  display:flex;gap:6px;align-items:center}
+.r-fila{display:grid;grid-template-columns:40px minmax(0,1fr) 64px 64px 44px;gap:8px;align-items:center;
+  padding:4px 6px;margin:0 -6px;border-radius:9px}
+.r-fila.hecha{background:var(--accent-soft)}
+.r-hd span{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);text-align:center}
+.r-hd span:nth-child(2){text-align:left}
+.r-num{height:40px;border-radius:8px;border:none;background:var(--surface-2);font-family:var(--mono);
+  font-weight:700;font-size:15px;color:var(--ink);cursor:pointer}
+.r-num.C{color:var(--amber)} .r-num.F{color:var(--clay)}
+.r-ant{font-family:var(--mono);font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-in{height:40px;width:100%;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);
+  font-family:var(--mono);font-size:16px;text-align:center;color:var(--ink);padding:0 4px}
+.r-in::placeholder{color:var(--ink-3);opacity:.8}
+.r-in:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.r-ok{height:40px;border-radius:8px;border:none;background:var(--surface-2);color:var(--ink-3);
+  cursor:pointer;display:grid;place-items:center}
+.r-fila.hecha .r-ok{background:var(--accent);color:#F2F4F1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .r-fila.hecha .r-ok{color:#0D1211}}
+:root[data-theme="dark"] .r-fila.hecha .r-ok{color:#0D1211}
+.r-acc{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:4px}
+.r-abd{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px;
+  background:var(--amber-soft);border-radius:10px;margin-top:16px}
+.r-abd b{font-family:var(--sans)}
+
+/* --- descanso y avisos --- */
+.r-descanso{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--ink);color:var(--ground);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;
+  justify-content:center;gap:12px;font-family:var(--sans);font-size:15px}
+.r-descanso b{font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums;margin-left:6px}
+.r-descanso button{font-family:var(--sans);font-weight:700;font-size:13px;border:none;border-radius:8px;
+  padding:9px 12px;background:rgba(127,127,127,.25);color:inherit;cursor:pointer}
+.r-desc-bar{position:absolute;left:0;top:0;height:3px;background:var(--accent)}
+.r-aviso{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:70;background:var(--accent);
+  color:#F2F4F1;font-family:var(--sans);font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;
+  box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .r-aviso{color:#0D1211}}
+:root[data-theme="dark"] .r-aviso{color:#0D1211}
+[hidden]{display:none!important}
+
+/* --- formularios --- */
+.r-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r-form label{display:flex;flex-direction:column;gap:4px;font-family:var(--sans);font-size:12px;
+  font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.r-form input,.r-form select,.r-sel{height:44px;border-radius:8px;border:1px solid var(--line-2);
+  background:var(--surface);color:var(--ink);font-family:var(--mono);font-size:16px;padding:0 10px;width:100%}
+.r-form .ancho{grid-column:1/-1}
+.r-lista{display:flex;flex-direction:column}
+.r-lista div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;
+  border-bottom:1px solid var(--line);font-size:15px}
+.r-lista div:last-child{border-bottom:none}
+.r-lista b{font-family:var(--mono);font-weight:600;font-size:14px}
+.r-mini{border:none;background:none;color:var(--ink-3);font-size:15px;cursor:pointer;padding:4px 8px}
+
+/* --- progreso --- */
+.r-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.r-stats div{background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.r-stats .v{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.r-stats .k{font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.g-svg{width:100%;height:auto;display:block}
+.g-grid{stroke:var(--line);stroke-width:1}
+.g-eje{font-family:var(--mono);font-size:10px;fill:var(--ink-3)}
+.g-line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.g-pt{fill:var(--accent)}
+.g-pt2{fill:var(--ink-3);opacity:.55}
+.g-bar{fill:var(--accent)}
+.g-bar.des{fill:var(--line-2)}
+.g-plan{stroke:var(--clay);stroke-width:2}
+.g-ley{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:12px;color:var(--ink-3)}
+.g-ley i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:3px;margin-right:5px;background:var(--accent)}
+.g-ley i.p{background:var(--clay)} .g-ley i.d{background:var(--ink-3);width:7px;height:7px;border-radius:50%;opacity:.55;vertical-align:1px}
+.gb{display:grid;grid-template-columns:88px 1fr 58px;gap:10px;align-items:center;font-size:14px}
+.gb .pista{position:relative;height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.gb .rango{position:absolute;top:0;bottom:0;background:var(--accent-soft)}
+.gb .fill{position:absolute;left:0;top:2px;bottom:2px;border-radius:4px;background:var(--accent)}
+.gb .plan{position:absolute;top:0;bottom:0;width:2px;background:var(--clay)}
+.gb .n{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);text-align:right}
+
+/* --- historial --- */
+.r-hist{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.r-hist summary{padding:13px 16px;cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:2px}
+.r-hist summary::-webkit-details-marker{display:none}
+.r-hist summary b{font-family:var(--sans);font-size:15.5px}
+.r-hist summary span{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.r-hist .cuerpo{padding:0 16px 14px;display:flex;flex-direction:column;gap:10px}
+.r-hist h5{font-family:var(--sans);font-size:14.5px;font-weight:700;color:var(--accent-ink)}
+.r-hist p{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+.r-rec{font-family:var(--sans);font-size:14px;padding:8px 12px;border-radius:8px;background:var(--amber-soft);color:var(--ink)}
+@media (max-width:380px){.r-fila{grid-template-columns:36px minmax(0,1fr) 56px 56px 40px;gap:6px}}
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <p class="eyebrow">Registro · series, peso corporal y carrera</p>
+  <h1>Tu <em>registro</em></h1>
+  <p class="dek">Apunta cada serie como en Hevy, con lo que hiciste la última vez al lado. Todo se guarda en este móvil: haz una copia de vez en cuando desde «Historial».</p>
+</header>
+<div class="chips r-tabs" id="r-tabs" role="tablist" aria-label="Registro"></div>
+<div class="r-vista" id="r-vista"></div>
+<footer>
+  El registro vive solo en este navegador · la copia de «Historial» es tu seguridad y tu forma de pasarlo al PC<br>
+  1RM estimado con la media de Epley y Brzycki (solo Epley por encima de 10 repeticiones). En dominadas y flexiones cuenta tu peso corporal más el lastre. Las series de calentamiento (C) no cuentan para volumen ni récords.
+</footer>
+</div>
+<div class="r-descanso" id="r-descanso" hidden>
+  <div class="r-desc-bar" id="r-desc-bar"></div>
+  <button id="r-desc-menos">−15 s</button>
+  <span>Descanso<b id="r-desc-t">0:00</b></span>
+  <button id="r-desc-mas">+15 s</button>
+  <button id="r-desc-saltar">Saltar</button>
+</div>
+<div class="r-aviso" id="r-aviso" hidden></div>

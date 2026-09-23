@@ -1,0 +1,81 @@
+<style>
+.seccion{margin-bottom:13px;background:var(--surface);border:1px solid var(--line);
+  border-radius:3px;overflow:hidden}
+.seccion h4{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);
+  padding:9px 16px;display:flex;justify-content:space-between;gap:10px}
+.seccion h4 span{color:var(--ink-3);font-weight:500}
+.item{display:grid;grid-template-columns:22px 1fr auto auto;gap:13px;padding:11px 16px;
+  border-bottom:1px solid var(--line);align-items:center}
+.item:last-child{border-bottom:none}
+.item input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;margin:0}
+.item label{font-size:15.5px;cursor:pointer;line-height:1.35}
+.item.done{background:var(--surface-2)}
+.item.done label{text-decoration:line-through;color:var(--ink-3)}
+.item .cant{font-family:var(--mono);font-size:13px;color:var(--ink-2);white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.item .eur{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);white-space:nowrap;
+  font-variant-numeric:tabular-nums;min-width:54px;text-align:right}
+.item .vf{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);
+  margin-left:7px;vertical-align:1px}
+@media (max-width:600px){
+  .item{grid-template-columns:22px 1fr auto;row-gap:2px}
+  .item .eur{grid-column:2/4;text-align:left;min-width:0}
+}
+.barra-sup{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:15px 18px;background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  box-shadow:var(--shadow);position:sticky;top:0;z-index:5}
+.barra-sup .cuenta{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink-2)}
+.barra-sup .total{font-family:var(--mono);font-size:23px;font-weight:600;color:var(--accent-ink);
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.barra-sup .total small{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);display:block}
+.reset{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--line-2);background:transparent;color:var(--ink-3);cursor:pointer}
+.reset:hover{border-color:var(--clay);color:var(--clay)}
+.progreso{height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex:1;min-width:110px}
+.progreso div{height:100%;background:var(--accent);border-radius:3px;transition:width .18s}
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <p class="eyebrow">Lista de la compra · Mercadona · Una semana completa</p>
+  <h1>La compra de <em>la semana</em></h1>
+  <p class="dek">Cantidades exactas para los siete días del bloque que elijas, ordenadas por el recorrido del supermercado. Marca según echas al carro: se queda guardado en este navegador.</p>
+  <div class="hermanos">
+    <a class="hermano" href="https://claude.ai/artifact/RqGzzc6vLLoseYuJYQgjNr" target="_top">El entreno</a>
+    <a class="hermano" href="https://claude.ai/artifact/T36P6b5juBiQMHdDgRE2SM" target="_top">La teoría</a>
+    <a class="hermano" href="https://claude.ai/artifact/S9WiFnMkqmqLgYucuWMgV9" target="_top">Cómo funciona</a>
+    <a class="hermano" href="https://claude.ai/artifact/JZPFMRu2xADNwA9sZiKkJo" target="_top">Menús</a>
+    <span class="hermano yo">La compra</span>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>Tu bloque</h2></div>
+  <div class="stack">
+    <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
+    <p class="nota" id="f-nota">—</p>
+    <div class="barra-sup">
+      <span class="cuenta" id="cuenta">—</span>
+      <div class="progreso"><div id="prog" style="width:0%"></div></div>
+      <button class="reset" id="reset">Desmarcar todo</button>
+      <span class="total" id="total">—<small>Total de la semana</small></span>
+    </div>
+    <div id="lista"></div>
+    <div class="rules">
+      <div class="rule"><span class="i">01</span><p><b>La primera compra es más cara que las siguientes.</b> El aceite, la avena, el arroz, la pasta, los frutos secos y la crema de cacahuete duran entre dos y nueve semanas. La lista reparte su coste por semana, así que el primer sábado gastarás unos veinte euros más y a partir del segundo bastante menos.</p></div>
+      <div class="rule"><span class="i">02</span><p><b>El punto verde marca precio verificado en tienda.</b> El resto son estimaciones cercanas consultadas en septiembre de 2026 en Madrid. Los precios cambian: úsalos como orden de magnitud, no como presupuesto cerrado.</p></div>
+      <div class="rule"><span class="i">03</span><p><b>Congela el mismo día que compras.</b> La pechuga de pollo viene en bandejas grandes: divídela en raciones del tamaño que marca el menú y congélalas por separado. Sacar una la noche antes es lo que evita que acabes pidiendo comida a domicilio un martes.</p></div>
+      <div class="rule"><span class="i">04</span><p><b>La creatina no está en Mercadona.</b> Los 5 g diarios del plan los compras aparte: un bote de 500 g de monohidrato cuesta entre quince y veinte euros y te dura tres meses. Es el único suplemento del plan que no entra en esta lista.</p></div>
+      <div class="rule"><span class="i">05</span><p><b>Frutos secos y bolsitas de fruta son ahora material de mochila.</b> Cómpralos siempre, aunque te sobren de la semana anterior: son lo único que te sostiene las siete horas que pasas fuera de casa, y quedarte sin ellos un martes es quedarte sin comer hasta las diez de la noche.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Lista calculada para Abraham · septiembre 2026 · parte 3 de 3 del sistema «Cocina para Junio 2027»<br>
+  Cantidades para una semana con la distribución real de días: lunes y miércoles tipo A, martes y jueves tipo B, viernes tipo C, sábado tipo D y domingo tipo E.<br>
+  Precios de Mercadona consultados el 13-14 de septiembre de 2026 en Madrid.
+</footer>
+</div>

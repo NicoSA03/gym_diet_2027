@@ -1,0 +1,165 @@
+<style>
+.veredicto{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--clay);
+  border-radius:3px;padding:24px;display:flex;flex-direction:column;gap:13px}
+.veredicto .tit{font-family:var(--sans);font-size:clamp(20px,4.2vw,26px);font-weight:700;
+  letter-spacing:-.015em;line-height:1.22}
+.veredicto .tit b{color:var(--clay)}
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:3px}
+.vg div{background:var(--surface);padding:13px 15px;display:flex;flex-direction:column;gap:2px}
+.vg .k{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+.vg .v{font-family:var(--mono);font-size:15.5px;font-weight:500;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.vg{grid-template-columns:1fr}}
+
+.tipos-tabla td.dia{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.tipos-tabla td.pct{font-family:var(--mono);color:var(--clay);font-weight:600}
+.tipos-tabla tr.destacada td{background:var(--accent-soft)}
+
+.linea{display:flex;flex-direction:column}
+.ln{display:grid;grid-template-columns:58px 11px 1fr;gap:11px;padding:8px 20px;align-items:baseline}
+.ln:not(:last-child){border-bottom:1px solid var(--line)}
+.ln .h{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-2);
+  font-variant-numeric:tabular-nums}
+.ln .pt{width:9px;height:9px;border-radius:50%;background:var(--line-2);align-self:center}
+.ln .q{font-size:15px}
+.ln .tag{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:2px 6px;border-radius:2px;margin-left:8px;vertical-align:1px}
+.ln.casa .pt{background:var(--accent)}
+.ln.uni .pt{background:var(--amber)} .ln.uni .tag{background:var(--amber-soft);color:var(--amber)}
+.ln.trabajo .pt{background:var(--clay)} .ln.trabajo .tag{background:var(--clay-soft);color:var(--clay)}
+.ln.fuera{background:var(--surface-2)} .ln.fuera .q{color:var(--ink-3);font-style:italic}
+.ln.fuera .pt{background:transparent;border:1.5px solid var(--line-2)}
+
+.escenarios{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.escenarios{grid-template-columns:1fr}}
+.esc{background:var(--surface);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.esc summary{font-family:var(--sans);font-size:15.5px;font-weight:700;padding:14px 18px;
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.esc summary::-webkit-details-marker{display:none}
+.esc summary::after{content:"+";font-family:var(--mono);font-size:17px;color:var(--accent-ink);font-weight:400}
+.esc[open] summary::after{content:"–"}
+.esc[open] summary{border-bottom:1px solid var(--line);background:var(--surface-2)}
+.esc p{padding:14px 18px;font-size:15.5px;color:var(--ink-2);line-height:1.55}
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <p class="eyebrow">Cómo funciona el plan · Resumen y reglas · Sistema de tres piezas</p>
+  <h1>Cómo funciona <em>todo esto</em></h1>
+  <p class="dek">El porqué de cada decisión, las calorías de cada etapa del macrociclo y qué hacer cuando la vida se cruza. Los menús con los pesos y la lista de la compra están en los otros dos archivos.</p>
+  <div class="hermanos">
+    <a class="hermano" href="https://claude.ai/artifact/RqGzzc6vLLoseYuJYQgjNr" target="_top">El entreno</a>
+    <a class="hermano" href="https://claude.ai/artifact/T36P6b5juBiQMHdDgRE2SM" target="_top">La teoría</a>
+    <span class="hermano yo">Cómo funciona</span>
+    <a class="hermano" href="https://claude.ai/artifact/JZPFMRu2xADNwA9sZiKkJo" target="_top">Menús</a>
+    <a class="hermano" href="https://claude.ai/artifact/4qgvgmpPLgZtqEuXXpY8fe" target="_top">La compra</a>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>A dónde vamos</h2></div>
+  <div class="stack">
+    <div class="veredicto">
+      <p class="tit">No vas a estar en 85 kg definido en junio de 2027. <b>Vas a estar en 78,7 kg con menos de un 10 % de grasa y bajando de 22:30 en el 5 km</b>, que es un sitio mucho mejor.</p>
+      <p class="prose">85 kg al 10 % de grasa son 76,5 kg de masa magra, y hoy tienes unos 68. Eso serían +8,5 kg de músculo en cuarenta semanas, más del doble del techo fisiológico de alguien con tu base, y eso entrenando solo fuerza. Los 85 kg reales son el hito de 2028, repitiendo este mismo ciclo.</p>
+      <p class="prose">Además, meter tres carreras semanales en lugar de dos cardios suaves cuesta en torno a un <strong>18 % de la ganancia de músculo</strong>: pasas de +3,7 kg a +3,0 kg. A cambio ganas unos ocho puntos de VDOT y cinco minutos en el 5 km. Es un buen trato si quieres ser híbrido, pero quiero que sepas exactamente qué estás pagando.</p>
+      <div class="vg">
+        <div><span class="k">Hoy · sep 2026</span><span class="v">78,0 kg · 68,2 magra · 12,5 % grasa</span></div>
+        <div><span class="k">Pico de volumen · mar 2027</span><span class="v">83,5 kg · 72,3 magra · 13,3 %</span></div>
+        <div><span class="k">Objetivo · 20 jun 2027</span><span class="v">78,7 kg · 71,2 magra · 9,5 %</span></div>
+        <div><span class="k">Carrera</span><span class="v">5 km: 27:30 → 22:30 · VDOT 34 → 43</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>Las seis etapas</h2></div>
+  <div class="stack">
+    <p class="prose">El macrociclo son cuarenta semanas repartidas en seis bloques. Cada uno tiene su objetivo de calorías, y dentro de cada bloque cada tipo de día come una cantidad distinta. Elige un bloque para ver los números exactos.</p>
+    <div class="chips" id="fases" role="tablist" aria-label="Bloque del macrociclo"></div>
+    <div class="card">
+      <div class="card-top">
+        <h3 id="f-nombre">—</h3>
+        <span class="aside" id="f-fechas">—</span>
+      </div>
+      <div class="macro-row" id="f-macros"></div>
+      <div class="tscroll" style="border:none;border-radius:0">
+        <table class="tipos-tabla">
+          <caption>Lo que come cada tipo de día en este bloque</caption>
+          <thead><tr><th>Tipo de día</th><th>Cuándo</th><th class="num">kcal</th>
+            <th class="num">Prot.</th><th class="num">Grasa</th><th class="num">Carbo.</th>
+            <th class="num">Tomas</th></tr></thead>
+          <tbody id="f-tipos"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="nota" id="f-nota">—</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>Los cinco tipos de día</h2></div>
+  <div class="stack">
+    <p class="prose">Tu gasto va de 2.467 kcal un domingo a 4.308 un sábado: <strong>1.841 kcal de diferencia</strong>. Comer un número plano significaría pasarte casi 900 el día que descansas y quedarte 900 corto el día que más te exiges. Por eso cada día de la semana tiene su propio objetivo.</p>
+    <div class="chips" id="tipos" role="tablist" aria-label="Tipo de día"></div>
+    <div class="card">
+      <div class="card-top">
+        <h3 id="t-nombre">—</h3>
+        <span class="aside" id="t-mult">—</span>
+      </div>
+      <div class="linea" id="t-hor"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">04</span><h2>Las seis decisiones</h2></div>
+  <div class="rules">
+    <div class="rule"><span class="i">01</span><p><b>El grueso va al desayuno y a la comida: entre los dos, el 66 % del día.</b> Son las dos únicas tomas en las que estás en casa, sentado y con tiempo. Con diez minutos entre clases no se calienta ni se come un plato, así que todo lo que pese mucho tiene que caber antes de las tres de la tarde.</p></div>
+    <div class="rule"><span class="i">02</span><p><b>La tarde son dos cosas y ninguna decisión:</b> una bolsita de frutos secos a las cinco y un potito de fruta a las siete y media. Los frutos secos son la pieza clave porque concentran 600 kcal por cada 100 g: un puñado resuelve casi 200 kcal sin que pares a comer. Llévalos pesados desde casa, porque comiendo del paquete grande se van 400 kcal sin enterarte.</p></div>
+    <div class="rule"><span class="i">03</span><p><b>La cena es magra y la dejas hecha al mediodía.</b> Unos 34 g de proteína y solo 7 de grasa. Ese perfil no es casual: una hora antes de dormir quieres proteína, que alimenta la recuperación nocturna, y poca grasa, que es lo que retrasa el vaciado del estómago y te complica conciliar el sueño.</p></div>
+    <div class="rule"><span class="i">04</span><p><b>El desayuno es post-entreno y es la toma más cargada de carbohidrato del día:</b> unos 157 g con solo 23 de grasa. Vienes de entrenar, el músculo está receptivo, y la grasa a esa hora solo ralentizaría la digestión de lo que sí te interesa reponer.</p></div>
+    <div class="rule"><span class="i">05</span><p><b>El cazo es tu único mando manual.</b> Un cazo son 145 kcal: 40 g de arroz en crudo, 60 g de pasta, 200 g de patata o batata, 100 g de ñoquis, 30 g de avena o 45 g de pan. Si un día te pasas o te quedas corto, ajusta ahí. No toques nunca la proteína ni la verdura.</p></div>
+    <div class="rule"><span class="i">06</span><p><b>El sábado se queda corto a propósito y el domingo se pasa a propósito.</b> Entre que te levantas a las once y media y entras a trabajar a las seis no hay horas materiales para meter 4.300 kcal sin que te siente mal en el turno. Esas calorías las recupera el domingo. Cuadra a nivel de semana, que es el nivel que decide.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Cuando la vida se cruza</h2></div>
+  <div class="stack">
+    <p class="prose">Doce situaciones que van a pasar, con lo que hay que hacer en cada una. La regla de fondo es siempre la misma: <strong>un día no decide nada, una semana sí</strong>. Casi todo lo que aparece aquí se arregla volviendo al plan al día siguiente sin intentar compensar.</p>
+    <div class="escenarios" id="escenarios"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">06</span><h2>Cocina y compra</h2></div>
+  <div class="rules">
+    <div class="rule"><span class="i">01</span><p><b>Pesa en crudo.</b> Todos los gramos del archivo de menús son en crudo: arroz, pasta, avena y legumbre sin cocer, carne y pescado sin cocinar, patata y batata crudas y peladas. Si pesas el arroz cocido estarás comiendo un tercio de lo que crees.</p></div>
+    <div class="rule"><span class="i">02</span><p><b>La báscula de cocina es obligatoria las tres primeras semanas.</b> Cuesta diez euros. A partir de ahí calculas a ojo con menos del 10 % de error y solo pesas lo que más pesa en el total: cereales, patata y proteína.</p></div>
+    <div class="rule"><span class="i">03</span><p><b>La legumbre no se cocina.</b> Lentejas, garbanzos y alubias de bote, escurridos y enjuagados. Nutricionalmente son casi idénticos a los secos cocidos en casa y te ahorran cuarenta minutos de olla a la semana.</p></div>
+    <div class="rule"><span class="i">04</span><p><b>La fibra, sin tabla de cortar.</b> Gazpacho de brik (un vaso de 300 ml son dos raciones de hortaliza), verdura y guisantes congelados al microondas, y champiñón ya laminado. Las únicas verduras que ven el horno son el calabacín, el pimiento y la cebolla del domingo, que salen de la misma bandeja que las patatas.</p></div>
+    <div class="rule"><span class="i">05</span><p><b>El queso solo como ingrediente.</b> Diez o quince gramos rallados y fundidos sobre los ñoquis o la pasta, donde aporta sal y grasa pero no es el sabor principal. No hay tablas de queso ni tostas untadas en ningún día del plan.</p></div>
+    <div class="rule"><span class="i">06</span><p><b>Batch cooking, dos sesiones.</b> El domingo, setenta minutos: horno con patatas, batatas y las verduras asadas, las pechugas de la primera mitad de la semana y siete huevos cocidos. El miércoles, veinticinco: la pasta, el segundo arroz y descongelar lo de los dos días siguientes. Cada día, al cocinar la comida de las dos, dejas hecha la cena de esa noche: son cuatro minutos más en la misma sartén.</p></div>
+    <div class="rule"><span class="i">07</span><p><b>Suplementos que hacen algo.</b> Creatina monohidrato, 5 g al día, todos los días, entrenes o no. Proteína en polvo como comodidad. Vitamina D de octubre a marzo. Cafeína a 3 mg/kg antes de las sesiones duras, no todos los días. El resto del pasillo de la tienda no te va a mover la aguja.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">07</span><h2>Llévalo en el móvil</h2></div>
+  <div class="rules">
+    <div class="rule"><span class="i">01</span><p><b>No hace falta instalar nada.</b> Abre esta página en el navegador del móvil y usa «Añadir a pantalla de inicio»: en iPhone está en el botón de compartir de Safari, en Android en el menú de tres puntos de Chrome. Te deja un icono en el escritorio que abre a pantalla completa, sin barra de navegador. Funciona igual que una app, pero sin APK ni tienda.</p></div>
+    <div class="rule"><span class="i">02</span><p><b>Hazlo con las tres.</b> Esta, la de menús y la de la compra son tres páginas distintas con tres iconos distintos. Las pastillas de arriba saltan de una a otra, así que con añadir la de menús ya llegas a las demás en un toque.</p></div>
+    <div class="rule"><span class="i">03</span><p><b>Lo que marques se queda en ese móvil.</b> La fase, el día, las opciones de cada toma y las casillas de la compra se guardan en el navegador del teléfono donde las marcas. No se sincronizan entre móvil y ordenador: si haces la compra desde el móvil, márcala en el móvil.</p></div>
+    <div class="rule"><span class="i">04</span><p><b>Necesita conexión para cargar.</b> Una vez abierta funciona sola, pero la primera carga baja de internet. Si vas a estar sin cobertura —el súper del sótano, el gimnasio sin datos— ábrela antes de entrar o tira del PDF, que sí es cien por cien offline.</p></div>
+  </div>
+</section>
+
+<footer>
+  Resumen del plan de Abraham · 182 cm · septiembre 2026 · parte 1 de 3 del sistema «Cocina para Junio 2027»<br>
+  Estimaciones de composición corporal y gasto energético basadas en ecuaciones poblacionales: valídalas con tus propios datos en las tres primeras semanas del bloque B0.<br>
+  Esto es un plan de nutrición deportiva, no consejo médico. Si aparece dolor articular que persiste más de una semana, para y consulta.
+</footer>
+</div>

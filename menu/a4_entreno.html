@@ -1,0 +1,161 @@
+<style>
+.dia-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.dia-btn{font-family:var(--sans);font-size:13px;font-weight:700;padding:11px 4px;border-radius:3px;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer;
+  display:flex;flex-direction:column;gap:2px;align-items:center;transition:all .12s}
+.dia-btn small{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3)}
+.dia-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#F2F4F1}
+.dia-btn[aria-selected="true"] small{color:#F2F4F1;opacity:.75}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dia-btn[aria-selected="true"],
+  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:#0D1211}}
+:root[data-theme="dark"] .dia-btn[aria-selected="true"],
+:root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:#0D1211}
+.finde{grid-column:1/-1;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);text-align:center;padding:9px;
+  border:1px dashed var(--line-2);border-radius:3px;margin-top:2px}
+
+.fase-nota{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding:12px 16px;background:var(--accent-soft);border-radius:3px}
+.fase-nota b{font-family:var(--sans);font-size:14.5px;font-weight:700;color:var(--accent-ink)}
+.fase-nota span{font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  font-variant-numeric:tabular-nums}
+
+.ses{background:var(--surface);border:1px solid var(--line);border-radius:3px;overflow:hidden;
+  box-shadow:var(--shadow)}
+.ses-top{padding:18px 20px 16px;border-bottom:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.ses-top h3{font-size:21px;font-weight:700;letter-spacing:-.015em}
+.ses-top .sub{font-size:15px;color:var(--ink-3);font-family:var(--serif)}
+.ses-top .dur{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-ink);
+  border:1px solid var(--line-2);border-radius:999px;padding:4px 11px;white-space:nowrap}
+
+.cal-box{padding:13px 20px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.cal-box h5{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.cal-box ul{margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.cal-box li{font-size:14.5px;color:var(--ink-2);list-style:none}
+
+.ejer{padding:14px 20px;border-bottom:1px solid var(--line)}
+.ejer:last-of-type{border-bottom:none}
+.ejer .fila{display:grid;grid-template-columns:30px 1fr auto;gap:11px;align-items:baseline}
+.ejer .t{font-family:var(--mono);font-size:10px;font-weight:600;color:#F2F4F1;background:var(--accent);
+  border-radius:3px;padding:3px 0;text-align:center}
+.ejer .t.t2{background:var(--amber)}
+.ejer .t.t3{background:var(--ink-3)}
+.ejer .t.tf{background:var(--line-2);color:var(--ink-2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ejer .t{color:#0D1211}}
+:root[data-theme="dark"] .ejer .t{color:#0D1211}
+.ejer h4{font-size:16.5px;font-weight:700;letter-spacing:-.01em}
+.ejer .pres{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent-ink);
+  white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.ejer .pres small{display:block;font-size:11px;font-weight:500;color:var(--ink-3)}
+.ejer .cue{font-size:14px;color:var(--ink-3);margin:3px 0 0 41px;line-height:1.4}
+.ejer .est{margin:7px 0 0 41px;padding:8px 11px;background:var(--surface-2);border-radius:3px;
+  font-size:13.5px;color:var(--ink-2);line-height:1.45}
+.ejer .est b{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:2px}
+@media (max-width:480px){.ejer .cue,.ejer .est{margin-left:0}}
+
+.tab{background:var(--amber-soft);border-top:1px solid var(--line);padding:16px 20px;
+  display:flex;flex-direction:column;gap:9px}
+.tab h5{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ink)}
+.tab .reloj{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--amber);
+  letter-spacing:.06em;text-transform:uppercase}
+.tab .par{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:14.5px;color:var(--ink-2)}
+.tab .par .k{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--amber);padding-top:3px}
+.tab .par b{font-family:var(--sans);font-weight:700;color:var(--ink)}
+.tab .como{font-size:14px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:8px}
+.tab .como i{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);display:block}
+
+.ses-nota{padding:13px 20px;border-top:1px solid var(--line);font-size:14.5px;color:var(--ink-3);
+  font-style:italic}
+.carrera-caja{padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.carrera-caja .ppal{font-family:var(--sans);font-size:17px;font-weight:700;line-height:1.4}
+
+.kmline{display:grid;gap:5px;align-items:end;margin-top:4px}
+.kmline .col{display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end}
+.kmline .bar{flex:none;width:100%;background:var(--accent);border-radius:2px 2px 0 0;min-height:4px}
+.kmline .bar.des{background:var(--line-2)}
+.kmline .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.kmline .s{font-family:var(--mono);font-size:9px;color:var(--ink-3);opacity:.7}
+
+.zmini{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.zmini div{background:var(--surface);padding:11px 10px 12px;display:flex;flex-direction:column;gap:1px}
+.zmini .z{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink-3)}
+.zmini .r{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent-ink);
+  font-variant-numeric:tabular-nums}
+@media (max-width:560px){.zmini{grid-template-columns:repeat(2,1fr)}}
+
+.varcard{background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  margin-bottom:10px;overflow:hidden}
+.varcard summary{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  font-family:var(--sans);font-weight:700;font-size:16px;list-style:none}
+.varcard summary::-webkit-details-marker{display:none}
+.varcard summary::after{content:"+";font-family:var(--mono);font-size:19px;color:var(--accent-ink)}
+.varcard[open] summary::after{content:"–"}
+.varcard summary .tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  border:1px solid var(--line-2);border-radius:999px;padding:3px 9px;white-space:nowrap;
+  margin-left:auto;margin-right:8px}
+.varcard .cuerpo{padding:0 18px 16px;display:flex;flex-direction:column;gap:10px}
+.varcard .cuerpo p{font-size:15px;color:var(--ink-2)}
+.varcard .cuerpo .cuando{font-family:var(--mono);font-size:12.5px;color:var(--clay)}
+.varcard .ses-v{border-top:1px solid var(--line);padding-top:9px}
+.varcard .ses-v h5{font-family:var(--sans);font-size:14.5px;font-weight:700;margin-bottom:3px}
+.varcard .ses-v p{font-size:14.5px}
+.varcard .conserva{background:var(--accent-soft);border-radius:3px;padding:11px 13px;
+  font-size:14px;color:var(--accent-ink)}
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <p class="eyebrow">El día a día · 5 días · lunes a viernes a las 07:00</p>
+  <h1>Qué toca <em>hoy</em></h1>
+  <p class="dek">Eliges bloque y día y tienes la sesión entera: series, repeticiones, esfuerzo y cómo se organizan. El porqué de todo esto está en el archivo de teoría.</p>
+  <div class="hermanos">
+    <span class="hermano yo">El entreno</span>
+    <a class="hermano" href="https://claude.ai/artifact/T36P6b5juBiQMHdDgRE2SM" target="_top">La teoría</a>
+    <a class="hermano" href="https://claude.ai/artifact/S9WiFnMkqmqLgYucuWMgV9" target="_top">Cómo funciona</a>
+    <a class="hermano" href="https://claude.ai/artifact/JZPFMRu2xADNwA9sZiKkJo" target="_top">Menús</a>
+    <a class="hermano" href="https://claude.ai/artifact/4qgvgmpPLgZtqEuXXpY8fe" target="_top">La compra</a>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>La sesión de hoy</h2></div>
+  <div class="stack">
+    <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
+    <div class="fase-nota"><b id="f-n">—</b><span id="f-f">—</span></div>
+    <div class="dia-grid" id="dias"></div>
+    <div class="finde">Sábado y domingo · descanso completo</div>
+    <div class="ses" id="sesion"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>La carrera del bloque</h2></div>
+  <div class="stack">
+    <div class="zmini" id="zmini"></div>
+    <div class="ses">
+      <div class="ses-top"><h3>Kilómetros por semana</h3><span class="dur" id="km-tope">—</span></div>
+      <div class="carrera-caja">
+        <div class="kmline" id="kmline"></div>
+        <p class="nota">Las barras grises son semanas de descarga.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>Si no puedes seguir el plan</h2></div>
+  <div id="variantes"></div>
+</section>
+
+<footer>
+  El día a día de Abraham · lunes a viernes a las 07:00 · sábado y domingo, nada<br>
+  El porqué de cada decisión, el desglose completo de cada ejercicio, las cargas de arranque y el seguimiento semanal están en «La teoría».
+</footer>
+</div>
