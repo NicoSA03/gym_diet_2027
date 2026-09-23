@@ -386,3 +386,5 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 ---
 
 *Versión del sistema: 22 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · con Registro y app instalable.*
+
+*Publicación de pages*
