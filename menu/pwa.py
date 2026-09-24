@@ -3,13 +3,16 @@
 
 Genera, junto a docs/index.html (que escribe standalone.py):
   manifest.webmanifest   nombre, colores e iconos de la app
-  icon-192.png, icon-512.png   iconos dibujados aquí mismo, en Python puro
+  icon-192.png, icon-512.png   iconos de la app. Si ya existen NO se tocan: puedes
+                         poner ahí tu propio logo y se respeta. Solo si falta alguno
+                         se dibuja uno en Python puro (la mancuerna).
+                         Para volver a los dibujados: python3 menu/pwa.py --iconos
   sw.js                  service worker: guarda la app en el móvil para que abra sin internet
                          y se actualice sola cuando subes una versión nueva a GitHub
 
 Una PWA solo se instala desde una web con https (GitHub Pages) o desde localhost.
 Abierta como archivo suelto (doble clic) sigue funcionando, pero no se instala."""
-import json, math, os, re, struct, zlib
+import json, math, os, re, struct, sys, zlib
 
 DOCS = "docs"
 NOMBRE, CORTO = "Junio 2027", "Junio 2027"
@@ -45,14 +48,39 @@ def icono(n):
             + trozo(b"IDAT", zlib.compress(b"".join(filas), 9)) + trozo(b"IEND", b""))
 
 
+def medida(ruta):
+    """Lee el tamaño real de un PNG de su cabecera. Así el manifiesto dice la verdad
+       aunque metas una imagen de 1024 en el archivo que se llama icon-192."""
+    with open(ruta, "rb") as f:
+        d = f.read(24)
+    if d[:8] != b"\x89PNG\r\n\x1a\n":
+        sys.exit(f"{ruta} no es un PNG. Los iconos de la app tienen que ser PNG.")
+    return struct.unpack(">II", d[16:24])
+
+
 MANIFIESTO = {
     "name": NOMBRE, "short_name": CORTO, "lang": "es",
     "description": "Plan de entrenamiento, dieta y registro de Abraham, septiembre 2026 a junio 2027.",
     "start_url": "./", "scope": "./", "display": "standalone", "orientation": "portrait",
     "background_color": "#0D1211", "theme_color": "#%02X%02X%02X" % FONDO,
-    "icons": [{"src": f"icon-{s}.png", "sizes": f"{s}x{s}", "type": "image/png", "purpose": p}
-              for s in (192, 512) for p in ("any", "maskable")],
 }
+
+
+def iconos_del_manifiesto(propios):
+    """«maskable» significa: Android puede recortarte los bordes para encajar el icono
+       en su forma (círculo, cuadrado redondeado...). La mancuerna que dibuja este
+       archivo está pensada para eso, con el fondo a sangre. Un logo tuyo, no: si lo
+       declaramos maskable, Android le come las esquinas. Por eso solo se marcan como
+       maskable los iconos dibujados aquí."""
+    out = []
+    for s in (192, 512):
+        ruta = os.path.join(DOCS, f"icon-{s}.png")
+        w, h = medida(ruta)
+        fines = ("any", "maskable") if s not in propios else ("any",)
+        for p in fines:
+            out.append({"src": f"icon-{s}.png", "sizes": f"{w}x{h}",
+                        "type": "image/png", "purpose": p})
+    return out
 
 SW = """// Service worker de «Junio 2027» · versión %(v)s (lo genera menu/pwa.py)
 const V = "junio2027-%(v)s";
@@ -96,16 +124,28 @@ def main():
     assert 'rel="manifest"' in html and "serviceWorker" in html, \
         "docs/index.html no enlaza el manifiesto o no registra el service worker"
     v = m.group(1)
+
+    # Los iconos: los tuyos mandan. Solo se dibuja el que falte, o todos con --iconos.
+    forzar = "--iconos" in sys.argv
+    propios = set()
     for s in (192, 512):
-        open(os.path.join(DOCS, f"icon-{s}.png"), "wb").write(icono(s))
-    json.dump(MANIFIESTO, open(os.path.join(DOCS, "manifest.webmanifest"), "w", encoding="utf-8"),
+        ruta = os.path.join(DOCS, f"icon-{s}.png")
+        if forzar or not os.path.exists(ruta):
+            open(ruta, "wb").write(icono(s))
+        else:
+            propios.add(s)
+
+    manifiesto = dict(MANIFIESTO, icons=iconos_del_manifiesto(propios))
+    json.dump(manifiesto, open(os.path.join(DOCS, "manifest.webmanifest"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
     open(os.path.join(DOCS, "sw.js"), "w", encoding="utf-8").write(SW % {"v": v})
     open(os.path.join(DOCS, ".nojekyll"), "w").write("")      # GitHub Pages sirve los archivos tal cual
     faltan = [f for f in ("index.html", "manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png")
               if not os.path.exists(os.path.join(DOCS, f))]
     assert not faltan, f"faltan archivos de la app: {faltan}"
-    print(f"PWA lista en docs/ · versión {v} · iconos 192 y 512 · sin conexión")
+    detalle = ", ".join(f"{s}: " + ("tuyo " if s in propios else "dibujado ") +
+                        "%d×%d" % medida(os.path.join(DOCS, f"icon-{s}.png")) for s in (192, 512))
+    print(f"PWA lista en docs/ · versión {v} · iconos {detalle} · sin conexión")
 
 
 if __name__ == "__main__":
