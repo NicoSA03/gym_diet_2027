@@ -9,15 +9,15 @@ def chk(ok, txt):
     if not ok: fallos+=1
     print(("  OK  " if ok else "  FALLO ")+txt)
 
-print("== 1. Calendario continuo, en lunes, y 39 semanas ==")
+print(f"== 1. Ciclo continuo de {SEMANAS} semanas, sin fechas ==")
 cal=calendario()
-chk(sum(c['sem'] for c in cal)==39, f"suma de bloques = {sum(c['sem'] for c in cal)} semanas")
-chk(all(c['ini'].weekday()==0 for c in cal), "todos los bloques empiezan en lunes")
+chk(sum(c['sem'] for c in cal)==SEMANAS, f"suma de bloques = {sum(c['sem'] for c in cal)} semanas")
+chk(cal[0]['s0']==1, f"el primer bloque arranca en la semana {cal[0]['s0']}")
 for a,b in zip(cal,cal[1:]):
-    chk((b['ini']-a['fin']).days==1, f"{a['cod']} → {b['cod']} sin hueco ni solape")
-chk(cal[-1]['fin'].isoformat()=="2027-06-20", f"termina el {fecha(cal[-1]['fin'])}")
+    chk(b['s0']-a['s1']==1, f"{a['cod']} → {b['cod']} sin hueco ni solape")
+chk(cal[-1]['s1']==SEMANAS, f"el ciclo acaba en la semana {cal[-1]['s1']}")
 for c in cal:
-    print(f"       {c['cod']} {c['n']:24s} {c['sem']:2d} sem · {fecha(c['ini'])} → {fecha(c['fin'])} · dieta {c['dieta']}")
+    print(f"       {c['cod']} {c['n']:24s} {c['sem']:2d} sem · semanas {c['s0']:2d}–{c['s1']:2d} · dieta {c['dieta']}")
 
 print("\n== 2. Volumen semanal por grupo dentro de rango útil ==")
 GRANDES={"Cuádriceps","Isquios","Glúteo","Pectoral","Espalda","Hombro"}

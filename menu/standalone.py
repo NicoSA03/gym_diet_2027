@@ -197,7 +197,7 @@ def construir():
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GD plan">
-<meta name="description" content="Plan de entrenamiento y alimentación de Abraham, septiembre 2026 a junio 2027.">
+<meta name="description" content="Plan de entrenamiento y alimentación de Abraham: un ciclo de 39 semanas, repetible.">
 <title>planificacion_dieta_gym</title>
 <link rel="icon" href="{ICONO}">
 <link rel="apple-touch-icon" href="{ICONO}">

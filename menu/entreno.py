@@ -3,7 +3,7 @@
    Fuente única de verdad para la página interactiva y para la verificación."""
 import json, math, datetime as dt
 
-PESO = 79.5        # kg, media real de partida (22 sep 2026)
+PESO = 79.5        # kg, media real de partida
 TEST_5K = "27:30"   # último test de 5 km (mm:ss); fija las zonas de carrera
 OBJETIVO_5K = "23:00"  # 5 km objetivo en junio
 
@@ -13,9 +13,10 @@ def seg(mmss):
 ALTURA = 182
 
 # ---------------------------------------------------------------- bloques
-# 21 sep 2026 (lunes) → 20 jun 2027 (domingo) = 39 semanas
+# El ciclo son 39 semanas seguidas. No lleva fechas: la de inicio la pones tú
+# en la app, en el Registro, y de ahí salen los días concretos.
 FASES = {
-"F0": dict(n="Rearranque", sem=4, ini="2026-09-21",
+"F0": dict(n="Rearranque", sem=4,
   lema="Recuperar el tejido, no la fuerza",
   foco="Pesos suaves y lejos del fallo para que tendones y articulaciones se readapten.",
   esquema={"T1":(3,"8–10","RIR 4"), "T2":(3,"10–12","RIR 4"), "T3":(2,"12–15","RIR 3"), "TF":(3,"15–20","RIR 2")},
@@ -24,7 +25,7 @@ FASES = {
   jue="Continuo fácil de 30 a 45 min. Subes 5 minutos por semana y nada más.",
   km=[7, 8, 9, 7], des=[4], largo=(30, 45)),
 
-"F1": dict(n="Construcción I", sem=8, ini="2026-10-19",
+"F1": dict(n="Construcción I", sem=8,
   lema="El bloque que más músculo te va a dar",
   foco="Volumen alto y superávit calórico: acumula series de calidad.",
   esquema={"T1":(4,"6–8","RIR 2"), "T2":(3,"8–12","RIR 2"), "T3":(3,"12–15","RIR 1"), "TF":(3,"15–20","RIR 2")},
@@ -33,7 +34,7 @@ FASES = {
   jue="Tirada progresiva de 45 a 68 min. Al final del bloque son unos 10 km.",
   km=[10, 11, 12, 9, 13, 14, 15, 12], des=[4, 8], largo=(45, 68)),
 
-"F2": dict(n="Fuerza y supervivencia", sem=5, ini="2026-12-14",
+"F2": dict(n="Fuerza y supervivencia", sem=5,
   lema="Menos volumen, más peso",
   foco="Menos series y más peso para conservar lo ganado cuando falta tiempo o descanso.",
   esquema={"T1":(5,"3–5","RIR 2"), "T2":(3,"6–8","RIR 2"), "T3":(2,"10–12","RIR 2"), "TF":(3,"15–20","RIR 2")},
@@ -42,7 +43,7 @@ FASES = {
   jue="Tirada sostenida de 50 a 62 min, unos 9 km. Sin prisa: el bloque es de sobrevivir.",
   km=[14, 15, 16, 12, 17], des=[4], largo=(50, 62)),
 
-"F3": dict(n="Construcción II", sem=6, ini="2027-01-18",
+"F3": dict(n="Construcción II", sem=6,
   lema="El último empujón de volumen antes de definir",
   foco="El bloque con más series, aún en superávit: aprieta.",
   esquema={"T1":(4,"6–8","RIR 1"), "T2":(4,"8–12","RIR 1"), "T3":(3,"12–15","RIR 0–1"), "TF":(3,"15–20","RIR 2")},
@@ -51,7 +52,7 @@ FASES = {
   jue="Tirada larga de 62 a 75 min, hasta 11,5 km.",
   km=[18, 19, 20, 15, 21, 22], des=[4], largo=(62, 75)),
 
-"F4": dict(n="Definición natural", sem=12, ini="2027-03-01",
+"F4": dict(n="Definición natural", sem=12,
   lema="Doce semanas a 300 kcal de déficit, ni una más",
   foco="Déficit de 300 kcal: principales pesadas, menos accesorios.",
   esquema={"T1":(4,"5–7","RIR 2"), "T2":(3,"8–10","RIR 1"), "T3":(3,"12–15","RIR 1"), "TF":(3,"15–20","RIR 2")},
@@ -60,7 +61,7 @@ FASES = {
   jue="Tirada larga de 70 a 80 min, hasta 13 km. Es el tope que permite tu hora y veinte.",
   km=[22, 23, 24, 18, 24, 25, 26, 19, 25, 26, 24, 20], des=[4, 8, 12], largo=(70, 80)),
 
-"F5": dict(n="Pico y verano", sem=4, ini="2027-05-24",
+"F5": dict(n="Pico y verano", sem=4,
   lema="Bajar el ruido y quedarse con la señal",
   foco="Menos volumen y la misma intensidad para llegar fresco.",
   esquema={"T1":(3,"4–6","RIR 3"), "T2":(3,"8–10","RIR 2"), "T3":(2,"12–15","RIR 2"), "TF":(3,"15–20","RIR 2")},
@@ -367,15 +368,19 @@ dict(cod="MN", n="Sesión mínima", dias="1 día", dur="25–30 min",
 ]
 
 # ---------------------------------------------------------------- calendario
+# El plan se mide en SEMANAS, no en fechas. Un bloque va de la semana s0 a la s1
+# contando desde que empiezas. Qué día del calendario es cada semana lo resuelve
+# la app con la fecha de inicio que tú le das, así que el ciclo vale para
+# cualquier arranque y se puede repetir las veces que haga falta.
 def calendario():
     out=[]; sem=1
     for cod,f in FASES.items():
-        ini=dt.date.fromisoformat(f["ini"])
-        fin=ini+dt.timedelta(days=7*f["sem"]-1)
         out.append(dict(cod=cod, n=f["n"], sem=f["sem"], s0=sem, s1=sem+f["sem"]-1,
-                        ini=ini, fin=fin, dieta=f["dieta"]))
+                        dieta=f["dieta"]))
         sem+=f["sem"]
     return out
+
+SEMANAS = sum(f["sem"] for f in FASES.values())   # lo que dura un ciclo entero
 
 MES={1:"ene",2:"feb",3:"mar",4:"abr",5:"may",6:"jun",7:"jul",8:"ago",9:"sep",10:"oct",11:"nov",12:"dic"}
 def fecha(d): return f"{d.day} {MES[d.month]} {d.year}"

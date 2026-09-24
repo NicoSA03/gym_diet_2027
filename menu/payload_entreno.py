@@ -2,14 +2,14 @@
 import sys, json; sys.path.insert(0,'menu')
 from entreno import (FASES, EJ, DIAS, VARIANTES, REGLAS, SEGUIMIENTO, TABATA,
                      TABATA_REGLA, ESTRUCTURA, GENERICO, GRUPO, TEST_5K, OBJETIVO_5K, seg,
-                     calendario, fecha, arranque, zonas, vdot, PESO)
+                     calendario, SEMANAS, arranque, zonas, vdot, PESO)
 
 cal = {c["cod"]: c for c in calendario()}
 
 PAY = {
  "peso": PESO,
+ "semanas": SEMANAS,
  "fases": {k: dict(n=v["n"], lema=v["lema"], foco=v["foco"], sem=v["sem"],
-                   ini=fecha(cal[k]["ini"]), fin=fecha(cal[k]["fin"]),
                    s0=cal[k]["s0"], s1=cal[k]["s1"], dieta=v["dieta"],
                    esquema={t: list(p) for t, p in v["esquema"].items()},
                    pct=v["pct"], mar=v["mar"], jue=v["jue"],

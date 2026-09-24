@@ -2,7 +2,7 @@
  "name": "GD plan",
  "short_name": "GD plan",
  "lang": "es",
- "description": "Plan de entrenamiento, dieta y registro de Abraham, septiembre 2026 a junio 2027.",
+ "description": "Plan de entrenamiento, dieta y registro de Abraham: un ciclo de 39 semanas, repetible.",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
@@ -12,7 +12,7 @@
  "icons": [
   {
    "src": "icon-192.png",
-   "sizes": "192x192",
+   "sizes": "1024x1024",
    "type": "image/png",
    "purpose": "any"
   },

@@ -10,7 +10,11 @@ const nf = (n,d)=>Number(n).toLocaleString("es-ES",{maximumFractionDigits:d===un
 const num = v=>{ const x=parseFloat(String(v).replace(",",".")); return isFinite(x)?x:null; };
 
 // ---------------------------------------------------------------- almacenamiento
-function vacio(){ return {v:1, sesiones:[], peso:[], carrera:[], activa:null}; }
+// «inicio» es la fecha en la que empezaste el ciclo, la única que hay en todo el
+// sistema. De ella salen la semana y el bloque que te toca. Si algún día paras,
+// no hace falta ningún ajuste aparte: mueves la fecha de inicio hacia delante
+// tantas semanas como hayas estado fuera y todo vuelve a cuadrar.
+function vacio(){ return {v:1, inicio:null, sesiones:[], peso:[], carrera:[], activa:null}; }
 function cargaDatos(){
   try{ const t=localStorage.getItem(KEY); if(t){ const d=JSON.parse(t); if(d && d.v===1) return Object.assign(vacio(), d); } }catch(e){}
   return vacio();
@@ -34,11 +38,26 @@ const hoy = ()=>iso(new Date());
 const deIso = s=>{ const [a,m,d]=s.split("-").map(Number); return new Date(a,m-1,d); };
 const corta = s=>{ const d=deIso(s); return d.getDate()+" "+MES[d.getMonth()]; };
 const lunes = s=>{ const d=deIso(s); d.setDate(d.getDate()-(d.getDay()+6)%7); return iso(d); };
-function faseDe(s){
-  const ks = Object.keys(R.fases);
-  for(const k of ks){ const f=R.fases[k]; if(s>=f.ini && s<=f.fin) return k; }
-  return s < R.fases[ks[0]].ini ? ks[0] : ks[ks.length-1];
+// Semana del ciclo en la que cae una fecha, contando desde la fecha de inicio.
+// null = todavía no has puesto fecha. Menor que 1 = aún no has empezado. Mayor
+// que R.semanas = ciclo terminado.
+function semanaDe(s){
+  if(!D.inicio) return null;
+  const a = deIso(lunes(D.inicio)).getTime(), b = deIso(lunes(s)).getTime();
+  return Math.round((b-a)/6048e5) + 1;
 }
+// Bloque que toca en esa fecha, o null si no se puede saber (sin fecha de inicio
+// o ciclo terminado). Al terminar no encadena otro ciclo solo: eliges tú.
+function faseDe(s){
+  const ks = Object.keys(R.fases), w = semanaDe(s);
+  if(w===null) return null;
+  if(w < 1) return ks[0];
+  for(const k of ks){ const f=R.fases[k]; if(w>=f.s0 && w<=f.s1) return k; }
+  return null;
+}
+// Para lo que necesita un bloque sí o sí: el de hoy, y si no se sabe, el que
+// tengas elegido a mano.
+function faseHoy(){ return faseDe(hoy()) || selFase || Object.keys(R.fases)[0]; }
 function diaDe(s){ const w=(deIso(s).getDay()+6)%7; return w<5 ? w : null; }
 function fmtDur(seg){
   seg = Math.max(0, Math.floor(seg));
@@ -100,8 +119,25 @@ function pintaTabs(){
     b.append(c);
   });
 }
+// ---------------------------------------------------------------- fecha de inicio
+function pintaInicio(){
+  const i = document.getElementById("r-ini"), s = document.getElementById("r-sem");
+  if(i.value !== (D.inicio || "")) i.value = D.inicio || "";
+  const w = semanaDe(hoy());
+  s.classList.remove("fin");
+  if(w === null){ s.textContent = ""; }
+  else if(w < 1){ s.textContent = "· empiezas en " + (1-w) + (1-w===1 ? " semana" : " semanas"); }
+  else if(w > R.semanas){ s.textContent = "· ciclo terminado · elige bloque"; s.classList.add("fin"); }
+  else { s.textContent = "· semana " + w + " de " + R.semanas + " · " + faseDe(hoy()); }
+}
+document.getElementById("r-ini").addEventListener("change", function(){
+  D.inicio = this.value || null;
+  guarda(); selFase = null; render();
+  aviso(D.inicio ? "Fecha de inicio guardada" : "Fecha de inicio borrada");
+});
+
 function render(){
-  pintaTabs(); paraReloj();
+  pintaTabs(); paraReloj(); pintaInicio();
   const box = document.getElementById("r-vista"); box.replaceChildren();
   ({entrenar:vEntrenar, cuerpo:vCuerpo, progreso:vProgreso, historial:vHistorial})[vista](box);
 }
@@ -113,7 +149,7 @@ function vEntrenar(box){
   if(D.activa){ vSesion(box); return; }
   if(resumen) box.append(tarjetaResumen(resumen));
   const h = hoy();
-  if(selFase===null) selFase = faseDe(h);
+  if(selFase===null) selFase = faseHoy();
   if(selDia===null){ const d=diaDe(h); selDia = d===null ? 0 : d; }
   const f = R.fases[selFase], d = R.dias[selDia];
 
@@ -136,6 +172,9 @@ function vEntrenar(box){
     dg.append(b);
   });
   card.append(dg);
+  const w = semanaDe(h);
+  if(w !== null && w > R.semanas)
+    card.append(el("p","nota","Has terminado las "+R.semanas+" semanas del ciclo. Elige arriba con qué bloque sigues; si quieres empezar otro ciclo entero, pon la fecha de inicio de hoy."));
   if(diaDe(h)===null) card.append(el("p","nota","Hoy es fin de semana y el plan no entrena. Si aun así vas a recuperar una sesión, elige cuál."));
 
   card.append(el("h3",null,d.dia+" · "+d.n), el("p","nota",d.sub));
@@ -348,7 +387,7 @@ function formCarrera(tipoDef){
 }
 
 function vCuerpo(box){
-  const h = hoy(), fk = faseDe(h), f = R.fases[fk];
+  const h = hoy(), fk = faseHoy(), f = R.fases[fk];
   const c = el("div","r-card");
   c.append(el("h3",null,"Peso corporal"));
   const w = el("div","r-form");
@@ -496,7 +535,8 @@ function vProgreso(box){
     const l = iso(new Date(deIso(sem).getTime()-i*7*864e5));
     const fin = iso(new Date(deIso(l).getTime()+6*864e5));
     const km = D.carrera.filter(x=>x.f>=l && x.f<=fin).reduce((a,x)=>a+x.km,0);
-    const p = R.km_plan.find(x=>x[0]===l);
+    const w = semanaDe(l);                      // el plan va por semana, no por fecha
+    const p = w===null ? null : R.km_plan.find(x=>x[0]===w);
     items.push({et:corta(l), v:km, plan:p?p[1]:0, des:p?p[2]:false});
   }
   const g3 = el("div"); g3.innerHTML = svgBarras(items);
@@ -505,7 +545,7 @@ function vProgreso(box){
 
   // --- series por grupo esta semana
   const c4 = el("div","r-card");
-  const fk = faseDe(hoy()), f = R.fases[fk], l0 = lunes(hoy());
+  const fk = faseHoy(), f = R.fases[fk], l0 = lunes(hoy());
   c4.append(el("h3",null,"Series por grupo · esta semana"));
   const cnt = {}; R.musculos.forEach(m=>{ cnt[m]=0; });
   D.sesiones.filter(s=>s.fecha>=l0).forEach(s=>s.ej.forEach(e=>{

@@ -60,7 +60,7 @@ def medida(ruta):
 
 MANIFIESTO = {
     "name": NOMBRE, "short_name": CORTO, "lang": "es",
-    "description": "Plan de entrenamiento, dieta y registro de Abraham, septiembre 2026 a junio 2027.",
+    "description": "Plan de entrenamiento, dieta y registro de Abraham: un ciclo de 39 semanas, repetible.",
     "start_url": "./", "scope": "./", "display": "standalone", "orientation": "portrait",
     "background_color": "#000000", "theme_color": "#%02X%02X%02X" % FONDO,
 }

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Datos de la pestaña «Registro»: plantillas de sesión por bloque, descansos, músculos,
    volumen y kilómetros que marca el plan. El móvil solo pinta y guarda: los números salen de aquí."""
-import sys, json, datetime as dt; sys.path.insert(0, 'menu')
-from entreno import FASES, EJ, DIAS, TABATA, calendario, PESO
+import sys, json; sys.path.insert(0, 'menu')
+from entreno import FASES, EJ, DIAS, TABATA, calendario, SEMANAS, PESO
 
 # Segundos de descanso entre series según el escalón del ejercicio
 DESCANSO = {"T1": 180, "T2": 120, "T3": 90, "TF": 60}
@@ -37,15 +37,16 @@ def volumen_plan(esq):
 
 musculos = GRANDES + sorted({m for e in EJ.values() for m in e["m"]} - set(GRANDES))
 
-km_plan = []            # [lunes de la semana, km, ¿descarga?]
+km_plan = []            # [semana del ciclo (1 a 39), km, ¿descarga?]
 for k, f in FASES.items():
     for i, km in enumerate(f["km"]):
-        lunes = cal[k]["ini"] + dt.timedelta(weeks=i)
-        km_plan.append([lunes.isoformat(), km, (i + 1) in f["des"]])
+        km_plan.append([cal[k]["s0"] + i, km, (i + 1) in f["des"]])
+assert len(km_plan) == SEMANAS, "a algún bloque le faltan o le sobran semanas de km"
 
 PAY = {
     "peso": PESO,
-    "fases": {k: dict(n=f["n"], ini=cal[k]["ini"].isoformat(), fin=cal[k]["fin"].isoformat(),
+    "semanas": SEMANAS,
+    "fases": {k: dict(n=f["n"], s0=cal[k]["s0"], s1=cal[k]["s1"],
                       esquema={t: list(p) for t, p in f["esquema"].items()},
                       piso=6 if k in ("F0", "F5") else 10, plan=volumen_plan(f["esquema"]),
                       ritmo=RITMO[k], mar=f["mar"], jue=f["jue"])

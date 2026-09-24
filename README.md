@@ -1,4 +1,4 @@
-# Junio 2027 · plan de entreno y dieta
+# Plan de entreno y dieta
 
 Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene siete pestañas:
 
@@ -74,7 +74,7 @@ junio2027/
 `menu/entreno.py`, arriba del todo:
 
 ```python
-PESO = 79.5        # kg, media real de partida (22 sep 2026)
+PESO = 79.5        # kg, media real de partida
 ```
 
 Usa la **media de 7 días**, nunca el dato de un día suelto. Este número se muestra en la teoría y sirve de base para calcular la proteína por kilo que comprueba la verificación.
@@ -91,8 +91,8 @@ Usa la **media de 7 días**, nunca el dato de un día suelto. Este número se mu
 Las calorías están en `menu/modelo.py`, en `FASES`. El tercer número de cada línea son las kcal medias del bloque:
 
 ```python
-"B1": ("Construcción I", "Sem 5–12 · 19 oct → 13 dic 2026", 3400,175,85,484),
-#                                                           kcal  P   G   C
+"B1": ("Construcción I", "Sem 5–12",   3400,175,85,484),
+#                                      kcal  P   G   C
 ```
 
 Cuando subas o bajes kcal, cambia también los carbohidratos (C) en la misma proporción: 100 kcal son unos 25 g de C. Después ejecuta `python3 actualizar.py --recalcular`.
@@ -182,11 +182,21 @@ La verificación es estricta aquí:
 - **Ninguna subida** puede pasar del 10 % respecto a la semana anterior (o de +1,5 km si el volumen es bajo). Las semanas de descarga no cuentan en esta comprobación.
 - **La tirada del jueves** no puede pasar de 80 minutos.
 
-### Fechas o duración de un bloque
+### Duración de un bloque
 
-En `FASES`, `sem=` (número de semanas) e `ini="AAAA-MM-DD"` (fecha de inicio, siempre en lunes). Los bloques tienen que ir seguidos, sin huecos ni solapes, y la verificación exige 39 semanas en total, con final el 20 de junio de 2027.
+En `FASES`, `sem=` (número de semanas). No hay fechas en ninguna parte del código: el plan se mide en semanas desde que empiezas, y los bloques se encadenan solos en el orden en que están escritos. La verificación comprueba que sumen 39 semanas seguidas, sin huecos ni solapes.
 
-Si mueves un bloque de entreno, mueve también el texto de fechas del bloque de dieta equivalente en `menu/modelo.py` (`B0` ↔ `F0`, `B1` ↔ `F1`…).
+Si cambias la duración de un bloque de entreno, cambia también el rango de semanas del bloque de dieta equivalente en `menu/modelo.py` (`B0` ↔ `F0`, `B1` ↔ `F1`…), que es solo el texto que se enseña.
+
+### La fecha de inicio
+
+La pones tú en la app, en **Registro → «Fecha de inicio»**, y se guarda en el móvil junto al resto del registro. De ella salen dos cosas: en qué semana del ciclo estás y, por tanto, qué bloque te toca.
+
+Esa misma fecha es el ajuste cuando la vida se cruza: si paras dos semanas por una lesión o un viaje, muévela dos semanas hacia delante y todo vuelve a cuadrar. No hay ningún otro mando.
+
+Al pasar la semana 39 el plan **no** encadena otro ciclo por su cuenta: te avisa de que has terminado y eliges tú con qué bloque sigues. Si quieres empezar un ciclo entero de nuevo, pon la fecha de inicio de hoy.
+
+Mientras no haya fecha, la app funciona igual: eliges el bloque a mano y no se enseña ninguna semana.
 
 ### El Registro
 
@@ -453,4 +463,4 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 
 ---
 
-*Versión del sistema: 24 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · con Registro, app instalable y base de datos de alimentos y platos.*
+*Versión del sistema: 25 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · ciclo de 39 semanas sin fechas fijas, con Registro, app instalable y base de datos de alimentos y platos.*
