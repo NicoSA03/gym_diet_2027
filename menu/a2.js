@@ -30,6 +30,12 @@ function macrosDe(items, s){
   });
   return t;
 }
+function insignia(n){
+  const f = M.foods[n], q = f && f[5] ? f[5] : "—";
+  const b = el("i","cal "+(q==="—" ? "x" : q), q);
+  b.title = (f && f[6]) || "Faltan datos de la etiqueta";
+  return b;
+}
 function claveSel(){ return fase + "|" + dia; }
 function opcionDe(b){
   const k = claveSel()+"|"+b;
@@ -69,7 +75,8 @@ function pintaTomas(){
     const ing = el("div","ing");
     op.it.forEach(([n,base])=>{
       const d = el("div");
-      d.append(el("span",null,n), el("b",null, gramos(n,base,sN)+" g"));
+      const et = el("span"); et.append(document.createTextNode(n), insignia(n));
+      d.append(et, el("b",null, gramos(n,base,sN)+" g"));
       ing.append(d);
     });
     row.append(top, ops, ing);

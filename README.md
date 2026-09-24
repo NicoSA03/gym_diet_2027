@@ -19,7 +19,7 @@ El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de 
 ## 1. En 30 segundos
 
 ```bash
-# 1. Cambia el dato en menu/entreno.py (entreno) o en menu/modelo.py (dieta)
+# 1. Cambia el dato: menu/entreno.py (entreno) o datos/*.csv (alimentos y platos)
 # 2. Regenera todo
 python3 actualizar.py
 # 3. El resultado está en salida/Junio2027.html y la app instalable en docs/
@@ -38,11 +38,18 @@ junio2027/
 ├── actualizar.py        ← la única orden que necesitas
 ├── restaurar.py         ← reconstruye menu/ desde el paquete del proyecto de Claude
 ├── README.md
+├── datos/
+│   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
+│   └── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
 ├── menu/
 │   ├── entreno.py       ← TODO el entreno: peso, bloques, ejercicios, series, tabata, carrera, variantes
-│   ├── modelo.py        ← la dieta: calorías por bloque, platos, cenas, tomas, tipos de día
-│   ├── db.py            ← los alimentos: macros, formato de venta y precio de Mercadona
-│   ├── payload3.py      ← en qué pasillo del súper está cada alimento
+│   ├── modelo.py        ← la dieta: calorías por bloque, tomas del día, tipos de día
+│   ├── db.py            ← carga datos/alimentos.csv y lo deja listo para el resto
+│   ├── platos.py        ← carga datos/platos.csv y comprueba que todo cuadre
+│   ├── generar.py       ← INVENTA PLATOS: tú pides calorías, él resuelve los gramos
+│   ├── calidad.py       ← la nota A–D de cada alimento, con sus reglas a la vista
+│   ├── ver_alimentos.py ← verificación de la base de datos y lista de datos que faltan
+│   ├── ver_platos.py    ← verificación de los platos: que encajen en su toma y las raciones sean de verdad
 │   ├── payload_registro.py ← datos del Registro: descansos, ejercicios de peso corporal, volumen y km del plan
 │   ├── pwa.py           ← convierte docs/ en app instalable: manifiesto, iconos y modo sin conexión
 │   ├── ver_entreno.py   ← verificación del entreno
@@ -56,7 +63,7 @@ junio2027/
     ├── manifest.webmanifest, sw.js, icon-192.png, icon-512.png
 ```
 
-**Regla de oro:** el 95 % de los cambios se hacen en `menu/entreno.py`. El resto, en `menu/modelo.py` y `menu/db.py`.
+**Regla de oro:** los cambios de entreno se hacen en `menu/entreno.py`; los de dieta, en los dos CSV de `datos/`. Solo hace falta tocar Python para cambiar las calorías de un bloque o las horas de las tomas (`menu/modelo.py`).
 
 ---
 
@@ -197,55 +204,98 @@ Las sesiones del Registro salen solas de `DIAS` y `FASES` de `menu/entreno.py`: 
 
 ## 4. Cambios en la dieta
 
-### Cambiar un plato o una cena
+### Cambiar o añadir un plato
 
-`menu/modelo.py`, listas `COMIDA` (7 platos) y `CENA` (7 cenas). Cada una es un nombre y una lista de `(alimento, gramos_base)`:
+Todos los platos están en **`datos/platos.csv`**, una fila por plato, y se edita igual que `alimentos.csv`:
 
-```python
-("Lentejas con huevo", [("Lentejas cocidas (bote)",520),("Pan integral de molde",110),
-                        ("Huevos",140),("Verdura congelada",150),("Aceite de oliva virgen ex.",22)]),
+| Columna | Qué poner |
+|---|---|
+| `toma` | A qué toma pertenece: `C` comida, `N` cena, `D` desayuno, `P` pre-entreno, `S1` frutos secos, `S2` potito, `T` y `T2` turno, `Z` antes de dormir |
+| `plato` | El nombre que sale en la app |
+| `alimentos` | Los ingredientes separados por barra vertical (`|`), escritos **exactamente** como en `alimentos.csv` |
+| `gramos` | Los gramos de cada uno, en el mismo orden y separados por barra |
+| `notas` | Para ti; la app no los usa |
+
+```
+C;Pasta con pollo;Pasta integral|Pechuga de pollo|Champiñón laminado|Aceite de oliva virgen ex.;220|145|250|25;
 ```
 
-Los gramos que pones aquí son de **referencia**: el sistema los escala para cada bloque y tipo de día, y además iguala solo las calorías entre las siete opciones, así que elijas el plato que elijas el día cuadra. Aun así, intenta que todos sumen parecido (unos 1.200–1.250 kcal las comidas y unas 475 las cenas). Si uno pesa mucho más o mucho menos que el resto, el sistema tendrá que encogerlo o estirarlo, y las porciones quedarán raras. La verificación avisa si algún alimento principal acaba en una cantidad absurda.
+Dos cosas que conviene tener claras:
+
+- **Los gramos son la receta base, no lo que vas a comer.** El sistema los escala para cada bloque y tipo de día, y además iguala las calorías entre todas las opciones de una toma, así que elijas el plato que elijas el día cuadra. Por eso un plato nuevo tiene que salir con calorías parecidas a sus compañeros de toma (unas 1.225 las comidas, unas 475 las cenas): si se sale mucho, el sistema tendrá que encogerlo o estirarlo y las porciones quedarán raras. `python3 menu/ver_platos.py` te avisa.
+- **En la comida y la cena, las siete primeras filas son la semana por defecto**, de lunes a domingo, y son las que entran en la lista de la compra. Las demás están ahí como alternativas para elegir a mano en la app.
 
 Después: `python3 actualizar.py --recalcular`.
 
-### Añadir un alimento nuevo (así se añadió el kéfir)
+### Inventar platos nuevos sin pensar los gramos
 
-**1.** En `menu/db.py`, dentro de `F`:
+`menu/generar.py` monta platos con los alimentos que ya tienes y calcula **los gramos exactos** para las calorías que le pidas. No necesita internet ni nada de fuera: es aritmética, y siempre da el mismo resultado.
 
-```python
-"Kéfir natural":  (63, 3.4, 3.5, 4.5,  500,  1.25, "fijo", "e"),
-#                  kcal P   G    C   formato precio grupo  fuente
+```bash
+# Propuestas de comida con las calorías que hacen falta para encajar en la app
+python3 menu/generar.py comida
+
+# Una cena suelta de 700 kcal y 55 g de proteína, para hoy
+python3 menu/generar.py cena --kcal 700 --proteina 55
+
+# Ocho ideas sin salmón, con patata sí o sí, de calidad B o mejor
+python3 menu/generar.py comida --sin "Salmón fresco" --con Patata --nota B --n 8
+
+# Guardar la propuesta número 3 en datos/platos.csv
+python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"
 ```
 
-- `grupo`: `carb`, `grasa` y `prot` se escalan según el bloque; `fijo` no se escala nunca.
-- `fuente`: `"f"` si has comprobado el precio en tienda (sale con punto verde en la lista de la compra), `"e"` si es una estimación.
+Cómo trabaja: coge una base, una proteína, una verdura y una grasa; descarta las combinaciones que no pegan; resuelve los gramos que clavan tus objetivos; tira las raciones absurdas; y ordena lo que queda por nota de calidad y precio. Si no le dices calorías, usa las de la toma, que es lo que necesita un plato para entrar en la app sin descuadrar nada.
 
-**2.** En `menu/payload3.py`, en `SECCION`, dile en qué pasillo está:
+Las reglas están arriba del archivo, a la vista y para que las cambies: `NO_JUNTOS` son las parejas que no pegan, `NO_DE_PLATO` lo que no quieres ver en una comida por mucho que cuadren los números, y `RACION` el mínimo y el máximo razonables de cada alimento.
 
-```python
-"Kéfir natural":"Huevos y lácteos",
-```
+Lo que propone son **ideas con los números resueltos**, no recetas probadas. Léelas antes de guardarlas: el programa sabe de aritmética, no de cocina.
 
-Si te saltas este paso, el montaje se para con un error que dice qué alimento falta.
+### Añadir un alimento nuevo
 
-**3.** Úsalo en un plato o en una toma (`BLOQUES`, en `menu/modelo.py`) y ejecuta `python3 actualizar.py --recalcular`. El kéfir entró como cuarta opción del desayuno:
+Todo pasa en **`datos/alimentos.csv`**, una fila por alimento. Se abre con Excel (o con el Bloc de notas): el separador es el punto y coma y los decimales van con coma, como los guarda Excel en español.
 
-```python
-("Avena con kéfir", [("Copos de avena Hacendado",165),("Leche semidesnatada",380),
-                     ("Kéfir natural",210),("Plátano",160),("Proteína en polvo",20)]),
-```
+| Columna | Qué poner |
+|---|---|
+| `nombre` | Tal cual lo vas a escribir en los platos. Si lo cambias, cámbialo también en los platos |
+| `kcal`, `proteina`, `grasa`, `carbohidrato` | Por 100 g. Obligatorios |
+| `azucares`, `fibra`, `sal`, `saturadas` | Por 100 g, de la etiqueta. Déjalos vacíos si aún no los tienes: vacío significa «no lo sé», no cero |
+| `formato_g` | Gramos del envase que compras (1000 para un kilo, 570 para un bote…) |
+| `precio_eur` | Lo que cuesta ese envase |
+| `grupo` | `carb`, `grasa` o `prot` si debe escalar con el bloque; `fijo` si no |
+| `seccion` | Pasillo del súper: Frutería, Carnicería, Pescadería, Huevos y lácteos, Refrigerados, Congelados, Conservas y despensa o Panadería |
+| `nova` | Grado de procesado, de 1 a 4 (ver más abajo) |
+| `fuente` | `f` si el precio lo has visto en tienda (sale con punto verde en la compra), `e` si es estimación |
+| `rol` | Qué papel juega en un plato: `base`, `proteina`, `verdura`, `grasa`, `fruta` o `lacteo`. Lo usa `generar.py` para no combinar cualquier cosa con cualquier cosa |
+| `notas` | Lo que quieras recordar |
 
-El kéfir tiene un tercio de la proteína del queso batido, así que la opción lleva proteína en polvo y no lleva crema de cacahuete. Con eso queda con los mismos macros que «Avena completa».
+Después, úsalo en un plato de `datos/platos.csv` y ejecuta `python3 actualizar.py --recalcular`.
 
-### Añadir una alternativa a una toma
+### La nota de calidad (A, B, C, D)
 
-Cada toma de `BLOQUES` (pre-entreno, desayuno, frutos secos, potito, turno, antes de dormir) es una lista de opciones con sus gramos base. Para añadir una, pon una línea más en la lista. No hace falta que sume exactamente lo mismo que las otras: el sistema iguala las calorías de todas las opciones de una toma automáticamente, así que da igual cuál elijas en la pestaña Menús. Solo procura que tenga parecida proteína, porque eso no se iguala. Después, `--recalcular`.
+Cada alimento lleva una letra que se calcula sola en `menu/calidad.py` y aparece en Menús y en La compra; al pasar el dedo o el ratón por encima te dice **por qué**. Se parte de 100 puntos:
+
+- **Procesado (NOVA):** 1 sin procesar (−0), 2 ingrediente de cocina como el aceite (−5), 3 procesado como una conserva (−20), 4 ultraprocesado (−35).
+- **Azúcares por 100 g:** hasta 5 no resta, de 5 a 22,5 resta 10, por encima resta 25.
+- **Sal por 100 g:** hasta 0,3 no resta, de 0,3 a 1,5 resta 8, por encima resta 20.
+- **Grasa saturada por 100 g:** hasta 1,5 no resta, de 1,5 a 5 resta 6, por encima resta 15.
+- **Fibra por 100 g:** de 3 a 6 suma 4, a partir de 6 suma 8.
+
+A partir de 85 es A, de 70 a 84 B, de 50 a 69 C, y por debajo D. Si falta algún dato de la etiqueta el alimento sale como «—» y no se inventa nota.
+
+Los cortes son por 100 g de producto, así que castigan a los alimentos grasos aunque la grasa sea buena: el aceite de oliva se queda en B por sus saturadas. Es el precio de una regla simple y comprobable. Lo que de verdad decide es **cuánto** comes de cada cosa, y de eso se encarga el menú. Si algún criterio no te convence, cámbialo en `menu/calidad.py` y se recalcula todo.
+
+`python3 menu/ver_alimentos.py` te dice, en cualquier momento, qué alimentos siguen sin datos de etiqueta y cuáles se quedan en C o D.
+
+### Añadir una alternativa a una toma pequeña
+
+El pre-entreno, el desayuno, los frutos secos, el potito, el kit del turno y lo de antes de dormir funcionan igual que las comidas: una fila más en `datos/platos.csv` con su código de toma. El sistema iguala las calorías de todas las opciones de una toma, así que da igual cuál elijas en la app. Solo procura que tenga parecida proteína, porque eso no se iguala. Después, `--recalcular`.
+
+Las horas y los nombres de las tomas (no los platos) están en el diccionario `TOMAS`, al principio de `menu/modelo.py`.
 
 ### Precios
 
-`menu/db.py`, el sexto número de cada alimento. La lista de la compra y el total semanal se recalculan solos.
+`datos/alimentos.csv`, columna `precio_eur`. La lista de la compra y el total semanal se recalculan solos.
 
 ---
 
@@ -304,7 +354,7 @@ En el pie del archivo aparece `versión xxxxxxxx`: una huella de todo su conteni
 
 ## 6. La verificación
 
-`actualizar.py` ejecuta dos baterías de comprobaciones antes de construir nada.
+`actualizar.py` ejecuta cuatro baterías de comprobaciones antes de construir nada.
 
 **Entreno** (`ver_entreno.py`):
 
@@ -316,6 +366,21 @@ En el pie del archivo aparece `versión xxxxxxxx`: una huella de todo su conteni
 - Carrera: regla del 10 %, un valor de km por semana, tirada de 80 minutos como máximo.
 - Cargas de arranque coherentes y cada bloque de entreno enlazado a su bloque de dieta.
 
+**Alimentos** (`ver_alimentos.py`):
+
+- Las calorías declaradas cuadran con los macros (4/4/9, y 2 por la fibra).
+- Los azúcares no pasan del carbohidrato ni las saturadas de la grasa.
+- Todo alimento tiene grupo de escalado y pasillo, y valores dentro de lo posible.
+- Lista de los alimentos sin datos de etiqueta y de los que se quedan en C o D.
+
+**Platos** (`ver_platos.py`):
+
+- Cada toma tiene platos suficientes (siete como mínimo la comida y la cena).
+- Todos los platos de una toma valen lo mismo, ±12 % o ±25 kcal.
+- Ninguna ración se sale de lo razonable, ni por arriba ni por abajo.
+- Ningún ingrediente repetido dentro del mismo plato.
+- Nota de calidad de cada plato y aviso de los que la tienen calculada a medias porque a algún ingrediente le faltan los datos de la etiqueta.
+
 **Dieta** (`ver_menu.py`):
 
 - Cada día cae dentro del ±5 % de su objetivo de calorías.
@@ -324,10 +389,12 @@ En el pie del archivo aparece `versión xxxxxxxx`: una huella de todo su conteni
 - Proteína de al menos 1,8 g por kilo.
 - Ninguna porción absurda (1,3 kg de patata no cuenta como comida).
 
-Si algo falla verás líneas que empiezan por `FALLO` con el motivo. Puedes ejecutar cualquiera de las dos por separado para ver el informe completo:
+Si algo falla verás líneas que empiezan por `FALLO` con el motivo. Puedes ejecutar cualquiera por separado para ver el informe completo:
 
 ```bash
 python3 menu/ver_entreno.py
+python3 menu/ver_alimentos.py
+python3 menu/ver_platos.py
 python3 menu/ver_menu.py
 ```
 
@@ -372,7 +439,8 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 
 | Qué ves | Qué pasa | Qué hacer |
 |---|---|---|
-| `KeyError: 'Kéfir natural'` | Alimento nuevo sin pasillo asignado | Añádelo a `SECCION` en `menu/payload3.py` |
+| `KeyError` con el nombre de un alimento | Está en un plato pero no en `datos/alimentos.csv`, o escrito distinto | Revisa que el nombre sea idéntico, tildes incluidas |
+| `datos/alimentos.csv, línea 12 (…): falta «kcal»` | Una fila incompleta | Rellena esa casilla; las de azúcares, fibra, sal y saturadas sí pueden ir vacías |
 | `KeyError` con el nombre de un ejercicio | Está en `DIAS` pero no en `EJ`, o está mal escrito | Revisa que el nombre sea idéntico en los dos sitios, tildes incluidas |
 | `FALLO F1: 7 semanas de kilometraje para 8 semanas de bloque` | `km` no tiene un valor por semana | Iguala la longitud de `km` a `sem` |
 | `FALLO … subidas … F1s3: 12→15 km` | Subida de más del 10 % | Reparte la subida en más semanas |
@@ -385,6 +453,4 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 
 ---
 
-*Versión del sistema: 22 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · con Registro y app instalable.*
-
-*Publicación de pages*
+*Versión del sistema: 24 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · con Registro, app instalable y base de datos de alimentos y platos.*

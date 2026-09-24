@@ -4,7 +4,8 @@
 
 Uso:
     python3 actualizar.py                 cambios normales (peso, test de 5 km, ejercicios, series...)
-    python3 actualizar.py --recalcular    si has tocado platos, alimentos o kcal de fase
+    python3 actualizar.py --recalcular    si has tocado datos/platos.csv, datos/alimentos.csv
+                                          o las kcal de una fase
     python3 actualizar.py --paginas       genera también las páginas sueltas para claude.ai
     python3 actualizar.py --empaquetar    genera fuente_junio2027.txt para subirlo al proyecto
     python3 actualizar.py --probar        sirve docs/ en http://localhost:8000 para probar la app
@@ -17,14 +18,16 @@ import argparse, os, subprocess, sys, time
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 os.chdir(RAIZ)
 
-FUENTE = ["db.py", "modelo.py", "entreno.py", "payload3.py", "payload_info.py",
-          "payload_entreno.py", "construir.py", "standalone.py",
-          "ver_entreno.py", "ver_menu.py", "base.css",
+FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "payload_info.py",
+          "payload_entreno.py", "construir.py", "standalone.py", "generar.py",
+          "ver_entreno.py", "ver_menu.py", "ver_alimentos.py", "ver_platos.py",
+          "calidad.py", "base.css",
           "a1_info.html", "a1.js", "a2_menus.html", "a2.js", "a3_compra.html", "a3.js",
           "a4_entreno.html", "a4.js", "a5_teoria.html", "a5.js",
           "payload_registro.py", "a6_registro.html", "a6.js", "pwa.py",
           "factores.json", "normas.json", "md.py"]
-RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore"]
+RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore",
+               "datos/alimentos.csv", "datos/platos.csv"]
 
 
 def paso(titulo, script, *args, obligatorio=True, silencioso=False):
@@ -76,6 +79,8 @@ def main():
     if a.recalcular:
         paso("Recalculando factores de la dieta (≈20 s)", "modelo.py", silencioso=True)
 
+    ok0 = paso("Verificando los alimentos", "ver_alimentos.py", obligatorio=False, silencioso=True)
+    okp = paso("Verificando los platos", "ver_platos.py", obligatorio=False, silencioso=True)
     paso("Datos de la dieta y la compra", "payload3.py", silencioso=True)
     paso("Datos de «Cómo funciona»", "payload_info.py", silencioso=True)
     paso("Datos del entreno", "payload_entreno.py", silencioso=True)
@@ -83,7 +88,7 @@ def main():
 
     ok1 = paso("Verificando el entreno", "ver_entreno.py", obligatorio=False, silencioso=True)
     ok2 = paso("Verificando la dieta", "ver_menu.py", obligatorio=False, silencioso=True)
-    if not (ok1 and ok2) and not a.forzar:
+    if not (ok0 and okp and ok1 and ok2) and not a.forzar:
         sys.exit("\n✗ La verificación ha encontrado fallos. No se ha generado nada nuevo.\n"
                  "  Mira las líneas FALLO de arriba. Si sabes lo que haces: --forzar")
 

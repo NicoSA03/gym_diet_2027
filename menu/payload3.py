@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys, json, math; sys.path.insert(0,'menu')
-from db import F, macros
+from db import F, A, SECCION, macros
+from calidad import calidad
 from modelo import BLOQUES, FASES, TIPOS, ORDEN_TOMAS, escalar, dia_totales, normas
 FACT=json.load(open('menu/factores.json'))
 NORM=json.load(open('menu/normas.json'))
@@ -10,7 +11,10 @@ usados=set()
 for b,(n,h,nota,ops) in BLOQUES.items():
     for _,items in ops:
         for f,_ in items: usados.add(f)
-FOODS={f:[F[f][0],F[f][1],F[f][2],F[f][3],F[f][6]] for f in sorted(usados)}
+def nota(f):
+    c = calidad(A[f])
+    return [c["letra"], " · ".join(c["motivos"])] if c else ["—", "Faltan datos de la etiqueta"]
+FOODS={f:[F[f][0],F[f][1],F[f][2],F[f][3],F[f][6]]+nota(f) for f in sorted(usados)}
 
 PAY={
  "foods":FOODS,
@@ -29,25 +33,6 @@ print("menús:", len(open('menu/pay_menus.json',encoding='utf8').read())//1024, 
 # ---- lista de la compra: semana real (L=A, M=B, X=A, J=B, V=C, S=D, D=E) ----
 SEMANA=[("Lunes","A",0),("Martes","B",1),("Miércoles","A",2),("Jueves","B",3),
         ("Viernes","C",4),("Sábado","D",5),("Domingo","E",6)]
-SECCION={
- "Kéfir natural":"Huevos y lácteos",
- "Pechuga de pollo":"Carnicería","Ternera magra (babilla)":"Carnicería",
- "Huevos":"Huevos y lácteos","Leche semidesnatada":"Huevos y lácteos",
- "Queso batido 0% / skyr":"Huevos y lácteos","Yogur natural":"Huevos y lácteos",
- "Queso rallado (ingred.)":"Huevos y lácteos","Batido proteínas (botella)":"Huevos y lácteos",
- "Salmón fresco":"Pescadería",
- "Merluza congelada":"Congelados","Verdura congelada":"Congelados","Guisantes congelados":"Congelados",
- "Atún claro al natural":"Conservas y despensa","Gazpacho (brik)":"Conservas y despensa",
- "Lentejas cocidas (bote)":"Conservas y despensa","Garbanzos cocidos (bote)":"Conservas y despensa",
- "Alubias cocidas (bote)":"Conservas y despensa","Copos de avena Hacendado":"Conservas y despensa",
- "Arroz largo Hacendado":"Conservas y despensa","Pasta integral":"Conservas y despensa",
- "Aceite de oliva virgen ex.":"Conservas y despensa","Crema de cacahuete":"Conservas y despensa",
- "Nueces":"Conservas y despensa","Almendras":"Conservas y despensa",
- "Proteína en polvo":"Conservas y despensa","Bolsita de fruta":"Conservas y despensa",
- "Pan integral de molde":"Panadería","Ñoquis de patata":"Refrigerados",
- "Plátano":"Frutería","Manzana":"Frutería","Patata":"Frutería","Batata":"Frutería",
- "Champiñón laminado":"Frutería","Verduras asadas (batch)":"Frutería",
-}
 ORDEN=["Frutería","Carnicería","Pescadería","Huevos y lácteos","Refrigerados","Congelados",
        "Conservas y despensa","Panadería"]
 
@@ -85,7 +70,8 @@ for fcod in FASES:
     for n,g in sorted(cons.items(), key=lambda x:-x[1]):
         g=round(g); eur=F[n][5]*g/F[n][4]; coste+=eur
         secs.setdefault(SECCION[n],[]).append(
-            {"n":n,"g":g,"c":cantidad(n,g),"e":round(eur,2),"v":F[n][7]=="f"})
+            {"n":n,"g":g,"c":cantidad(n,g),"e":round(eur,2),"v":F[n][7]=="f",
+             "q":nota(n)[0],"qm":nota(n)[1]})
     COMPRA[fcod]={"secs":[{"s":s,"items":secs[s]} for s in ORDEN if s in secs],
                   "total":round(coste,2),
                   "obj":FASES[fcod][2],"n":FASES[fcod][0],"f":FASES[fcod][1]}

@@ -1,60 +1,95 @@
 # -*- coding: utf-8 -*-
-# kcal, Proteina, Grasa, Carbohidrato por 100 g | formato de venta (g) | precio | grupo | fuente
-# grupos: carb (escala), grasa (escala), prot (escala), fijo (no escala)
-F = {
- # --- añadidos ---
- "Kéfir natural":             ( 63,  3.4,  3.5,  4.5,    500,   1.25, "fijo", "e"),
- # --- cereales y tuberculos ---
- "Copos de avena Hacendado":  (375, 13.5,  7.0, 60.0,   1000,   1.30, "carb", "e"),
- "Arroz largo Hacendado":     (360,  7.0,  0.9, 79.0,   1000,   1.25, "carb", "e"),
- "Pasta integral":            (350, 13.0,  2.5, 63.0,   1000,   1.15, "carb", "e"),
- "Ñoquis de patata":          (160,  4.0,  1.0, 33.0,    500,   1.35, "carb", "e"),
- "Patata":                    ( 80,  2.0,  0.1, 17.0,   5000,   4.50, "carb", "e"),
- "Batata":                    ( 86,  1.6,  0.1, 20.0,   1000,   2.20, "carb", "e"),
- "Pan integral de molde":     (250,  9.0,  3.5, 43.0,    450,   1.20, "carb", "e"),
- # --- legumbre de bote (sin cocinar) ---
- "Lentejas cocidas (bote)":   ( 95,  7.0,  0.5, 14.0,    570,   1.00, "carb", "e"),
- "Garbanzos cocidos (bote)":  (120,  7.0,  2.5, 16.0,    570,   1.10, "carb", "e"),
- "Alubias cocidas (bote)":    (100,  7.0,  0.6, 15.0,    570,   1.05, "carb", "e"),
- # --- proteina animal ---
- "Pechuga de pollo":          (110, 23.0,  1.8,  0.0,   1200,   6.76, "prot", "f"),
- "Ternera magra (babilla)":   (135, 22.0,  5.0,  0.0,   1000,  11.00, "prot", "e"),
- "Filete de pavo":            (105, 22.0,  1.5,  0.0,    500,   4.00, "prot", "e"),
- "Pavo en lonchas":           (105, 18.0,  2.5,  2.0,    200,   2.20, "prot", "e"),
+"""Los alimentos. Los datos ya no viven aquí: están en datos/alimentos.csv, que se
+   edita con Excel o con el Bloc de notas. Este archivo solo los carga y los deja
+   listos para el resto del sistema.
 
- "Merluza congelada":         ( 72, 16.0,  0.6,  0.0,   1000,   6.50, "prot", "e"),
- "Salmón fresco":             (200, 20.0, 13.0,  0.0,    500,   9.00, "prot", "e"),
- "Atún claro al natural":     (110, 25.0,  1.0,  0.0,    240,   2.40, "prot", "f"),
- "Huevos":                    (143, 12.6,  9.9,  0.7,    720,   2.63, "fijo", "f"),
- # --- lacteos ---
- "Leche semidesnatada":       ( 46,  3.2,  1.6,  4.8,   1000,   0.79, "fijo", "e"),
- "Queso batido 0% / skyr":    ( 60, 10.0,  0.3,  4.0,    500,   1.45, "prot", "e"),
- "Yogur natural":             ( 60,  4.0,  3.0,  4.5,    500,   0.95, "fijo", "e"),
- "Queso rallado (ingred.)":   (380, 26.0, 29.0,  2.0,    200,   2.20, "grasa","e"),
- "Proteína en polvo":         (380, 78.0,  5.0,  6.0,    500,   9.50, "prot", "e"),
- # --- fibra vegetal sin elaboracion ---
- "Gazpacho (brik)":           ( 40,  0.8,  2.5,  3.5,   1000,   1.55, "fijo", "e"),
- "Verdura congelada":         ( 40,  2.5,  0.4,  5.0,   1000,   1.80, "fijo", "e"),
- "Guisantes congelados":      ( 80,  5.5,  0.4, 11.0,   1000,   1.70, "fijo", "e"),
- "Champiñón laminado":        ( 22,  3.0,  0.3,  1.0,    500,   1.60, "fijo", "e"),
- "Verduras asadas (batch)":   ( 45,  1.5,  2.0,  5.0,   1000,   2.00, "fijo", "e"),
- "Tomate cherry":             ( 20,  1.0,  0.2,  3.0,    500,   1.70, "fijo", "e"),
- # --- para la mochila: cero preparación ---
- "Bolsita de fruta":          ( 65,  0.4,  0.2, 15.0,    400,   1.90, "carb", "e"),
- "Almendras":                 (600, 21.0, 53.0,  5.0,    200,   3.00, "grasa","e"),
- "Batido proteínas (botella)":( 60,  6.0,  1.5,  5.5,    330,   1.20, "prot", "e"),
- # --- fruta y grasas ---
- "Plátano":                   ( 89,  1.1,  0.3, 20.0,   1000,   1.75, "carb", "e"),
- "Manzana":                   ( 52,  0.3,  0.2, 12.0,   1000,   2.00, "carb", "e"),
- "Nueces":                    (654, 15.0, 65.0,  7.0,    500,   4.50, "grasa","e"),
- "Crema de cacahuete":        (600, 25.0, 50.0, 12.0,    500,   3.00, "grasa","e"),
- "Aguacate":                  (160,  2.0, 15.0,  2.0,    500,   3.50, "grasa","e"),
- "Aceite de oliva virgen ex.":(900,  0.0,100.0,  0.0,   1000,   7.50, "grasa","e"),
-}
+   El CSV usa punto y coma como separador y coma decimal, que es como los abre y
+   los guarda Excel en español. Las casillas vacías significan «todavía no lo he
+   copiado de la etiqueta», no cero.
+
+   Lo que exporta:
+     F[nombre]   -> (kcal, proteína, grasa, carbohidrato, formato_g, precio, grupo, fuente)
+     A[nombre]   -> todos los campos, incluidos azúcares, fibra, sal, saturadas, NOVA y rol
+     SECCION[n]  -> pasillo del supermercado
+     ROL[n]      -> papel en un plato: base, proteina, verdura, grasa, fruta o lacteo
+     macros(items), calidad(a)
+"""
+import csv, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from calidad import calidad
+
+CSV = os.path.join("datos", "alimentos.csv")
+COLUMNAS = ["nombre", "kcal", "proteina", "grasa", "carbohidrato", "azucares", "fibra",
+            "sal", "saturadas", "formato_g", "precio_eur", "grupo", "seccion", "nova",
+            "fuente", "notas"]
+GRUPOS = ("carb", "grasa", "prot", "fijo")      # carb/grasa/prot escalan; fijo no
+ROLES = ("base", "proteina", "verdura", "grasa", "fruta", "lacteo")
+# Si la columna «rol» está vacía se deduce del grupo. Es solo un apaño para que un
+# alimento recién añadido no rompa nada: lo suyo es escribir el rol a mano.
+ROL_POR_GRUPO = {"carb": "base", "prot": "proteina", "grasa": "grasa", "fijo": "verdura"}
+
+
+def _num(x):
+    """'3,5' -> 3.5 · vacío -> None (dato que falta, no cero)."""
+    x = (x or "").strip().replace(",", ".")
+    return float(x) if x else None
+
+
+def cargar(ruta=CSV):
+    if not os.path.exists(ruta):
+        sys.exit(f"No encuentro {ruta}. Ejecuta las órdenes desde la carpeta del proyecto.")
+    with open(ruta, encoding="utf-8-sig", newline="") as f:
+        filas = list(csv.DictReader(f, delimiter=";"))
+    if not filas:
+        sys.exit(f"{ruta} está vacío.")
+    faltan = [c for c in COLUMNAS if c not in filas[0]]
+    if faltan:
+        sys.exit(f"A {ruta} le faltan columnas: {faltan}")
+    out = {}
+    for i, fila in enumerate(filas, 2):                 # 2 = primera fila de datos
+        n = (fila["nombre"] or "").strip()
+        if not n:
+            continue
+        if n in out:
+            sys.exit(f"{ruta}, línea {i}: «{n}» está repetido.")
+        a = {"nombre": n, "linea": i,
+             "grupo": (fila["grupo"] or "").strip(),
+             "seccion": (fila["seccion"] or "").strip(),
+             "fuente": (fila["fuente"] or "e").strip() or "e",
+             "notas": (fila["notas"] or "").strip()}
+        for c in ("kcal", "proteina", "grasa", "carbohidrato", "azucares", "fibra",
+                  "sal", "saturadas", "formato_g", "precio_eur", "nova"):
+            a[c] = _num(fila[c])
+        for c in ("kcal", "proteina", "grasa", "carbohidrato", "formato_g", "precio_eur"):
+            if a[c] is None:
+                sys.exit(f"{ruta}, línea {i} ({n}): falta «{c}», que es obligatorio.")
+        if a["grupo"] not in GRUPOS:
+            sys.exit(f"{ruta}, línea {i} ({n}): grupo «{a['grupo']}» no vale. Usa {GRUPOS}.")
+        a["rol"] = (fila.get("rol") or "").strip() or ROL_POR_GRUPO[a["grupo"]]
+        if a["rol"] not in ROLES:
+            sys.exit(f"{ruta}, línea {i} ({n}): rol «{a['rol']}» no vale. Usa {ROLES}.")
+        if not a["seccion"]:
+            sys.exit(f"{ruta}, línea {i} ({n}): falta el pasillo del súper.")
+        out[n] = a
+    return out
+
+
+A = cargar()
+F = {n: (a["kcal"], a["proteina"], a["grasa"], a["carbohidrato"],
+         a["formato_g"], a["precio_eur"], a["grupo"], a["fuente"]) for n, a in A.items()}
+SECCION = {n: a["seccion"] for n, a in A.items()}
+ROL = {n: a["rol"] for n, a in A.items()}
+
 
 def macros(items):
-    t=[0.0]*4
-    for n,g in items:
-        k,p,gr,c = F[n][:4]
-        t[0]+=k*g/100; t[1]+=p*g/100; t[2]+=gr*g/100; t[3]+=c*g/100
-    return tuple(round(x,1) for x in t)
+    t = [0.0] * 4
+    for n, g in items:
+        k, p, gr, c = F[n][:4]
+        t[0] += k * g / 100; t[1] += p * g / 100; t[2] += gr * g / 100; t[3] += c * g / 100
+    return tuple(round(x, 1) for x in t)
+
+
+if __name__ == "__main__":
+    print(f"{len(A)} alimentos en {CSV}")
+    sin = [n for n, a in A.items() if calidad(a) is None]
+    print(f"con nota de calidad: {len(A)-len(sin)} · sin datos de etiqueta: {len(sin)}")

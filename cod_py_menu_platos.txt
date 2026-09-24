@@ -1,0 +1,4 @@
+python3 menu/generar.py comida            # platos de mediodía, listos para la app
+python3 menu/generar.py cena --kcal 700   # una cena suelta de 700 kcal, para hoy
+python3 menu/generar.py comida --sin "Salmón fresco" --con Patata --nota B --n 8
+python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"

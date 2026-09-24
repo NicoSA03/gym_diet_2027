@@ -1,74 +1,45 @@
 # -*- coding: utf-8 -*-
-"""Modelo único: bloques, platos, fases y tipos de día. Resuelve los factores
-   por (fase × tipo de día) para que el navegador solo tenga que multiplicar."""
+"""Modelo único: tomas, fases y tipos de día. Resuelve los factores por
+   (fase × tipo de día) para que el navegador solo tenga que multiplicar.
+
+   Los platos ya no están aquí: viven en datos/platos.csv y los carga platos.py.
+   Aquí solo queda la ficha de cada toma (nombre, hora y dónde se come)."""
 import sys, json, itertools
 sys.path.insert(0,'menu')
 from db import F, macros
+from platos import PLATOS
 
-# ---------- tomas ----------
+# ---------- las tomas del día ----------
 # Snacks reducidos: solo cabe 1 bolsita de frutos secos y 1 potito en la mochila
-BLOQUES = {
-"P": ("Pre-entreno","06:30","En casa, 15 min antes de salir",[
-  ("Plátano y batido",  [("Plátano",165),("Proteína en polvo",13)]),
-  ("Avena líquida",     [("Leche semidesnatada",250),("Copos de avena Hacendado",22)]),
-  ("De bolsillo",       [("Pan integral de molde",50),("Crema de cacahuete",9),("Proteína en polvo",10)]),
-]),
-"D": ("Desayuno post-entreno","08:45","En casa, al volver del entreno",[
-  ("Avena completa",    [("Copos de avena Hacendado",165),("Leche semidesnatada",380),("Queso batido 0% / skyr",210),("Plátano",160),("Crema de cacahuete",16)]),
-  ("Salado",            [("Huevos",180),("Pan integral de molde",165),("Yogur natural",250),("Plátano",165),("Crema de cacahuete",15),("Queso batido 0% / skyr",120)]),
-  ("Batido con prisa",  [("Leche semidesnatada",480),("Copos de avena Hacendado",140),("Plátano",170),("Crema de cacahuete",22),("Proteína en polvo",28)]),
-  ("Avena con kéfir",   [("Copos de avena Hacendado",165),("Leche semidesnatada",380),("Kéfir natural",210),("Plátano",160),("Proteína en polvo",20)]),
-]),
-"S1":("Frutos secos","17:00","1 bolsita, en la mochila",[
-  ("Nueces",            [("Nueces",40)]),
-  ("Almendras",         [("Almendras",40)]),
-  ("Mezcla",            [("Nueces",20),("Almendras",20)]),
-]),
-"S2":("Potito de fruta","19:30","1 potito, en la mochila",[
-  ("Bolsita de fruta",  [("Bolsita de fruta",100)]),
-  ("Bolsita grande",    [("Bolsita de fruta",120)]),
-  ("Plátano",           [("Plátano",95)]),
-]),
-"T": ("Kit de turno de bar","01:00","En la mochila del trabajo",[
-  ("Frutos secos y batido",[("Nueces",32),("Plátano",130),("Proteína en polvo",20)]),
-  ("Botella y almendras",[("Batido proteínas (botella)",330),("Almendras",28),("Bolsita de fruta",100)]),
-  ("Mezcla",            [("Almendras",25),("Nueces",15),("Manzana",200),("Proteína en polvo",16)]),
-]),
-"T2":("Segunda parada del turno","21:00","Solo el sábado, turno de 9 h",[
-  ("Frutos secos",      [("Nueces",30),("Bolsita de fruta",100)]),
-  ("Botella",           [("Batido proteínas (botella)",330),("Almendras",20)]),
-  ("Fruta y almendras", [("Almendras",30),("Manzana",200)]),
-]),
-"Z": ("Antes de dormir","04:15","Al llegar del turno",[
-  ("Skyr",              [("Queso batido 0% / skyr",230),("Nueces",14)]),
-  ("Leche",             [("Leche semidesnatada",300),("Proteína en polvo",19)]),
-  ("Yogur",             [("Yogur natural",250),("Proteína en polvo",18)]),
-]),
+TOMAS = {
+"P": ("Pre-entreno",             "06:30","En casa, 15 min antes de salir"),
+"D": ("Desayuno post-entreno",   "08:45","En casa, al volver del entreno"),
+"C": ("Comida",                  "14:00","En casa, el plato fuerte del día"),
+"S1":("Frutos secos",            "17:00","1 bolsita, en la mochila"),
+"S2":("Potito de fruta",         "19:30","1 potito, en la mochila"),
+"N": ("Cena",                    "22:00","En casa, la dejas hecha al mediodía"),
+"T2":("Segunda parada del turno","21:00","Solo el sábado, turno de 9 h"),
+"T": ("Kit de turno de bar",     "01:00","En la mochila del trabajo"),
+"Z": ("Antes de dormir",         "04:15","Al llegar del turno"),
 }
-
-# ---------- los 7 platos de mediodía y las 7 cenas ----------
-COMIDA = [
- ("Ñoquis con pollo", [("Ñoquis de patata",455),("Pechuga de pollo",185),("Verdura congelada",200),("Queso rallado (ingred.)",15),("Aceite de oliva virgen ex.",18)]),
- ("Lentejas con huevo", [("Lentejas cocidas (bote)",520),("Pan integral de molde",110),("Huevos",140),("Verdura congelada",150),("Aceite de oliva virgen ex.",22)]),
- ("Pasta con ternera", [("Pasta integral",220),("Ternera magra (babilla)",140),("Champiñón laminado",150),("Queso rallado (ingred.)",15),("Aceite de oliva virgen ex.",18)]),
- ("Batata con pollo", [("Batata",600),("Pan integral de molde",100),("Pechuga de pollo",210),("Guisantes congelados",120),("Aceite de oliva virgen ex.",15)]),
- ("Arroz con salmón", [("Arroz largo Hacendado",190),("Salmón fresco",200),("Verdura congelada",200),("Aceite de oliva virgen ex.",8)]),
- ("Patata con pollo", [("Patata",650),("Pan integral de molde",100),("Pechuga de pollo",210),("Verduras asadas (batch)",200),("Aceite de oliva virgen ex.",15)]),
- ("Garbanzos con atún", [("Garbanzos cocidos (bote)",480),("Pan integral de molde",90),("Atún claro al natural",110),("Verduras asadas (batch)",200),("Aceite de oliva virgen ex.",24)]),
-]
-CENA = [
- ("Gazpacho y pollo", [("Gazpacho (brik)",250),("Pechuga de pollo",150),("Pan integral de molde",85)]),
- ("Arroz con pollo", [("Arroz largo Hacendado",70),("Pechuga de pollo",150),("Verdura congelada",150)]),
- ("Atún y gazpacho", [("Gazpacho (brik)",250),("Atún claro al natural",145),("Pan integral de molde",85)]),
- ("Alubias con huevo", [("Alubias cocidas (bote)",240),("Huevos",130),("Verdura congelada",120)]),
- ("Ñoquis con pollo", [("Ñoquis de patata",170),("Pechuga de pollo",150),("Champiñón laminado",150)]),
- ("Patata y huevos", [("Patata",230),("Huevos",120),("Queso batido 0% / skyr",205)]),
- ("Merluza con batata", [("Batata",240),("Merluza congelada",210),("Guisantes congelados",150)]),
-]
-BLOQUES["C"] = ("Comida","14:00","En casa, el plato fuerte del día", COMIDA)
-BLOQUES["N"] = ("Cena","22:00","En casa, la dejas hecha al mediodía", CENA)
-
 ORDEN_TOMAS = ["P","D","C","S1","S2","N","T2","T","Z"]
+
+_sobran = set(PLATOS) - set(TOMAS)
+if _sobran:
+    sys.exit(f"datos/platos.csv usa tomas que no existen: {sorted(_sobran)}. "
+             f"Las válidas son {sorted(TOMAS)}.")
+_vacias = [t for t in TOMAS if not PLATOS.get(t)]
+if _vacias:
+    sys.exit(f"Estas tomas se han quedado sin ningún plato en datos/platos.csv: {_vacias}")
+for _t in ("C", "N"):
+    if len(PLATOS[_t]) < 7:
+        sys.exit(f"La toma {_t} necesita al menos 7 platos en datos/platos.csv "
+                 f"(uno por día de la semana) y solo tiene {len(PLATOS[_t])}.")
+
+BLOQUES = {t: (n, h, d, PLATOS[t]) for t, (n, h, d) in TOMAS.items()}
+COMIDA = PLATOS["C"]     # se siguen usando por su nombre en las verificaciones
+CENA = PLATOS["N"]
+SEMANA_OPC = 7           # en la comida y la cena, los 7 primeros = lunes a domingo
 
 FASES = {
  "B0": ("Rearranque",     "Sem 1–4 · 21 sep → 18 oct 2026",    3050,170,80,413),

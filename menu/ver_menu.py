@@ -22,17 +22,17 @@ for f,(fn,ff,K,P,G,C) in M.FASES.items():
     print(f"  {est} {f}: desviacion diaria max {peor:.1f} %  ({peord})")
 
 print("\n== 2. CUALQUIER combinacion de opciones sigue en rango ==")
+# El dia es la suma de tomas independientes, asi que el dia mas flojo es la suma
+# de las opciones mas flojas y el mas cargado la de las mas cargadas. Sale exacto
+# sin recorrer el producto cartesiano, que con 14 platos por toma seria millonario.
 for f,(fn,ff,K,P,G,C) in M.FASES.items():
     for t,(tn,td,mult,tomas) in M.TIPOS.items():
         fc,fg,fp = FACT[f"{f}|{t}"]
         tgt=K*mult
-        lo=1e9; hi=0
-        keys=list(tomas)
-        rangos=[range(len(M.BLOQUES[b][3])) if b in M.BLOQUES else range(7) for b in keys]
-        for combo in itertools.product(*rangos):
-            sel=dict(zip(keys,combo))
-            k=M.dia_totales(tomas,sel,fc,fg,fp)[0]
-            lo=min(lo,k); hi=max(hi,k)
+        lo=hi=0.0
+        for b in tomas:
+            ks=[M.macros_bloque(b,i,fc,fg,fp)[0] for i in range(len(M.BLOQUES[b][3]))]
+            lo+=min(ks); hi+=max(ks)
         pl=(lo-tgt)/tgt*100; ph=(hi-tgt)/tgt*100
         est="OK " if (pl>=-12 and ph<=12) else "FALLO"
         if est=="FALLO": fallos+=1
@@ -64,10 +64,14 @@ for f,(fn,ff,K,P,G,C) in M.FASES.items():
 
 print("\n== 5. Porciones plausibles (ningun alimento fuera de rango) ==")
 LIM={"Pechuga de pollo":320,"Salmón fresco":300,"Ternera magra (babilla)":280,
-     "Atún claro al natural":200,"Merluza":320,"Huevos":220,
-     "Aceite de oliva virgen ex.":35,"Crema de cacahuete":45,
+     "Atún claro al natural":200,"Merluza congelada":320,"Huevos":220,
+     "Filete de pavo":320,"Pavo en lonchas":200,
+     "Aceite de oliva virgen ex.":35,"Crema de cacahuete":45,"Queso rallado (ingred.)":45,
+     "Aguacate":200,"Nueces":60,"Almendras":60,
      "Lentejas cocidas (bote)":850,"Garbanzos cocidos (bote)":850,"Alubias cocidas (bote)":600,
-     "Patata":1200,"Batata":1100}
+     "Patata":1200,"Batata":1100,
+     "Verdura congelada":350,"Guisantes congelados":300,"Champiñón laminado":350,
+     "Tomate cherry":300,"Gazpacho (brik)":400}
 peores={}
 for f in M.FASES:
     for t in M.TIPOS:

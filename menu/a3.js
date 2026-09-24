@@ -35,6 +35,9 @@ function render(){
         guarda("hechos", JSON.stringify(hechos)); render();
       });
       const lab = el("label"); lab.htmlFor=k; lab.append(document.createTextNode(it.n));
+      const q = el("i","cal "+(it.q==="—" ? "x" : it.q), it.q || "—");
+      q.title = it.qm || "Faltan datos de la etiqueta";
+      lab.append(q);
       if(it.v){ const d=el("span","vf"); d.title="Precio verificado en tienda"; lab.append(d); }
       row.append(cb, lab, el("span","cant",it.c), el("span","eur",eur(it.e)));
       s.append(row);
