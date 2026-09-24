@@ -25,7 +25,7 @@ function pintaFases(){
   const f = E.fases[fase];
   document.getElementById("f-n").textContent = f.lema;
   document.getElementById("f-f").textContent =
-    "Semanas " + f.s0 + "–" + f.s1 + " · " + f.ini + " → " + f.fin + " · dieta " + f.dieta;
+    "Semanas " + f.s0 + "–" + f.s1 + " · dieta " + f.dieta;
 }
 
 function pintaDias(){
@@ -90,7 +90,13 @@ function pintaSesion(){
         c.append(p);
       });
       const como = el("div","como");
-      como.append(el("i",null,"Cómo se sube"), document.createTextNode(t.sube));
+      como.append(el("i",null,"Cómo se sube"));
+      t.sube.forEach(([n,s])=>{
+        const l = el("div");
+        l.append(el("b",null,n+": "), document.createTextNode(s));
+        como.append(l);
+      });
+      if(t.regla) como.append(el("div","regla",t.regla));
       c.append(como);
       box.append(c);
     }

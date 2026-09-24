@@ -28,7 +28,7 @@ if __name__=="__main__":
         open('salida/paginas/compra.html','w',encoding='utf8').write(h)
         print("compra.html:", len(h)//1024, "KB")
     if cual in ("todos","4"):
-        h = pagina("Qué Toca Hoy",'menu/a4_entreno.html','menu/a4.js','menu/pay_entreno.json','E')
+        h = pagina("Entrenamiento",'menu/a4_entreno.html','menu/a4.js','menu/pay_entreno.json','E')
         open('salida/paginas/entreno.html','w',encoding='utf8').write(h)
         print("entreno.html:", len(h)//1024, "KB")
     if cual in ("todos","5"):

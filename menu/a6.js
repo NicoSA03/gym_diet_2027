@@ -201,7 +201,7 @@ function vSesion(box){
     const ab = el("div","r-abd");
     const t = el("div"); t.append(el("b",null,"Abdominales"), el("p","nota",a.abd.n+" · tabata 20-20, 8 rondas"));
     const ok = el("button","r-ok"); ok.innerHTML = CHECK; ok.style.width="44px";
-    if(a.abd.hecha){ ok.style.background="var(--accent)"; ok.style.color="#F2F4F1"; }
+    if(a.abd.hecha){ ok.style.background="var(--accent)"; ok.style.color="#FFFFFF"; }
     ok.addEventListener("click", ()=>{ a.abd.hecha=!a.abd.hecha; guarda(); render(); });
     ab.append(t, ok); box.append(ab);
   }

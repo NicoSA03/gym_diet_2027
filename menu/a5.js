@@ -41,7 +41,7 @@ function pintaBloque(){
   const f = T.fases[fase];
   document.getElementById("b-n").textContent = fase + " · " + f.n;
   document.getElementById("b-meta").textContent =
-    f.sem + " semanas · sem " + f.s0 + "–" + f.s1 + "\n" + f.ini + " → " + f.fin +
+    f.sem + " semanas · sem " + f.s0 + "–" + f.s1 +
     "\nDieta: bloque " + f.dieta;
   document.getElementById("b-lema").textContent = f.lema;
   document.getElementById("b-foco").textContent = f.foco;
@@ -126,7 +126,12 @@ function pintaTablas(){
     const row = el("div","serie");
     row.append(el("span","g","Cómo se sube"));
     const txt = el("div");
-    txt.append(el("p",null,t.sube));
+    t.sube.forEach(([n,s])=>{
+      const l = el("p");
+      l.append(el("b",null,n+": "), document.createTextNode(s));
+      txt.append(l);
+    });
+    if(t.regla) txt.append(el("p",null,t.regla));
     row.append(txt);
     ser.append(row);
     c.append(ser);
@@ -159,6 +164,35 @@ function pintaEstaticos(){
   });
 }
 
+function calculadora1RM(){
+  const kgI = document.getElementById("rm-kg"), rI = document.getElementById("rm-reps");
+  const n = (x,d)=>x.toLocaleString("es-ES",{maximumFractionDigits:d===undefined?1:d});
+  const calc = ()=>{
+    const kg = parseFloat(String(kgI.value).replace(",", ".")), r = parseInt(rI.value, 10);
+    if(!(kg>0) || !(r>=1 && r<=30)){
+      ["rm-ep","rm-br","rm-fin"].forEach(id=>document.getElementById(id).textContent="—");
+      document.getElementById("rm-ep-f").textContent = "kg × (1 + reps ÷ 30)";
+      document.getElementById("rm-br-f").textContent = "kg × 36 ÷ (37 − reps)";
+      document.getElementById("rm-fin-f").textContent = "(Epley + Brzycki) ÷ 2";
+      document.getElementById("rm-br-li").classList.remove("off");
+      return;
+    }
+    const ep = kg*(1+r/30), br = kg*36/(37-r), solo = r>10;
+    const fin = solo ? ep : (ep+br)/2;
+    document.getElementById("rm-ep-f").textContent = n(kg,2)+" × (1 + "+r+" ÷ 30)";
+    document.getElementById("rm-ep").textContent = n(ep)+" kg";
+    document.getElementById("rm-br-f").textContent = solo ? "no cuenta con más de 10 reps" : n(kg,2)+" × 36 ÷ (37 − "+r+")";
+    document.getElementById("rm-br").textContent = n(br)+" kg";
+    document.getElementById("rm-br-li").classList.toggle("off", solo);
+    document.getElementById("rm-fin-f").textContent = solo ? "solo Epley" : "("+n(ep)+" + "+n(br)+") ÷ 2";
+    document.getElementById("rm-fin").textContent = n(fin)+" kg";
+    guarda("t_rm", kg+"|"+r);
+  };
+  try{ const g = lee("t_rm"); if(g){ const [a,b] = g.split("|"); kgI.value = a; rI.value = b; } }catch(e){}
+  kgI.addEventListener("input", calc); rI.addEventListener("input", calc);
+  calc();
+}
+
 try{ const f = lee("t_fase"); if(f && T.fases[f]) fase = f; }catch(e){}
 pintaCabecera(); pintaFases(); pintaBloque(); pintaCargas();
-pintaEjercicios(); pintaTablas(); pintaEstaticos();
+pintaEjercicios(); pintaTablas(); pintaEstaticos(); calculadora1RM();

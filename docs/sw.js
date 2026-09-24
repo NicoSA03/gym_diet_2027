@@ -1,5 +1,5 @@
-// Service worker de «Junio 2027» · versión 479008f1 (lo genera menu/pwa.py)
-const V = "junio2027-479008f1";
+// Service worker de «Junio 2027» · versión 3d03bee6 (lo genera menu/pwa.py)
+const V = "junio2027-3d03bee6";
 const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {

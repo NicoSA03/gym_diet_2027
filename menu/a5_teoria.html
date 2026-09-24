@@ -51,6 +51,38 @@
 .ejcard .serie h5{font-family:var(--sans);font-size:14.5px;font-weight:700;margin-bottom:2px}
 .ejcard .serie p{font-size:14.5px;color:var(--ink-2)}
 @media (max-width:520px){.ejcard .serie{grid-template-columns:1fr;gap:3px}}
+.rm-in{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.rm-in label{display:flex;flex-direction:column;gap:4px;position:relative}
+.rm-in label span{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3)}
+.rm-in input{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--ink);width:128px;
+  background:transparent;border:none;border-bottom:2px solid var(--line-2);padding:2px 30px 4px 0;
+  font-variant-numeric:tabular-nums;-moz-appearance:textfield;border-radius:0}
+.rm-in input::-webkit-outer-spin-button,.rm-in input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.rm-in input:focus{outline:none;border-bottom-color:var(--accent)}
+.rm-in i{position:absolute;right:0;bottom:9px;font-style:normal;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.rm-in .x{font-family:var(--mono);font-size:22px;color:var(--ink-3);padding-bottom:8px}
+.rm-pipe{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.rm-pipe li{display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:baseline;
+  padding:11px 0;border-bottom:1px solid var(--line)}
+.rm-pipe .n{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+.rm-pipe code{font-family:var(--mono);font-size:14px;color:var(--ink-2);overflow-wrap:anywhere}
+.rm-pipe b{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.rm-pipe li.off{opacity:.4}
+.rm-pipe li.off b{text-decoration:line-through}
+.rm-pipe li.fin{border-bottom:2px solid var(--accent)}
+.rm-pipe li.fin .n{color:var(--accent-ink)}
+.rm-pipe li.fin b{font-size:30px;color:var(--accent-ink);letter-spacing:-.02em}
+.rm-exp{display:flex;flex-direction:column;gap:10px;max-width:64ch}
+.rm-exp p{font-size:15px;color:var(--ink-2)}
+.rm-exp b{font-family:var(--sans);font-weight:700;color:var(--ink)}
+.rm-solo{background:var(--amber-soft);border:1px solid var(--amber);border-left-width:4px;border-radius:3px;
+  padding:13px 16px;display:flex;flex-direction:column;gap:5px;max-width:64ch}
+.rm-solo p{font-size:14.5px;color:var(--ink-2)}
+.rm-solo b{font-family:var(--sans);font-weight:700;color:var(--amber)}
+@media (max-width:520px){.rm-pipe li{grid-template-columns:1fr auto}.rm-pipe code{grid-column:1/-1;grid-row:2}}
 </style>
 
 <div class="wrap">
@@ -103,7 +135,7 @@
         <tbody id="t-esquema"></tbody>
       </table>
     </div>
-    <p class="nota">RIR es «repeticiones en reserva»: las que te quedarían si siguieras hasta no poder más. RIR 2 significa parar cuando te quedan dos. En el bloque de rearranque vas a RIR 4, que parece poquísimo y es justo lo que toca.</p>
+    <p class="nota">RIR es «repeticiones en reserva»: las que te quedarían si siguieras hasta no poder más.</p>
   </div>
 </section>
 
@@ -118,8 +150,8 @@
       </table>
     </div>
     <div class="rules">
-      <div class="rule"><span class="i">01</span><p><b>Esos kilos de la semana 1 te van a parecer una broma y no lo son.</b> Después de ocho semanas parado se pierde entre un 10 y un 15 % de fuerza, pero lo que se pierde de verdad es la tolerancia del tendón. Vas al 60 % de lo que podrías mover porque el objetivo de las cuatro primeras semanas es llegar a la quinta sin molestias, no impresionar a nadie un martes de septiembre.</p></div>
-      <div class="rule"><span class="i">02</span><p><b>Vas a recuperar tus marcas alrededor de la semana 6.</b> La memoria muscular es real: los núcleos que ganaste entrenando siguen ahí. Volver a 70 de banca y 80 de sentadilla te va a costar seis semanas, no seis meses. A partir de ahí es terreno nuevo.</p></div>
+      <div class="rule"><span class="i">01</span><p><b>Esos kilos de la semana 1 te van a parecer una broma y no lo son.</b> Después de ocho semanas parado se pierde entre un 10 y un 15 % de fuerza, pero lo que se pierde de verdad es la tolerancia del tendón. Vas al 60 % de lo que podrías mover: el objetivo es preparar el cuerpo.</p></div>
+      <div class="rule"><span class="i">02</span><p><b>Vas a recuperar tus marcas alrededor de la semana 6.</b> La memoria muscular es real: los núcleos que ganaste entrenando siguen ahí. Volver a 70 de banca y 80 de sentadilla te va a costar seis semanas, no seis meses.</p></div>
       <div class="rule"><span class="i">03</span><p><b>Progresión doble: primero repeticiones, luego kilos.</b> Cuando completes el extremo alto del rango en todas las series con el RIR que marca el bloque, sube el peso lo mínimo que permita el gimnasio y vuelve al extremo bajo. Nunca subas las dos cosas a la vez: es la forma más rápida de quedarte atascado.</p></div>
       <div class="rule"><span class="i">04</span><p><b>Recalcula cada cuatro semanas.</b> Apunta kilos y repeticiones de la última serie buena de sentadilla, banca y peso muerto. Con eso sacas el 1RM estimado y sabes si el superávit está yendo a músculo. Si el peso sube y el 1RM no se mueve en dos mediciones seguidas, el superávit es demasiado grande.</p></div>
     </div>
@@ -127,18 +159,44 @@
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">04</span><h2>Los dieciocho ejercicios, uno a uno</h2></div>
+  <div class="sec-head"><span class="num">04</span><h2>Fórmula 1RM estimado</h2></div>
   <div class="stack">
-    <p class="prose">Cada uno con su técnica, su sustituto si la máquina está ocupada y —lo que faltaba— cómo se organizan las series en cada tipo de bloque. Porque cuatro series de dominadas no significan lo mismo en octubre que en diciembre.</p>
+    <p class="prose">Pon el peso y las repeticiones de tu última serie buena y la fórmula hace el resto.</p>
+    <div class="rm-in">
+      <label><span>Peso</span><input id="rm-kg" type="number" inputmode="decimal" min="0" step="0.5" value="80"><i>kg</i></label>
+      <span class="x">×</span>
+      <label><span>Repeticiones</span><input id="rm-reps" type="number" inputmode="numeric" min="1" max="30" step="1" value="4"><i>reps</i></label>
+    </div>
+    <ol class="rm-pipe">
+      <li><span class="n">Epley</span><code id="rm-ep-f">kg × (1 + reps ÷ 30)</code><b id="rm-ep">—</b></li>
+      <li id="rm-br-li"><span class="n">Brzycki</span><code id="rm-br-f">kg × 36 ÷ (37 − reps)</code><b id="rm-br">—</b></li>
+      <li class="fin"><span class="n">1RM</span><code id="rm-fin-f">(Epley + Brzycki) ÷ 2</code><b id="rm-fin">—</b></li>
+    </ol>
+    <div class="rm-exp">
+      <p><b>Para qué sirve.</b> El 1RM es el peso máximo que podrías levantar una sola vez. Estimarlo te dice cuánta fuerza tienes sin arriesgarte a probarlo, y te deja comparar series con pesos y repeticiones distintos.</p>
+      <p><b>Cómo funciona.</b> Epley y Brzycki convierten una serie de varias repeticiones en su equivalente a una sola. Con pocas repeticiones Epley da un poco más que Brzycki, y la media reparte esa diferencia. Por encima de 10 repeticiones Brzycki se dispara, y por eso ahí solo cuenta Epley.</p>
+      <p><b>Cómo se calcula.</b> Usa la última serie buena, con técnica limpia y entre 3 y 10 repeticiones: cuantas menos, más preciso. En dominadas, el peso es tu peso corporal más el lastre. Repítelo cada cuatro semanas con el mismo ejercicio: si el 1RM sube, estás ganando fuerza.</p>
+    </div>
+    <div class="rm-solo">
+      <p><b>Solo vale para:</b> sentadilla trasera y frontal, press banca, peso muerto convencional, press militar de pie, remo con barra y dominadas lastradas.</p>
+      <p>En aislamiento, máquinas, poleas, zancadas y flexiones el resultado sale inflado o no se puede comparar.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Los dieciocho ejercicios, uno a uno</h2></div>
+  <div class="stack">
+    <p class="prose">Cada uno explicado con su técnica, el sustituto en máquina y cómo se cuentan las series y el peso.</p>
     <div id="ejercicios"></div>
   </div>
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">05</span><h2>Los abdominales</h2></div>
+  <div class="sec-head"><span class="num">06</span><h2>Los abdominales</h2></div>
   <div class="stack">
     <div class="veredicto" style="border-left-color:var(--amber)">
-      <p class="tit">Ocho rondas, <b>cinco minutos y veinte</b>, y ni un minuto más.</p>
+      <p class="tit">Ocho rondas, <b>cinco minutos y veinte</b>.</p>
       <p id="tab-regla">—</p>
       <p>El formato es el tuyo: tabata 20-20 con una isometría y un giro ruso con balón. Lo único que he cambiado es que en vez de una tabla única hay tres, una por día de fuerza, y cada una ataca una función distinta del core. La razón es que el abdominal se adapta rapidísimo a un estímulo repetido: con tres tablas rotando, la misma inversión de tiempo rinde bastante más durante bastante más tiempo.</p>
       <p>El orden importa: los abdominales van siempre al final. Si los pones antes de la sentadilla o del peso muerto, el core llega fatigado al ejercicio que más lo necesita como estabilizador, y eso es exactamente al revés de lo que interesa.</p>
@@ -148,7 +206,7 @@
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">06</span><h2>Carrera: zonas y por qué</h2></div>
+  <div class="sec-head"><span class="num">07</span><h2>Carrera: zonas y por qué</h2></div>
   <div class="stack">
     <div class="tscroll">
       <table>
@@ -159,7 +217,7 @@
     </div>
     <div class="rules">
       <div class="rule"><span class="i">01</span><p><b>El test de la semana 4 es lo que pone el plan en tu escala.</b> El último domingo del bloque de rearranque, 5 km a tope con el Garmin. Ese tiempo fija todas las zonas de los nueve meses siguientes. Repítelo al final de cada bloque: cinco tests en total.</p></div>
-      <div class="rule"><span class="i">02</span><p><b>El 80 % de tus kilómetros van en Z2 y te va a costar creerlo.</b> A 7:00 el kilómetro vas a sentir que pierdes el tiempo. No lo pierdes: la base aeróbica se construye a intensidad baja y volumen alto, y correr todo a ritmo medio es el error que hace que la gente se estanque durante años con el 5k en veintisiete minutos.</p></div>
+      <div class="rule"><span class="i">02</span><p><b>El 80 % de tus kilómetros van en Z2 y te va a costar creerlo.</b> A 7:00 el kilómetro vas a sentir que pierdes el tiempo. No lo pierdes: la base aeróbica se construye a intensidad baja y volumen alto, y correr todo a ritmo medio es un error.</p></div>
       <div class="rule"><span class="i">03</span><p><b>La regla del 10 % es la que te salva de la periostitis.</b> Nunca subas el volumen semanal más de un 10 % respecto a la semana anterior, aunque te encuentres perfecto. Cuando el volumen es bajo, el tope práctico es kilómetro y medio. Es la lesión que más planes de nueve meses ha roto y aparece justo cuando empiezas a ir bien.</p></div>
       <div class="rule"><span class="i">04</span><p><b>Correr en ayunas está bien para la Z2 y mal para las series.</b> La tirada del jueves la puedes hacer en ayunas sin problema. El martes, con las series duras, necesitas el plátano y el batido de antes de salir: sin carbohidrato disponible no vas a alcanzar las intensidades que hacen que esa sesión sirva de algo.</p></div>
     </div>
@@ -167,7 +225,7 @@
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">07</span><h2>Qué mirar cada semana</h2></div>
+  <div class="sec-head"><span class="num">08</span><h2>Qué mirar cada semana</h2></div>
   <div class="stack">
     <p class="prose">Con Garmin, Strava y Hevy el seguimiento no te cuesta tiempo: solo hay que saber qué seis números importan y cuáles hay que ignorar. Diez minutos el domingo por la noche.</p>
     <div class="tscroll">
@@ -181,13 +239,18 @@
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">08</span><h2>Las siete reglas</h2></div>
+  <div class="sec-head"><span class="num">09</span><h2>Las siete reglas</h2></div>
   <div class="rules" id="reglas"></div>
 </section>
 
 <footer>
-  La teoría del macrociclo de Abraham · 182 cm · 39 semanas · septiembre 2026<br>
-  Estimaciones de 1RM con la media de Epley y Brzycki; pérdida por desentrenamiento del 12 % sobre ocho semanas sin entrenar. VO₂máx estimado con las ecuaciones de Daniels y Gilbert. Todas son estimaciones poblacionales: el test de la semana 4 y las mediciones cada cuatro semanas son lo que las convierte en tus números.<br>
-  Esto es planificación deportiva, no consejo médico. Dolor articular que persiste más de una semana: para y consulta.
+  La teoría del macrociclo de Abraham - 182 cm - 39 semanas
+  <ul class="pie">
+    <li>1RM: media de Epley y Brzycki.</li>
+    <li>Pérdida por parar ocho semanas: 12 % de fuerza.</li>
+    <li>VO₂máx: ecuaciones de Daniels y Gilbert.</li>
+    <li>Son estimaciones generales: el test de la semana 4 y las mediciones cada cuatro semanas las ajustan a ti.</li>
+    <li>No es consejo médico: si un dolor articular dura más de una semana, para y consulta.</li>
+  </ul>
 </footer>
 </div>

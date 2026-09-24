@@ -5,12 +5,12 @@
 import re, json, hashlib, datetime as dt
 
 SECCIONES = [
+    ("menus",   "Menús",        "menu/a2_menus.html",   "menu/a2.js", "menu/pay_menus.json",   "M"),
+    ("compra",  "La compra",    "menu/a3_compra.html",  "menu/a3.js", "menu/pay_compra.json",  "C"),
     ("entreno", "El entreno",   "menu/a4_entreno.html", "menu/a4.js", "menu/pay_entreno.json", "E"),
     ("registro","Registro",     "menu/a6_registro.html","menu/a6.js", "menu/pay_registro.json","R"),
     ("teoria",  "La teoría",    "menu/a5_teoria.html",  "menu/a5.js", "menu/pay_entreno.json", "T"),
     ("info",    "Cómo funciona","menu/a1_info.html",    "menu/a1.js", "menu/pay_info.json",    "I"),
-    ("menus",   "Menús",        "menu/a2_menus.html",   "menu/a2.js", "menu/pay_menus.json",   "M"),
-    ("compra",  "La compra",    "menu/a3_compra.html",  "menu/a3.js", "menu/pay_compra.json",  "C"),
     ("manual",  "Actualizar",   None, None, None, None),
 ]
 
@@ -53,7 +53,7 @@ def seccion_manual():
     filas = []
     for k, f in FE.items():
         d = FD[f["dieta"]]
-        filas.append(f"<tr><td class='ex'>{k} · {f['n']}</td><td>{fecha(cal[k]['ini'])} → {fecha(cal[k]['fin'])}</td>"
+        filas.append(f"<tr><td class='ex'>{k} · {f['n']}</td><td>{cal[k]['s0']}–{cal[k]['s1']}</td>"
                      f"<td class='num'>{d[2]:,}".replace(",", ".") + f"</td><td class='num'>{max(f['km'])}</td></tr>")
     valores = f"""
 <div class="vgrid">
@@ -62,7 +62,7 @@ def seccion_manual():
   <div><div class="v">{OBJETIVO_5K}</div><div class="eyebrow">OBJETIVO_5K</div></div>
   <div><div class="v">{vdot(5000, seg(TEST_5K)):.0f} → {vdot(5000, seg(OBJETIVO_5K)):.0f}</div><div class="eyebrow">VO₂máx estimado</div></div>
 </div>
-<div class="tscroll valores"><table><thead><tr><th>Bloque</th><th>Fechas</th><th class="num">kcal/día</th><th class="num">km/sem</th></tr></thead>
+<div class="tscroll valores"><table><thead><tr><th>Bloque</th><th>Semanas</th><th class="num">kcal/día</th><th class="num">km/sem</th></tr></thead>
 <tbody>{''.join(filas)}</tbody></table></div>
 <p class="nota">Las kcal se cambian en <code>menu/modelo.py</code>; el resto de valores, en <code>menu/entreno.py</code>.</p>"""
     manual = convertir(open('README.md', encoding='utf-8').read())
@@ -81,7 +81,7 @@ FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
  '&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">')
 
 ICONO = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
-         "%3Crect width='32' height='32' rx='7' fill='%230D5C4D'/%3E"
+         "%3Crect width='32' height='32' rx='7' fill='%23E0323C'/%3E"
          "%3Cpath d='M8 20.5V11.5M24 20.5V11.5M11 16h10M8 14.5v3M24 14.5v3' stroke='%23F2F4F1' "
          "stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")
 
@@ -97,9 +97,9 @@ body{padding-top:0}
 .appnav button{flex:none;font-family:var(--sans);font-size:13px;font-weight:700;
   padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);
   color:var(--ink-2);cursor:pointer;white-space:nowrap;transition:all .12s}
-.appnav button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:#F2F4F1}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .appnav button[aria-current="true"]{color:#0D1211}}
-:root[data-theme="dark"] .appnav button[aria-current="true"]{color:#0D1211}
+.appnav button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .appnav button[aria-current="true"]{color:#FFFFFF}}
+:root[data-theme="dark"] .appnav button[aria-current="true"]{color:#FFFFFF}
 .app-sec{display:none}
 .app-sec.on{display:block}
 .app-sec .hermanos{display:none}
@@ -131,6 +131,10 @@ NAV_JS = """
     b.addEventListener('click', function(){ ir(s[0], true); });
     botones[s[0]] = b;
     nav.append(b);
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('[data-ir]');
+    if(a){ e.preventDefault(); ir(a.getAttribute('data-ir'), true); }
   });
   var ini = SEC[0][0];
   try{ var g = localStorage.getItem('app_sec');
@@ -189,12 +193,12 @@ def construir():
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0D5C4D">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Junio 2027">
+<meta name="apple-mobile-web-app-title" content="GD plan">
 <meta name="description" content="Plan de entrenamiento y alimentación de Abraham, septiembre 2026 a junio 2027.">
-<title>Junio 2027 · el sistema completo</title>
+<title>planificacion_dieta_gym</title>
 <link rel="icon" href="{ICONO}">
 <link rel="apple-touch-icon" href="{ICONO}">
 <link rel="manifest" href="manifest.webmanifest">
@@ -211,11 +215,7 @@ def construir():
 {cuerpo_todo}
 </main>
 <div class="sello">
-  <b>Junio 2027 · el sistema completo</b> · versión {firma} · generado el {hoy.day} de {MES[hoy.month]} de {hoy.year}<br>
-  Archivo único y autónomo: no necesita internet salvo para las tipografías, ni ninguna aplicación.
-  Instálalo como app desde GitHub Pages (Chrome → «Instalar aplicación»).<br>
-  Lo que marques (bloque, día, opciones de cada toma y casillas de la compra) se guarda en este navegador.
-  Al sustituir el archivo por una versión nueva se conserva, porque va asociado al navegador y no al archivo.
+  versión {firma} · {hoy.day} de {MES[hoy.month]} de {hoy.year}
 </div>
 <script>
 {NAV_JS % {"lista": lista}}
@@ -227,10 +227,10 @@ def construir():
 """
     import os
     os.makedirs('salida', exist_ok=True); os.makedirs('docs', exist_ok=True)
-    destino = 'salida/Junio2027.html'
+    destino = 'salida/planificacion_dieta_gym.html'
     open(destino, 'w', encoding='utf8').write(doc)
     open('docs/index.html', 'w', encoding='utf8').write(doc)   # para GitHub Pages
-    print(f"Junio2027.html: {len(doc)//1024} KB · versión {firma} · {len(SECCIONES)} secciones")
+    print(f"planificacion_dieta_gym.html: {len(doc)//1024} KB · versión {firma} · {len(SECCIONES)} secciones")
     return destino
 
 if __name__ == "__main__":

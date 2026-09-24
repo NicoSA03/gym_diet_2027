@@ -1,6 +1,6 @@
 # Junio 2027 · plan de entreno y dieta
 
-Todo el sistema cabe en **un único archivo, `Junio2027.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene siete pestañas:
+Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene siete pestañas:
 
 | Pestaña | Para qué |
 |---|---|
@@ -12,7 +12,7 @@ Todo el sistema cabe en **un único archivo, `Junio2027.html`**, que funciona ig
 | La compra | La lista de Mercadona de la semana, con casillas |
 | Actualizar | Este manual y los valores con los que está generado el archivo |
 
-El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de datos en Python. Cambias un dato, ejecutas una orden y sale un `Junio2027.html` nuevo. Para eso solo necesitas **Python 3.8 o superior**, sin librerías extra. Todo lo que se calcula (el plan, los datos del registro, la app instalable y sus iconos) se hace en Python; en el móvil solo corre el JavaScript mínimo para pintar y guardar. Y si no quieres tocar código, pídeselo a Claude en el proyecto «gym_dieta» (sección 7).
+El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de datos en Python. Cambias un dato, ejecutas una orden y sale un `planificacion_dieta_gym.html` nuevo. Para eso solo necesitas **Python 3.8 o superior**, sin librerías extra. Todo lo que se calcula (el plan, los datos del registro, la app instalable y sus iconos) se hace en Python; en el móvil solo corre el JavaScript mínimo para pintar y guardar. Y si no quieres tocar código, pídeselo a Claude en el proyecto «gym_dieta» (sección 7).
 
 ---
 
@@ -22,7 +22,7 @@ El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de 
 # 1. Cambia el dato: menu/entreno.py (entreno) o datos/*.csv (alimentos y platos)
 # 2. Regenera todo
 python3 actualizar.py
-# 3. El resultado está en salida/Junio2027.html y la app instalable en docs/
+# 3. El resultado está en salida/planificacion_dieta_gym.html y la app instalable en docs/
 ```
 
 Si has tocado **platos, alimentos o calorías de la dieta**, usa `python3 actualizar.py --recalcular` (tarda unos 20 segundos más).
@@ -57,7 +57,7 @@ junio2027/
 │   ├── a1…a6 *.html/.js ← diseño e interacción de cada pestaña (a6 es el Registro)
 │   └── …                ← el resto son piezas internas del montaje
 ├── salida/
-│   └── Junio2027.html   ← EL ARCHIVO DEL MÓVIL
+│   └── planificacion_dieta_gym.html   ← EL ARCHIVO DEL MÓVIL
 └── docs/                ← LA APP: esto es lo que publica GitHub Pages
     ├── index.html       ← el mismo archivo
     ├── manifest.webmanifest, sw.js, icon-192.png, icon-512.png
@@ -329,7 +329,7 @@ La app mira si hay versión nueva cada vez que la abres con conexión y la usa e
 python3 actualizar.py --probar
 ```
 
-Abre `http://localhost:8000` en Chrome: funciona como la app de verdad, instalación incluida. Abierto con doble clic, `Junio2027.html` sigue funcionando entero, pero no se instala (una PWA necesita https o localhost).
+Abre `http://localhost:8000` en Chrome: funciona como la app de verdad, instalación incluida. Abierto con doble clic, `planificacion_dieta_gym.html` sigue funcionando entero, pero no se instala (una PWA necesita https o localhost).
 
 ### El Registro y tus datos
 
@@ -340,7 +340,7 @@ Abre `http://localhost:8000` en Chrome: funciona como la app de verdad, instalac
 
 ### En el PC o en iPhone
 
-Doble clic en `Junio2027.html`, o abre la dirección de GitHub Pages: en Safari, Compartir → «Añadir a pantalla de inicio».
+Doble clic en `planificacion_dieta_gym.html`, o abre la dirección de GitHub Pages: en Safari, Compartir → «Añadir a pantalla de inicio».
 
 ### Qué pasa con lo que tienes marcado
 
@@ -406,11 +406,11 @@ python3 menu/ver_menu.py
 
 El proyecto guarda siempre la versión vigente de tres cosas:
 
-- `claude/Junio2027.html` → el archivo de siete pestañas, listo para descargar desde cualquier dispositivo.
+- `claude/planificacion_dieta_gym.html` → el archivo de siete pestañas, listo para descargar desde cualquier dispositivo.
 - `claude/README.md` → este manual.
 - `claude/fuente_junio2027.txt` → todo el código en un solo archivo de texto.
 
-**Cambiar algo desde Claude** es escribir en el proyecto lo que quieres, por ejemplo: «peso 80,1», «test de 5 km en 26:10» o «cambia las lentejas por alubias». Claude restaura la fuente, aplica el cambio, verifica, regenera el archivo y actualiza los tres documentos del proyecto. Tú solo descargas el nuevo `Junio2027.html`.
+**Cambiar algo desde Claude** es escribir en el proyecto lo que quieres, por ejemplo: «peso 80,1», «test de 5 km en 26:10» o «cambia las lentejas por alubias». Claude restaura la fuente, aplica el cambio, verifica, regenera el archivo y actualiza los tres documentos del proyecto. Tú solo descargas el nuevo `planificacion_dieta_gym.html`.
 
 Para que Claude y tú trabajéis siempre sobre la misma versión:
 
@@ -431,7 +431,7 @@ python3 actualizar.py --recalcular
 
 Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. El archivo del móvil y GitHub Pages los controlas tú.
 
-`python3 actualizar.py --paginas` genera también esas cinco páginas sueltas en `salida/paginas/`, por si alguna vez las quieres publicar tú. Son fragmentos pensados para claude.ai: para uso propio, usa siempre `Junio2027.html`.
+`python3 actualizar.py --paginas` genera también esas cinco páginas sueltas en `salida/paginas/`, por si alguna vez las quieres publicar tú. Son fragmentos pensados para claude.ai: para uso propio, usa siempre `planificacion_dieta_gym.html`.
 
 ---
 

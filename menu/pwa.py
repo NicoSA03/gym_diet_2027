@@ -15,8 +15,8 @@ Abierta como archivo suelto (doble clic) sigue funcionando, pero no se instala."
 import json, math, os, re, struct, sys, zlib
 
 DOCS = "docs"
-NOMBRE, CORTO = "Junio 2027", "Junio 2027"
-FONDO, TINTA = (0x0D, 0x5C, 0x4D), (0xF2, 0xF4, 0xF1)
+NOMBRE, CORTO = "GD plan", "GD plan"
+FONDO, TINTA = (0xE0, 0x32, 0x3C), (0xFF, 0xFF, 0xFF)
 
 # Mancuerna del favicon, en una rejilla de 32×32: segmentos con extremos redondeados
 TRAZOS = [((8, 11.5), (8, 20.5)), ((24, 11.5), (24, 20.5)), ((11, 16), (21, 16))]
@@ -62,7 +62,7 @@ MANIFIESTO = {
     "name": NOMBRE, "short_name": CORTO, "lang": "es",
     "description": "Plan de entrenamiento, dieta y registro de Abraham, septiembre 2026 a junio 2027.",
     "start_url": "./", "scope": "./", "display": "standalone", "orientation": "portrait",
-    "background_color": "#0D1211", "theme_color": "#%02X%02X%02X" % FONDO,
+    "background_color": "#000000", "theme_color": "#%02X%02X%02X" % FONDO,
 }
 
 

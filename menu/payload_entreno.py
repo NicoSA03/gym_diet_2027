@@ -21,7 +21,7 @@ PAY = {
  "ej": {k: dict(m=v["m"], p=v["p"], cue=v["cue"], nota=v["nota"], sus=v["sus"])
         for k, v in EJ.items()},
  "tabata": {k: dict(n=v["n"], dur=v["dur"], a=list(v["a"]), b=list(v["b"]),
-                    como=v["como"], sube=v["sube"]) for k, v in TABATA.items()},
+                    como=v["como"], sube=[list(s) for s in v["sube"]], regla=v.get("regla","")) for k, v in TABATA.items()},
  "tabata_regla": TABATA_REGLA,
  "estructura": {k: {g: list(x) for g, x in v.items()} for k, v in ESTRUCTURA.items()},
  "generico": {g: list(x) for g, x in GENERICO.items()},

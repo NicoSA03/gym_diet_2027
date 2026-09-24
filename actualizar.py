@@ -100,7 +100,7 @@ def main():
         empaquetar()
 
     print("\n✓ Listo.")
-    print("  salida/Junio2027.html  → el archivo para el móvil")
+    print("  salida/planificacion_dieta_gym.html  → el archivo para el móvil")
     print("  docs/                  → la app instalable, lista para GitHub Pages")
     if a.probar:
         import functools, http.server

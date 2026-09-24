@@ -6,14 +6,14 @@
   display:flex;flex-direction:column;gap:2px;align-items:center;transition:all .12s}
 .dia-btn small{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.06em;color:var(--ink-3)}
 .dia-btn:hover{border-color:var(--accent)}
-.dia-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#F2F4F1}
-.dia-btn[aria-selected="true"] small{color:rgba(242,244,241,.75)}
+.dia-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.dia-btn[aria-selected="true"] small{color:rgba(255,255,255,.75)}
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"]{color:#0D1211}
-  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:rgba(13,18,17,.7)}
+  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"]{color:#FFFFFF}
+  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:rgba(255,255,255,.75)}
 }
-:root[data-theme="dark"] .dia-btn[aria-selected="true"]{color:#0D1211}
-:root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:rgba(13,18,17,.7)}
+:root[data-theme="dark"] .dia-btn[aria-selected="true"]{color:#FFFFFF}
+:root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:rgba(255,255,255,.75)}
 
 .toma{border-bottom:1px solid var(--line);padding:16px 20px}
 .toma:last-child{border-bottom:none}

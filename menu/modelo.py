@@ -42,12 +42,12 @@ CENA = PLATOS["N"]
 SEMANA_OPC = 7           # en la comida y la cena, los 7 primeros = lunes a domingo
 
 FASES = {
- "B0": ("Rearranque",     "Sem 1–4 · 21 sep → 18 oct 2026",    3050,170,80,413),
- "B1": ("Construcción I", "Sem 5–12 · 19 oct → 13 dic 2026",   3400,175,85,484),
- "B2": ("Fuerza",         "Sem 13–17 · 14 dic → 17 ene 2027",  3450,178,90,482),
- "B3": ("Construcción II","Sem 18–23 · 18 ene → 28 feb 2027",  3600,185,92,508),
- "B4": ("Definición",     "Sem 24–35 · 1 mar → 23 may 2027",   2950,200,72,375),
- "B5": ("Pico",           "Sem 36–39 · 24 may → 20 jun 2027",  3050,190,76,401),
+ "B0": ("Rearranque",     "Sem 1–4",    3050,170,80,413),
+ "B1": ("Construcción I", "Sem 5–12",   3400,175,85,484),
+ "B2": ("Fuerza",         "Sem 13–17",  3450,178,90,482),
+ "B3": ("Construcción II","Sem 18–23",  3600,185,92,508),
+ "B4": ("Definición",     "Sem 24–35",   2950,200,72,375),
+ "B5": ("Pico",           "Sem 36–39",  3050,190,76,401),
 }
 TIPOS = {
  "A": ("Fuerza + universidad por la tarde",  "Lunes y miércoles", 0.91, ["P","D","C","S1","S2","N"]),

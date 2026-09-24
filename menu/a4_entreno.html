@@ -5,12 +5,12 @@
   display:flex;flex-direction:column;gap:2px;align-items:center;transition:all .12s}
 .dia-btn small{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink-3)}
-.dia-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#F2F4F1}
-.dia-btn[aria-selected="true"] small{color:#F2F4F1;opacity:.75}
+.dia-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.dia-btn[aria-selected="true"] small{color:#FFFFFF;opacity:.75}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dia-btn[aria-selected="true"],
-  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:#0D1211}}
+  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:#FFFFFF}}
 :root[data-theme="dark"] .dia-btn[aria-selected="true"],
-:root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:#0D1211}
+:root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:#FFFFFF}
 .finde{grid-column:1/-1;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-3);text-align:center;padding:9px;
   border:1px dashed var(--line-2);border-radius:3px;margin-top:2px}
@@ -39,13 +39,13 @@
 .ejer{padding:14px 20px;border-bottom:1px solid var(--line)}
 .ejer:last-of-type{border-bottom:none}
 .ejer .fila{display:grid;grid-template-columns:30px 1fr auto;gap:11px;align-items:baseline}
-.ejer .t{font-family:var(--mono);font-size:10px;font-weight:600;color:#F2F4F1;background:var(--accent);
+.ejer .t{font-family:var(--mono);font-size:10px;font-weight:600;color:#FFFFFF;background:var(--accent);
   border-radius:3px;padding:3px 0;text-align:center}
 .ejer .t.t2{background:var(--amber)}
 .ejer .t.t3{background:var(--ink-3)}
 .ejer .t.tf{background:var(--line-2);color:var(--ink-2)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ejer .t{color:#0D1211}}
-:root[data-theme="dark"] .ejer .t{color:#0D1211}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ejer .t{color:#FFFFFF}}
+:root[data-theme="dark"] .ejer .t{color:#FFFFFF}
 .ejer h4{font-size:16.5px;font-weight:700;letter-spacing:-.01em}
 .ejer .pres{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent-ink);
   white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
@@ -62,12 +62,16 @@
 .tab h5{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ink)}
 .tab .reloj{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--amber);
   letter-spacing:.06em;text-transform:uppercase}
-.tab .par{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:14.5px;color:var(--ink-2)}
-.tab .par .k{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--amber);padding-top:3px}
+.tab .par{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;font-size:14.5px;color:var(--ink-2)}
+.tab .par .k{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--amber);white-space:nowrap;
+  border:1px solid var(--amber);border-radius:6px;padding:2px 7px;margin-top:1px;min-width:62px;text-align:center}
 .tab .par b{font-family:var(--sans);font-weight:700;color:var(--ink)}
 .tab .como{font-size:14px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:8px}
 .tab .como i{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-3);display:block}
+.tab .como b{font-family:var(--sans);font-weight:700;color:var(--ink)}
+.tab .como div{margin-top:3px}
+.tab .como .regla{margin-top:6px;color:var(--ink-3)}
 
 .ses-nota{padding:13px 20px;border-top:1px solid var(--line);font-size:14.5px;color:var(--ink-3);
   font-style:italic}
@@ -112,8 +116,7 @@
 
 <div class="wrap">
 <header class="masthead">
-  <p class="eyebrow">El día a día · 5 días · lunes a viernes a las 07:00</p>
-  <h1>Qué toca <em>hoy</em></h1>
+  <h1>Entrenamiento</h1>
   <p class="dek">Eliges bloque y día y tienes la sesión entera: series, repeticiones, esfuerzo y cómo se organizan. El porqué de todo esto está en el archivo de teoría.</p>
   <div class="hermanos">
     <span class="hermano yo">El entreno</span>
@@ -155,7 +158,6 @@
 </section>
 
 <footer>
-  El día a día de Abraham · lunes a viernes a las 07:00 · sábado y domingo, nada<br>
-  El porqué de cada decisión, el desglose completo de cada ejercicio, las cargas de arranque y el seguimiento semanal están en «La teoría».
+  <a href="#" data-ir="teoria">La teoría →</a> el porqué de cada decisión, las cargas de arranque y el seguimiento semanal.
 </footer>
 </div>
