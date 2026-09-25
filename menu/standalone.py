@@ -80,10 +80,34 @@ FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800'
  '&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">')
 
-ICONO = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
-         "%3Crect width='32' height='32' rx='7' fill='%23E0323C'/%3E"
-         "%3Cpath d='M8 20.5V11.5M24 20.5V11.5M11 16h10M8 14.5v3M24 14.5v3' stroke='%23F2F4F1' "
-         "stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")
+# Logo NK (docs/Icono@1x.png reescalado a 180x180). Va incrustado para que el HTML
+# siga siendo un archivo unico que funciona sin cargar nada de fuera.
+ICONO = ("data:image/png;base64,"
+         "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"
+         "AElFTkSuQmCC")
 
 CSS_APP = """
 html{scroll-padding-top:64px}

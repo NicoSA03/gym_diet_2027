@@ -16,7 +16,7 @@ import json, math, os, re, struct, sys, zlib
 
 DOCS = "docs"
 NOMBRE, CORTO = "GD plan", "GD plan"
-FONDO, TINTA = (0xE0, 0x32, 0x3C), (0xFF, 0xFF, 0xFF)
+FONDO, TINTA = (0x0E, 0x10, 0x14), (0xF2, 0xEF, 0xE8)   # negro y crema de la marca NK
 
 # Mancuerna del favicon, en una rejilla de 32×32: segmentos con extremos redondeados
 TRAZOS = [((8, 11.5), (8, 20.5)), ((24, 11.5), (24, 20.5)), ((11, 16), (21, 16))]
@@ -62,8 +62,13 @@ MANIFIESTO = {
     "name": NOMBRE, "short_name": CORTO, "lang": "es",
     "description": "Plan de entrenamiento, dieta y registro de Abraham: un ciclo de 39 semanas, repetible.",
     "start_url": "./", "scope": "./", "display": "standalone", "orientation": "portrait",
-    "background_color": "#000000", "theme_color": "#%02X%02X%02X" % FONDO,
+    "background_color": "#%02X%02X%02X" % FONDO, "theme_color": "#%02X%02X%02X" % FONDO,
 }
+
+# La portada NK. Android no admite una imagen de bienvenida propia: compone la suya con
+# background_color y el icono centrado, que con los colores de arriba sale igual que la
+# portada. Aquí se declara como «screenshot», que es lo que Chrome enseña al ofrecer instalar.
+PORTADA = "Portada@2x.png"
 
 
 def iconos_del_manifiesto(propios):
@@ -136,6 +141,11 @@ def main():
             propios.add(s)
 
     manifiesto = dict(MANIFIESTO, icons=iconos_del_manifiesto(propios))
+    portada = os.path.join(DOCS, PORTADA)
+    if os.path.exists(portada):
+        w, h = medida(portada)
+        manifiesto["screenshots"] = [{"src": PORTADA, "sizes": f"{w}x{h}",
+                                      "type": "image/png", "form_factor": "narrow"}]
     json.dump(manifiesto, open(os.path.join(DOCS, "manifest.webmanifest"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
     open(os.path.join(DOCS, "sw.js"), "w", encoding="utf-8").write(SW % {"v": v})
