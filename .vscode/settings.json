@@ -1,0 +1,12 @@
+{
+    // Los CSV del proyecto van con punto y coma como separador y punto decimal
+    "csv.separatorByExtension": {
+        ".csv": ";",
+        ".tsv": "\t"
+    },
+    "files.associations": {
+        "*.csv": "csv (semicolon)"
+    },
+    // Rainbow CSV: alinea las columnas en pantalla sin añadir espacios al archivo
+    "rainbow_csv.virtual_alignment_mode": "always"
+}

@@ -12,7 +12,7 @@ Ejemplos:
     python3 menu/generar.py cena --kcal 700 --proteina 55
         Una cena suelta de 700 kcal y 55 g de proteína, para hoy.
 
-    python3 menu/generar.py comida --sin "Salmón fresco" --con Patata --nota B --n 8
+    python3 menu/generar.py comida --sin "Salmón congelado hacendado" --con Patata --nota B --n 8
         Ocho propuestas sin salmón, con patata sí o sí, y de calidad B o mejor.
 
     python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"
@@ -54,22 +54,22 @@ PATRONES = {
     "T2": [("grasa", "fruta")],
     "Z":  [("lacteo", "grasa"), ("lacteo", "proteina")],
 }
-PAN = ["Pan integral de molde"]          # la guarnición que acompaña, no la base
+PAN = ["Pan de semillas"]          # la guarnición que acompaña, no la base
 
 # Parejas que no pegan en el mismo plato. Añade las tuyas.
 NO_JUNTOS = [
     {"Gazpacho (brik)", "Pasta integral"},
-    {"Gazpacho (brik)", "Arroz largo Hacendado"},
+    {"Gazpacho (brik)", "Arroz redondo Hacendado"},
     {"Gazpacho (brik)", "Ñoquis de patata"},
     {"Gazpacho (brik)", "Copos de avena Hacendado"},
     {"Gazpacho (brik)", "Queso rallado (ingred.)"},
-    {"Salmón fresco", "Queso rallado (ingred.)"},
+    {"Salmón congelado hacendado", "Queso rallado (ingred.)"},
     {"Atún claro al natural", "Queso rallado (ingred.)"},
     {"Merluza congelada", "Queso rallado (ingred.)"},
     {"Tomate cherry", "Copos de avena Hacendado"},
     {"Crema de cacahuete", "Pechuga de pollo"},
     {"Crema de cacahuete", "Ternera magra (babilla)"},
-    {"Crema de cacahuete", "Salmón fresco"},
+    {"Crema de cacahuete", "Salmón congelado hacendado"},
     {"Crema de cacahuete", "Merluza congelada"},
     {"Crema de cacahuete", "Atún claro al natural"},
     {"Aguacate", "Copos de avena Hacendado"},
@@ -86,9 +86,9 @@ NO_DE_PLATO = {"Copos de avena Hacendado", "Proteína en polvo", "Crema de cacah
 NO_DE_DESAYUNO = {"Lentejas cocidas (bote)", "Garbanzos cocidos (bote)",
                   "Alubias cocidas (bote)", "Gazpacho (brik)", "Champiñón laminado",
                   "Verdura congelada", "Guisantes congelados", "Tomate cherry",
-                  "Ternera magra (babilla)", "Merluza congelada", "Salmón fresco",
+                  "Ternera magra (babilla)", "Merluza congelada", "Salmón congelado hacendado",
                   "Atún claro al natural", "Pechuga de pollo", "Filete de pavo",
-                  "Patata", "Ñoquis de patata", "Pasta integral", "Arroz largo Hacendado",
+                  "Patata", "Ñoquis de patata", "Pasta integral", "Arroz redondo Hacendado",
                   "Aceite de oliva virgen ex.", "Queso rallado (ingred.)"}
 NO_EN = {"C": NO_DE_PLATO, "N": NO_DE_PLATO, "D": NO_DE_DESAYUNO}
 
@@ -102,13 +102,13 @@ NO_EN = {"C": NO_DE_PLATO, "N": NO_DE_PLATO, "D": NO_DE_DESAYUNO}
 RACION = {
     "Pechuga de pollo": (110, 215), "Filete de pavo": (110, 215),
     "Ternera magra (babilla)": (100, 190), "Pavo en lonchas": (60, 130),
-    "Salmón fresco": (110, 200), "Merluza congelada": (120, 215),
+    "Salmón congelado hacendado": (110, 200), "Merluza congelada": (120, 215),
     "Atún claro al natural": (80, 135), "Huevos": (60, 200),
     "Proteína en polvo": (10, 35), "Queso batido 0% / skyr": (120, 300),
-    "Patata": (150, 700), "Batata": (150, 650), "Ñoquis de patata": (150, 500),
+    "Patata": (150, 700), "Batata doce congelada": (80, 345), "Ñoquis de patata": (150, 500),
     "Lentejas cocidas (bote)": (200, 560), "Garbanzos cocidos (bote)": (200, 560),
-    "Alubias cocidas (bote)": (200, 395), "Pan integral de molde": (30, 170),
-    "Arroz largo Hacendado": (50, 220), "Pasta integral": (50, 220),
+    "Alubias cocidas (bote)": (200, 395), "Pan de semillas": (30, 170),
+    "Arroz redondo Hacendado": (50, 220), "Pasta integral": (50, 220),
     "Copos de avena Hacendado": (40, 200),
     "Aceite de oliva virgen ex.": (5, 28), "Queso rallado (ingred.)": (8, 35),
     "Crema de cacahuete": (8, 35), "Nueces": (15, 50), "Almendras": (15, 50),
@@ -126,13 +126,13 @@ POR_ROL = {"base": (60, 300), "proteina": (100, 250), "verdura": (100, 250),
 
 # Nombre corto para bautizar el plato.
 CORTO = {"Pechuga de pollo": "pollo", "Filete de pavo": "pavo", "Pavo en lonchas": "pavo",
-         "Ternera magra (babilla)": "ternera", "Salmón fresco": "salmón",
+         "Ternera magra (babilla)": "ternera", "Salmón congelado hacendado": "salmón",
          "Merluza congelada": "merluza", "Atún claro al natural": "atún", "Huevos": "huevo",
          "Proteína en polvo": "batido", "Queso batido 0% / skyr": "skyr",
-         "Arroz largo Hacendado": "arroz", "Pasta integral": "pasta",
+         "Arroz redondo Hacendado": "arroz", "Pasta integral": "pasta",
          "Copos de avena Hacendado": "avena", "Ñoquis de patata": "ñoquis",
          "Lentejas cocidas (bote)": "lentejas", "Garbanzos cocidos (bote)": "garbanzos",
-         "Alubias cocidas (bote)": "alubias", "Pan integral de molde": "pan",
+         "Alubias cocidas (bote)": "alubias", "Pan de semillas": "pan",
          "Leche semidesnatada": "leche", "Yogur natural": "yogur", "Kéfir natural": "kéfir",
          "Gazpacho (brik)": "gazpacho", "Champiñón laminado": "champiñón",
          "Verdura congelada": "verdura", "Guisantes congelados": "guisantes",

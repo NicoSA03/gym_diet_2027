@@ -3,9 +3,9 @@
    edita con Excel o con el Bloc de notas. Este archivo solo los carga y los deja
    listos para el resto del sistema.
 
-   El CSV usa punto y coma como separador y coma decimal, que es como los abre y
-   los guarda Excel en español. Las casillas vacías significan «todavía no lo he
-   copiado de la etiqueta», no cero.
+   El CSV usa punto y coma como separador y punto decimal (3.5). Si Excel lo
+   guarda con coma decimal (3,5) también se entiende. Las casillas vacías
+   significan «todavía no lo he copiado de la etiqueta», no cero.
 
    Lo que exporta:
      F[nombre]   -> (kcal, proteína, grasa, carbohidrato, formato_g, precio, grupo, fuente)
@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from calidad import calidad
 
 CSV = os.path.join("datos", "alimentos.csv")
-COLUMNAS = ["nombre", "kcal", "proteina", "grasa", "carbohidrato", "azucares", "fibra",
-            "sal", "saturadas", "formato_g", "precio_eur", "grupo", "seccion", "nova",
+COLUMNAS = ["nombre", "kcal", "grasa", "saturadas", "carbohidrato", "azucares", "fibra",
+            "proteina", "sal", "formato_g", "precio_eur", "grupo", "seccion", "nova",
             "fuente", "notas"]
 GRUPOS = ("carb", "grasa", "prot", "fijo")      # carb/grasa/prot escalan; fijo no
 ROLES = ("base", "proteina", "verdura", "grasa", "fruta", "lacteo")

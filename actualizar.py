@@ -18,6 +18,13 @@ import argparse, os, subprocess, sys, time
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 os.chdir(RAIZ)
 
+# En Windows Python escribe por defecto en cp1252, que no tiene ▶, ✓ ni −.
+# Todo en UTF-8: la pantalla de aquí y los archivos que escriben los scripts de menu/.
+os.environ["PYTHONUTF8"] = "1"
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "payload_info.py",
           "payload_entreno.py", "construir.py", "standalone.py", "generar.py",
           "ver_entreno.py", "ver_menu.py", "ver_alimentos.py", "ver_platos.py",
@@ -34,7 +41,7 @@ def paso(titulo, script, *args, obligatorio=True, silencioso=False):
     print(f"\n▶ {titulo}")
     t = time.time()
     r = subprocess.run([sys.executable, os.path.join("menu", script), *args],
-                       capture_output=silencioso, text=True)
+                       capture_output=silencioso, text=True, encoding="utf-8")
     if silencioso:
         claves = ("FALLO", "TODO OK", "HAY FALLOS")
         utiles = [l for l in r.stdout.splitlines() if any(k in l for k in claves)]

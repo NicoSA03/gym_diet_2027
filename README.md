@@ -249,7 +249,7 @@ python3 menu/generar.py comida
 python3 menu/generar.py cena --kcal 700 --proteina 55
 
 # Ocho ideas sin salmón, con patata sí o sí, de calidad B o mejor
-python3 menu/generar.py comida --sin "Salmón fresco" --con Patata --nota B --n 8
+python3 menu/generar.py comida --sin "Salmón congelado hacendado" --con Patata --nota B --n 8
 
 # Guardar la propuesta número 3 en datos/platos.csv
 python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"
@@ -263,7 +263,7 @@ Lo que propone son **ideas con los números resueltos**, no recetas probadas. L�
 
 ### Añadir un alimento nuevo
 
-Todo pasa en **`datos/alimentos.csv`**, una fila por alimento. Se abre con Excel (o con el Bloc de notas): el separador es el punto y coma y los decimales van con coma, como los guarda Excel en español.
+Todo pasa en **`datos/alimentos.csv`**, una fila por alimento. Se abre con Excel (o con el Bloc de notas): el separador es el punto y coma y los decimales van con punto (3.5). Si Excel lo guarda con coma decimal (3,5) también vale: el programa entiende las dos.
 
 | Columna | Qué poner |
 |---|---|

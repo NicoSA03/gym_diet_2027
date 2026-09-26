@@ -63,13 +63,13 @@ for f,(fn,ff,K,P,G,C) in M.FASES.items():
     print(f"  {est} {f}: {gkg:.2f} g/kg")
 
 print("\n== 5. Porciones plausibles (ningun alimento fuera de rango) ==")
-LIM={"Pechuga de pollo":320,"Salmón fresco":300,"Ternera magra (babilla)":280,
+LIM={"Pechuga de pollo":320,"Salmón congelado hacendado":300,"Ternera magra (babilla)":280,
      "Atún claro al natural":200,"Merluza congelada":320,"Huevos":220,
      "Filete de pavo":320,"Pavo en lonchas":200,
      "Aceite de oliva virgen ex.":35,"Crema de cacahuete":45,"Queso rallado (ingred.)":45,
      "Aguacate":200,"Nueces":60,"Almendras":60,
      "Lentejas cocidas (bote)":850,"Garbanzos cocidos (bote)":850,"Alubias cocidas (bote)":600,
-     "Patata":1200,"Batata":1100,
+     "Patata":1200,"Batata doce congelada":580,
      "Verdura congelada":350,"Guisantes congelados":300,"Champiñón laminado":350,
      "Tomate cherry":300,"Gazpacho (brik)":400}
 peores={}
