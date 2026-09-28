@@ -107,6 +107,11 @@ def _error(tomas, tgt, fc, fg, fp):
         e += ((t[0]-k)/k)**2*3 + ((t[1]-p)/p)**2*2 + ((t[2]-g)/g)**2 + ((t[3]-c)/c)**2
     return e/7
 
+# Tope del factor de hidrato: por encima, las raciones dejan de ser comibles (medio
+# kilo de patata en un plato). Los días más altos se quedan algo por debajo del
+# objetivo antes que pedir cantidades irreales.
+FC_MAX = 1.45
+
 def resolver(tomas, tgt):
     """Malla gruesa y luego refinado alrededor del mejor punto."""
     best=None
@@ -118,9 +123,9 @@ def resolver(tomas, tgt):
                     e=_error(tomas,tgt,fc,fg,fp)
                     if best is None or e<best[0]: best=(e,fc,fg,fp)
     lin=lambda a,b,n: [a+(b-a)*i/(n-1) for i in range(n)]
-    barrer(lin(0.50,1.75,18), lin(0.30,1.50,17), lin(0.70,1.40,9))
+    barrer(lin(0.50,FC_MAX,18), lin(0.30,1.50,17), lin(0.70,1.40,9))
     _,fc,fg,fp = best
-    barrer(lin(max(0.40,fc-0.09), fc+0.09, 10),
+    barrer(lin(max(0.40,fc-0.09), min(FC_MAX,fc+0.09), 10),
            lin(max(0.25,fg-0.10), fg+0.10, 11),
            lin(max(0.65,fp-0.08), fp+0.08, 9))
     return best[1:]

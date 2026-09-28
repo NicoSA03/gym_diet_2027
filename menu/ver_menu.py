@@ -68,26 +68,27 @@ LIM={"Pechuga de pollo":320,"Salmón congelado hacendado":300,"Ternera magra (ba
      "Filete de pavo":320,"Pavo en lonchas":200,
      "Aceite de oliva virgen ex.":35,"Crema de cacahuete":45,"Queso rallado (ingred.)":45,
      "Aguacate":200,"Nueces":60,"Almendras":60,
-     "Lentejas cocidas (bote)":850,"Garbanzos cocidos (bote)":850,"Alubias cocidas (bote)":600,
-     "Patata":1200,"Batata doce congelada":580,
      "Verdura congelada":350,"Guisantes congelados":300,"Champiñón laminado":350,
      "Tomate cherry":300,"Gazpacho (brik)":400,
      "Pan de semillas":125,"Copos de avena Hacendado":65,"Plátano":120,"Zumo de naranja exprimido":400,
-     "Tortitas de arroz integral":80}
+     "Tortitas de arroz integral":80,
+     "Arroz redondo Hacendado":180,"Pasta integral":180,"Fajitas 100% integrales":250}
+# Nadie come medio kilo de nada en una toma: tope para todo lo que no tenga uno propio
+TOPE=450
 peores={}
 for f in M.FASES:
     for t in M.TIPOS:
         fc,fg,fp=FACT[f"{f}|{t}"]
         for b in M.TIPOS[t][3]:
             opts = M.BLOQUES[b][3] if b in M.BLOQUES else (M.COMIDA if b=="C" else M.CENA)
-            for nom,items in opts:
-                for food,base in items:
-                    g=M.escalar([(food,base)],fc,fg,fp)[0][1]
-                    if food in LIM and g>LIM[food]:
-                        if g>peores.get(food,(0,))[0]: peores[food]=(g,f,t,nom)
+            s = M.normas(b,fc,fg,fp)          # la app aplica también el corrector por opción
+            for i,(nom,items) in enumerate(opts):
+                for food,g in M.escalar(items,fc,fg,fp,s[i]):
+                    lim=min(LIM.get(food,TOPE),TOPE)
+                    if g>lim and g>peores.get(food,(0,))[0]: peores[food]=(g,f,t,nom)
 if not peores: print("  OK  todas las porciones dentro de limites")
 for food,(g,f,t,nom) in peores.items():
-    fallos+=1; print(f"  FALLO {food}: {g} g en {f}/{t} ({nom}) > {LIM[food]} g")
+    fallos+=1; print(f"  FALLO {food}: {g} g en {f}/{t} ({nom}) > {min(LIM.get(food,TOPE),TOPE)} g")
 
 print("\n" + ("HAY FALLOS: %d" % fallos if fallos else "TODO OK"))
 sys.exit(1 if fallos else 0)
