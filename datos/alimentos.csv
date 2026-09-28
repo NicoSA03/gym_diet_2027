@@ -1,12 +1,12 @@
 nombre;kcal;grasa;saturadas;carbohidrato;azucares;fibra;proteina;sal;formato_g;precio_eur;grupo;seccion;nova;fuente;rol;notas
 Kéfir natural;74;4.2;2.9;5.1;2.3;0;3.9;0.1;500;2.20;fijo;Huevos y lácteos;1;e;lacteo;Precio y macros estimados: copia los del envase
-Copos de avena Hacendado;375;7.0;1.3;59.9;1.0;10.0;13.5;0.02;1000;1.63;carb;Conservas y despensa;1;e;base;
+Copos de avena Hacendado;375;7.0;1.3;59.9;1.0;10.0;13.5;0.02;1000;1.63;fijo;Conservas y despensa;1;e;base;Fijo para que la ración no pase de unos 50 g: el ajuste del día lo hacen el pan y el plátano
 Arroz redondo Hacendado;344;1.0;0.2;75.0;0.5;0;8.2;0;1000;1.15;carb;Conservas y despensa;1;e;base;
 Pasta integral;350;2.5;0.5;63.0;3.0;8.0;13.0;0.02;1000;1.15;carb;Conservas y despensa;1;e;base;
 Ñoquis de patata;174;0.4;0.2;37.6;0.2;0;4.5;0.9;500;2.00;carb;Refrigerados;3;e;base;Del envase: llevan conservantes y sal
 Patata;80;0.1;0.02;17.0;0.8;2.2;2.0;0.01;5000;4.50;carb;Frutería;1;e;base;
 Batata doce congelada;163;5.0;0.5;26;9.5;3.2;1.6;0.3;1000;3.53;carb;Congelados;1;e;base;
-Pan de semillas;271;5.1;0.7;43.0;2.6;6.2;11.0;1.0;450;3.00;carb;Panadería;4;e;base;Del envase: el azúcar y la sal cambian mucho entre marcas
+Pan de semillas;271;5.1;0.7;43.0;2.6;6.2;11.0;1.0;450;3.00;fijo;Panadería;4;e;base;Del envase: el azúcar y la sal cambian mucho entre marcas
 Lentejas cocidas (bote);95;0.5;;14.0;;;7.0;;570;1.00;carb;Conservas y despensa;3;e;base;Del envase: mira sobre todo la sal
 Garbanzos cocidos (bote);120;2.5;;16.0;;;7.0;;570;1.10;carb;Conservas y despensa;3;e;base;Del envase: mira sobre todo la sal
 Alubias cocidas (bote);100;0.6;;15.0;;;7.0;;570;1.05;carb;Conservas y despensa;3;e;base;Del envase: mira sobre todo la sal
@@ -17,7 +17,7 @@ Pavo en lonchas;124;5.0;1.7;1.0;0.0;0.0;20.0;0.4;500;8.20;prot;Huevos y lácteos
 Merluza congelada;82;1.2;0.3;0.5;0.5;0.0;18.0;0.2;500;9.80;prot;Congelados;1;e;proteina;
 Salmón congelado hacendado;223;16.0;2.3;0.0;0.0;0.0;20.0;0.1;500;23.8;prot;Congelados;1;e;proteina;
 Atún claro al natural;110;1.0;;0.0;;;25.0;;240;2.40;prot;Conservas y despensa;3;f;proteina;Del envase: mira la sal
-Huevos;150;11.1;3.1;0.5;0.5;0.0;12.5;0.4;720;3.05;fijo;Huevos y lácteos;1;f;proteina;
+Huevos;150;11.1;3.1;0.5;0.5;0.0;12.5;0.4;780;3.05;fijo;Huevos y lácteos;1;f;proteina;
 Leche semidesnatada;46;1.6;;4.8;;;3.2;;1000;0.79;fijo;Huevos y lácteos;1;e;lacteo;Del envase
 Yogur natural;60;3.0;;4.5;;;4.0;;500;0.95;fijo;Huevos y lácteos;1;e;lacteo;Del envase, el natural sin azúcar es NOVA 1
 Queso rallado (ingred.);380;29.0;;2.0;;;26.0;;200;2.20;grasa;Huevos y lácteos;3;e;grasa;Del envase: sal y grasa saturada altas
@@ -28,10 +28,10 @@ Guisantes congelados;80;0.4;0.1;11.0;3.5;5.0;5.5;0.02;1000;1.70;fijo;Congelados;
 Champiñón laminado;22;0.3;0.05;1.0;0.5;1.0;3.0;0.01;500;1.60;fijo;Frutería;1;e;verdura;
 Verduras asadas (batch);45;2.0;0.3;5.0;3.5;2.0;1.5;0.10;1000;2.00;fijo;Frutería;1;e;verdura;Calabacín, pimiento y cebolla con un poco de aceite
 Tomate cherry;20;0.2;0.03;3.0;2.8;1.2;1.0;0.01;500;1.70;fijo;Frutería;1;e;verdura;
-Bolsita de fruta;65;0.2;;15.0;;;0.4;;400;1.90;carb;Conservas y despensa;3;e;fruta;Del envase: que sea 100 % fruta, sin azúcar añadido
+Bolsita de fruta;65;0.2;;15.0;;;0.4;;400;1.90;fijo;Conservas y despensa;3;e;fruta;Del envase: que sea 100 % fruta, sin azúcar añadido
 Almendras;600;53.0;4.0;5.0;4.4;12.5;21.0;0.0;200;3.00;grasa;Conservas y despensa;1;e;grasa;Crudas o tostadas sin sal
 Batido proteínas (botella);60;1.5;;5.5;;;6.0;;330;1.20;prot;Huevos y lácteos;4;e;proteina;Del envase
-Plátano;89;0.3;0.1;20.0;12.2;2.6;1.1;0.0;1000;1.75;carb;Frutería;1;e;fruta;
+Plátano;89;0.3;0.1;20.0;12.2;2.6;1.1;0.0;1000;1.75;fijo;Frutería;1;e;fruta;
 Manzana;52;0.2;0.03;12.0;10.4;2.4;0.3;0.0;1000;2.00;carb;Frutería;1;e;fruta;
 Nueces;654;65.0;6.1;7.0;2.6;6.7;15.0;0.0;500;4.50;grasa;Conservas y despensa;1;e;grasa;
 Crema de cacahuete;600;50.0;;12.0;;;25.0;;500;3.00;grasa;Conservas y despensa;2;e;grasa;Del bote: la de 100 % cacahuete es NOVA 2, con azúcar y aceites, NOVA 4
@@ -40,3 +40,9 @@ Aceite de oliva virgen ex.;900;100.0;14.0;0.0;0.0;0.0;0.0;0.0;1000;7.50;grasa;Co
 Fajitas 100% integrales;271;5.8;1.9;41;2.1;8.5;9.3;1.5;320;4.31;carb;Panadería;4;e;base;Macros y precio estimados: copia los del envase
 Carne picada vacuno y cerdo;230;17.0;7.0;0.5;0.3;0.0;18.0;1.2;400;3.20;prot;Carnicería;3;e;proteina;El preparado de carne picada lleva sal y conservante: copia los del envase
 Pimiento y cebolla;30;0.2;0.03;5.5;4.0;1.8;1.0;0.01;1000;2.50;fijo;Frutería;1;e;verdura;Para las fajitas, en tiras
+Claras de huevo (brik);48;0.2;0.0;0.7;0.7;0.0;11.0;0.4;1000;3.50;prot;Huevos y lácteos;1;e;proteina;Para las tortitas de avena. Macros y precio estimados: copia los del envase
+Jamón serrano (lonchas);245;13.0;4.5;0.5;0.5;0.0;31.0;4.5;100;2.00;prot;Huevos y lácteos;3;e;proteina;Mucha sal: mejor en poca cantidad. Macros y precio estimados
+Fuet;440;37.0;14.0;2.0;1.0;0.0;25.0;4.0;160;2.00;grasa;Huevos y lácteos;4;e;grasa;Mucha sal y grasa saturada. Macros y precio estimados
+Creatina monohidrato;0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;500;20.00;fijo;Conservas y despensa;1;e;lacteo;5 g al día, disuelta en la leche, el kéfir o el batido. No aporta calorías
+Zumo de naranja exprimido;45;0.2;0.0;10.4;8.4;0.2;0.7;0.0;1000;2.20;carb;Refrigerados;1;e;fruta;El que va en la nevera, sin azúcar añadido. Es lo que ajusta el hidrato del desayuno según el día
+Tortitas de arroz integral;380;2.8;0.6;80.0;0.5;3.5;8.0;0.02;130;1.10;carb;Conservas y despensa;3;e;base;Sin sal. Una tortita pesa unos 8 g. Macros y precio estimados

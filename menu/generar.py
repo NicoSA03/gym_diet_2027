@@ -76,7 +76,7 @@ NO_JUNTOS = [
 ]
 
 # Alimentos que no quieres que entren en platos nuevos de ninguna toma.
-NUNCA = {"Batido proteínas (botella)", "Verduras asadas (batch)"}
+NUNCA = {"Batido proteínas (botella)", "Verduras asadas (batch)", "Creatina monohidrato"}
 
 # Un plato de mediodía o de cena no se hace con avena, batido ni fruta, por mucho
 # que los números cuadren. Y un desayuno no se hace con lentejas.
@@ -88,8 +88,9 @@ NO_DE_DESAYUNO = {"Lentejas cocidas (bote)", "Garbanzos cocidos (bote)",
                   "Verdura congelada", "Guisantes congelados", "Tomate cherry",
                   "Ternera magra (babilla)", "Merluza congelada", "Salmón congelado hacendado",
                   "Atún claro al natural", "Pechuga de pollo", "Filete de pavo",
-                  "Patata", "Ñoquis de patata", "Pasta integral", "Arroz redondo Hacendado",
-                  "Aceite de oliva virgen ex.", "Queso rallado (ingred.)"}
+                  "Patata", "Batata doce congelada", "Ñoquis de patata", "Pasta integral", "Arroz redondo Hacendado",
+                  "Aceite de oliva virgen ex.", "Queso rallado (ingred.)",
+                  "Fajitas 100% integrales", "Carne picada vacuno y cerdo", "Pimiento y cebolla"}
 NO_EN = {"C": NO_DE_PLATO, "N": NO_DE_PLATO, "D": NO_DE_DESAYUNO}
 
 # Ración razonable de cada alimento, en gramos. Lo que no esté aquí se deduce de
@@ -107,16 +108,19 @@ RACION = {
     "Proteína en polvo": (10, 35),
     "Patata": (150, 700), "Batata doce congelada": (80, 345), "Ñoquis de patata": (150, 500),
     "Lentejas cocidas (bote)": (200, 560), "Garbanzos cocidos (bote)": (200, 560),
-    "Alubias cocidas (bote)": (200, 395), "Pan de semillas": (30, 170),
+    "Alubias cocidas (bote)": (200, 395), "Pan de semillas": (30, 110),
     "Arroz redondo Hacendado": (50, 220), "Pasta integral": (50, 220),
-    "Copos de avena Hacendado": (40, 200),
+    "Copos de avena Hacendado": (30, 60),
+    "Tortitas de arroz integral": (15, 60), "Zumo de naranja exprimido": (150, 250),
+    "Claras de huevo (brik)": (100, 300), "Jamón serrano (lonchas)": (20, 80),
+    "Fuet": (15, 40), "Creatina monohidrato": (3, 10),
     "Aceite de oliva virgen ex.": (5, 28), "Queso rallado (ingred.)": (8, 35),
     "Crema de cacahuete": (8, 35), "Nueces": (15, 50), "Almendras": (15, 50),
     "Aguacate": (50, 150),
     "Gazpacho (brik)": (150, 300), "Champiñón laminado": (100, 250),
     "Verdura congelada": (100, 250), "Guisantes congelados": (100, 220),
     "Tomate cherry": (80, 200),
-    "Plátano": (90, 220), "Manzana": (100, 250), "Bolsita de fruta": (100, 200),
+    "Plátano": (80, 110), "Manzana": (100, 250), "Bolsita de fruta": (100, 200),
     "Leche semidesnatada": (150, 450), "Yogur natural": (125, 375),
     "Kéfir natural": (125, 375),
     "Batido proteínas (botella)": (330, 330),    # formato cerrado: una botella

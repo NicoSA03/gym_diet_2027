@@ -71,7 +71,9 @@ LIM={"Pechuga de pollo":320,"Salmón congelado hacendado":300,"Ternera magra (ba
      "Lentejas cocidas (bote)":850,"Garbanzos cocidos (bote)":850,"Alubias cocidas (bote)":600,
      "Patata":1200,"Batata doce congelada":580,
      "Verdura congelada":350,"Guisantes congelados":300,"Champiñón laminado":350,
-     "Tomate cherry":300,"Gazpacho (brik)":400}
+     "Tomate cherry":300,"Gazpacho (brik)":400,
+     "Pan de semillas":125,"Copos de avena Hacendado":65,"Plátano":120,"Zumo de naranja exprimido":400,
+     "Tortitas de arroz integral":80}
 peores={}
 for f in M.FASES:
     for t in M.TIPOS:
