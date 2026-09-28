@@ -2,8 +2,8 @@ toma;plato;alimentos;gramos;notas
 P;Plátano y batido;Plátano|Proteína en polvo;165|13;
 P;Avena líquida;Leche semidesnatada|Copos de avena Hacendado;250|22;
 P;De bolsillo;Pan de semillas|Crema de cacahuete|Proteína en polvo;50|9|10;
-D;Avena completa;Copos de avena Hacendado|Pan de semillas|Leche semidesnatada|Queso batido 0% / skyr|Plátano|Crema de cacahuete;120|60|380|210|160|16;
-D;Salado;Huevos|Pan de semillas|Yogur natural|Plátano|Crema de cacahuete|Queso batido 0% / skyr;180|165|250|165|15|120;
+D;Avena completa;Copos de avena Hacendado|Pan de semillas|Leche semidesnatada|Proteína en polvo|Plátano|Crema de cacahuete;130|60|380|25|160|16;
+D;Salado;Huevos|Pavo en lonchas|Pan de semillas|Yogur natural|Plátano|Crema de cacahuete;180|60|165|250|165|15;
 D;Batido con prisa;Leche semidesnatada|Copos de avena Hacendado|Pan de semillas|Plátano|Crema de cacahuete|Proteína en polvo;480|95|60|170|22|28;
 D;Avena con kéfir;Copos de avena Hacendado|Pan de semillas|Leche semidesnatada|Kéfir natural|Plátano|Proteína en polvo;120|60|380|210|160|20;
 C;Ñoquis con pollo;Ñoquis de patata|Pechuga de pollo|Verdura congelada|Queso rallado (ingred.)|Aceite de oliva virgen ex.;455|185|200|15|18;
@@ -31,7 +31,7 @@ N;Arroz con pollo;Arroz redondo Hacendado|Pechuga de pollo|Verdura congelada;70|
 N;Atún y gazpacho;Gazpacho (brik)|Atún claro al natural|Pan de semillas;250|145|85;
 N;Alubias con huevo;Alubias cocidas (bote)|Huevos|Verdura congelada;240|130|120;
 N;Ñoquis con pollo;Ñoquis de patata|Pechuga de pollo|Champiñón laminado;170|150|150;
-N;Patata y huevos;Patata|Huevos|Queso batido 0% / skyr;230|120|205;
+N;Patata y huevos;Patata|Huevos|Filete de pavo;230|120|100;
 N;Merluza con batata;Batata doce congelada|Merluza congelada|Guisantes congelados;125|210|150;
 N;Pasta con pavo;Pasta integral|Filete de pavo|Guisantes congelados|Aceite de oliva virgen ex.;60|130|110|5;
 N;Arroz con merluza;Arroz redondo Hacendado|Merluza congelada|Verdura congelada|Aceite de oliva virgen ex.;55|215|180|5;
@@ -46,8 +46,8 @@ T2;Fruta y almendras;Almendras|Manzana;30|200;
 T;Frutos secos y batido;Nueces|Plátano|Proteína en polvo;32|130|20;
 T;Botella y almendras;Batido proteínas (botella)|Almendras|Bolsita de fruta;330|28|100;
 T;Mezcla;Almendras|Nueces|Manzana|Proteína en polvo;25|15|200|16;
-Z;Skyr;Queso batido 0% / skyr|Nueces;230|14;
+Z;Kéfir con nueces;Kéfir natural|Proteína en polvo|Nueces;150|8|14;
 Z;Leche;Leche semidesnatada|Proteína en polvo;300|19;
 Z;Yogur;Yogur natural|Proteína en polvo;250|18;
-C;Fajitas de pollo;Fajitas 100% integrales|Pechuga de pollo|Pimiento y cebolla|Aceite de oliva virgen ex.;290|220|250|15;
-C;Fajitas de carne picada;Fajitas 100% integrales|Carne picada vacuno y cerdo|Pimiento y cebolla|Queso batido 0% / skyr;250|170|250|150;El skyr hace de salsa en lugar de nata agria
+C;Fajitas de pollo;Fajitas 100% integrales|Pechuga de pollo|Pimiento y cebolla|Aceite de oliva virgen ex.;298|200|250|15;
+C;Fajitas de carne picada;Fajitas 100% integrales|Carne picada vacuno y cerdo|Pimiento y cebolla|Yogur natural;250|170|250|150;El yogur natural hace de salsa en lugar de nata agria
