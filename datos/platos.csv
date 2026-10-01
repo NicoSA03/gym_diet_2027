@@ -7,7 +7,7 @@ D;Salado;Huevos|Jamón serrano (lonchas)|Fuet|Pan de semillas|Aceite de oliva vi
 D;Batido con prisa;Leche semidesnatada|Kéfir natural|Copos de avena Hacendado|Plátano|Crema de cacahuete|Proteína en polvo|Creatina monohidrato|Huevos|Pan de semillas|Zumo de naranja exprimido;150|200|55|100|20|30|5|120|100|200;Batido: leche, kéfir, avena, plátano, crema, proteína y creatina. Huevos cocidos y pan aparte
 D;Avena con kéfir;Copos de avena Hacendado|Leche semidesnatada|Kéfir natural|Proteína en polvo|Creatina monohidrato|Huevos|Pan de semillas|Aceite de oliva virgen ex.|Jamón serrano (lonchas)|Plátano|Zumo de naranja exprimido;55|150|210|20|5|120|100|10|30|100|200;
 C;Ñoquis con pollo;Ñoquis de patata|Pan de semillas|Pechuga de pollo|Verdura congelada|Queso rallado (ingred.)|Aceite de oliva virgen ex.;260|80|185|200|15|18;
-C;Lentejas con huevo;Lentejas cocidas (bote)|Arroz redondo Hacendado|Pan de semillas|Huevos|Verdura congelada|Aceite de oliva virgen ex.;250|60|80|180|150|22;
+C;Lentejas con huevo;Lentejas cocidas (bote)|Arroz redondo Hacendado|Pan de semillas|Huevos|Verdura congelada|Aceite de oliva virgen ex.;250|60|80|180|150|24;
 C;Pasta con ternera;Pasta integral|Tomate frito Hacendado|Pan de semillas|Ternera magra (babilla)|Champiñón laminado|Queso rallado (ingred.)|Aceite de oliva virgen ex.;110|100|80|170|150|15|10;
 C;Batata con pollo;Batata doce congelada|Pan de semillas|Pechuga de pollo|Guisantes congelados|Aceite de oliva virgen ex.;260|80|210|120|15;
 C;Arroz con salmón;Arroz redondo Hacendado|Pan de semillas|Salmón congelado hacendado|Verdura congelada|Aceite de oliva virgen ex.;110|80|200|200|5;
@@ -37,7 +37,7 @@ N;Pasta con pavo;Pasta integral|Tomate frito Hacendado|Filete de pavo|Guisantes 
 N;Arroz con merluza;Arroz redondo Hacendado|Merluza congelada|Verdura congelada|Aceite de oliva virgen ex.;55|215|180|5;
 N;Patata con atún;Patata|Atún claro al natural|Huevos|Tomate cherry;275|105|70|180;
 N;Garbanzos con pavo;Garbanzos cocidos (bote)|Filete de pavo|Verdura congelada;270|110|100;
-N;Lentejas con pollo;Lentejas cocidas (bote)|Pechuga de pollo|Champiñón laminado;335|110|100;
+N;Lentejas con pollo;Lentejas cocidas (bote)|Pechuga de pollo|Champiñón laminado;300|125|100;
 N;Alubias con pavo;Alubias cocidas (bote)|Filete de pavo|Champiñón laminado;330|110|100;
 N;Ñoquis con ternera;Ñoquis de patata|Ternera magra (babilla)|Champiñón laminado;150|130|250;
 T2;Frutos secos y bocadillo;Nueces|Bolsita de fruta|Tortitas de arroz integral|Pan de semillas|Pavo en lonchas;30|100|30|80|50;Bocadillo de pavo

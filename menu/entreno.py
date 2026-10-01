@@ -142,10 +142,26 @@ EJ = {
   nota="Sube hasta la altura del hombro y baja despacio.",
   cue="Sube hasta la altura del hombro y baja despacio.",
   sus="Elevaciones laterales en polea"),
-"Face pull":               dict(m=["Hombro","Espalda"], p="Tirón alto",
+"Face pull":               dict(m=["Hombro","Espalda","Trapecio"], p="Tirón alto",
   nota="A la altura de la cara, con los codos por encima de las muñecas.",
   cue="A la altura de la cara, con los codos por encima de las muñecas.",
   sus="Pájaros con mancuernas tumbado en banco inclinado"),
+"Encogimientos con mancuernas": dict(m=["Trapecio"], p="Aislamiento",
+  nota="Sube los hombros hacia las orejas, pausa de un segundo y baja del todo; sin girar los hombros.",
+  cue="Sube los hombros hacia las orejas, pausa de un segundo y baja del todo; sin girar los hombros.",
+  sus="Encogimientos con barra o en máquina Smith"),
+"Fondos en paralelas":     dict(m=["Pectoral","Tríceps"], p="Empuje vertical",
+  nota="Torso algo inclinado hacia delante y baja hasta que el hombro quede a la altura del codo; pasadas las 15, lastre con cinturón.",
+  cue="Torso algo inclinado hacia delante y baja hasta que el hombro quede a la altura del codo; pasadas las 15, lastre con cinturón.",
+  sus="Fondos asistidos en máquina o press declinado"),
+"Curl martillo":           dict(m=["Bíceps"], p="Aislamiento",
+  nota="Agarre neutro, codos pegados y sin balanceo; trabaja braquial y antebrazo.",
+  cue="Agarre neutro, codos pegados y sin balanceo; trabaja braquial y antebrazo.",
+  sus="Curl en polea con cuerda"),
+"Crunch en polea alta":    dict(m=["Abdomen"], p="Aislamiento",
+  nota="De rodillas y con la cuerda junto a la cabeza, enrolla las costillas hacia la pelvis; la cadera no se mueve.",
+  cue="De rodillas y con la cuerda junto a la cabeza, enrolla las costillas hacia la pelvis; la cadera no se mueve.",
+  sus="Crunch con disco en el suelo"),
 }
 
 
@@ -247,15 +263,16 @@ TABATA_REGLA = (
 
 # ---------------------------------------------------------------- semana
 DIAS = [
-dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerza", dur="65–75 min",
+dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerza", dur="65–80 min",
   cal=["Bici o remo suave 5 min",
        "Movilidad de cadera y tobillo 3 min",
        "2 × 5 saltos al cajón bajo — toda la pliometría de la semana empieza aquí"],
   ej=[("T1","Sentadilla trasera"),("T1","Press banca"),
       ("T2","Peso muerto rumano"),("T2","Remo con barra"),
-      ("T3","Flexión clásica"),("T3","Curl de bíceps con barra Z"),("TF","Elevación de talones")],
+      ("T3","Flexión clásica"),("T3","Curl de bíceps con barra Z"),
+      ("TF","Elevación de talones"),("TF","Encogimientos con mancuernas")],
   tabata="A",
-  nota=""),
+  nota="Talones y encogimientos van en superserie: los dos de pie y con las mismas mancuernas, así no suman tiempo."),
 
 dict(cod="M", dia="Martes", n="Carrera de calidad", sub="VO2máx y umbral", tipo="carrera", dur="50–60 min",
   cal=["Trote muy suave 10 min",
@@ -270,24 +287,24 @@ dict(cod="X", dia="Miércoles", n="Fuerza B", sub="Tirón y cadena posterior", t
        "2 × 10 pogos (saltitos con el tobillo rígido)"],
   ej=[("T1","Peso muerto convencional"),("T1","Dominadas lastradas"),
       ("T2","Zancada búlgara"),("T2","Press militar de pie"),
-      ("T3","Extensión de tríceps en polea"),("TF","Elevación de talones")],
+      ("T3","Fondos en paralelas"),("T3","Curl martillo"),("TF","Elevación de talones")],
   tabata="B",
-  nota="Peso muerto a las siete de la mañana pide diez minutos de calentamiento de verdad. No los recortes."),
+  nota="Peso muerto a las siete de la mañana pide diez minutos de calentamiento de verdad. No los recortes. Fondos y curl martillo, en superserie."),
 
 dict(cod="J", dia="Jueves", n="Tirada larga", sub="Base aeróbica en Z2", tipo="carrera", dur="45–80 min",
   cal=["Los tres primeros kilómetros SON el calentamiento: sal más lento de lo que te pide el cuerpo"],
   ej=[], tabata=None,
   nota="Toda en Z2: tienes que poder hablar frases completas. Si no puedes, vas demasiado rápido, y una tirada larga rápida no entrena nada y te deja sin el viernes."),
 
-dict(cod="V", dia="Fuerza C", n="Fuerza C", sub="Funcional y densidad", tipo="fuerza", dur="60–70 min",
+dict(cod="V", dia="Fuerza C", n="Fuerza C", sub="Funcional y densidad", tipo="fuerza", dur="65–75 min",
   cal=["Cuerda o bici 5 min",
        "Movilidad global 3 min",
        "3 × 3 saltos horizontales"],
   ej=[("T1","Sentadilla frontal"),("T1","Press inclinado con mancuernas"),
       ("T2","Hip thrust"),("T2","Remo con mancuerna a una mano"),
-      ("T3","Elevaciones laterales"),("T3","Face pull")],
+      ("T3","Elevaciones laterales"),("T3","Face pull"),("T3","Crunch en polea alta")],
   tabata="C",
-  nota="Última sesión antes de dos días sin entrenar. Puedes dejarte más que ningún otro día: tienes el sábado y el domingo para recuperar."),
+  nota="Crunch en polea en superserie con las elevaciones laterales. Última sesión antes de dos días sin entrenar. Puedes dejarte más que ningún otro día: tienes el sábado y el domingo para recuperar."),
 ]
 DIAS[4]["dia"]="Viernes"
 

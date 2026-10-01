@@ -29,8 +29,10 @@ for fc,f in FASES.items():
     # F0 (rearranque) y F5 (afinamiento) van por debajo a propósito:
     # ahí el suelo es el de mantenimiento, no el de construcción.
     piso = 6 if fc in ("F0","F5") else 10
+    # Abdomen: el crunch en polea es un complemento; el grueso lo pone el tabata
+    # de cada día de fuerza, que no se cuenta en series. Solo se mira el techo.
     malos=[(m,v) for m,v in vol.items()
-           if not ((piso<=v<=22) if m in GRANDES else (4<=v<=22))]
+           if not ((piso<=v<=22) if m in GRANDES else ((v<=22) if m=="Abdomen" else (4<=v<=22)))]
     chk(not malos, f"{fc} {f['n'][:20]:20s} " +
         " ".join(f"{m[:4]}{v}" for m,v in sorted(vol.items())) +
         ("" if not malos else f"  ← fuera de rango: {malos}"))

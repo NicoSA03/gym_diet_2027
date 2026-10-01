@@ -9,7 +9,7 @@ DESCANSO = {"T1": 180, "T2": 120, "T3": 90, "TF": 60}
 
 # Ejercicios de peso corporal: lo que se apunta en «kg» es el lastre, y el 1RM
 # estimado se calcula con tu peso corporal + lastre
-CORPORAL = {"Flexión clásica", "Dominadas lastradas"}
+CORPORAL = {"Flexión clásica", "Dominadas lastradas", "Fondos en paralelas"}
 
 # Rango útil de series semanales por grupo (el mismo que usa ver_entreno.py)
 GRANDES = ["Cuádriceps", "Isquios", "Glúteo", "Pectoral", "Espalda", "Hombro"]
