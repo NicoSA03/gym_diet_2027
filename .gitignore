@@ -3,5 +3,4 @@ __pycache__/
 salida/
 fuente_junio2027.txt
 menu/pay_*.json
-obsoleto/
 *.tmp
