@@ -14,7 +14,7 @@
 import sys, os, json, argparse, hashlib, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from comun import CAMPOS, SUPER
-import fuente_mercadona, fuente_off
+import fuente_mercadona, catalogo.fuente_openFood as fuente_openFood
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SALIDA = os.path.join(RAIZ, "docs", "catalogo.json")
@@ -67,7 +67,7 @@ def main():
             continue
         try:
             nuevo = (fuente_mercadona.obtener() if letra == "M"
-                     else fuente_off.obtener_tienda(letra))
+                     else fuente_openFood.obtener_tienda(letra))
             if previo and len(nuevo) < MINIMO * len(previo):
                 raise RuntimeError(f"solo {len(nuevo)} productos frente a "
                                    f"{len(previo)} la vez anterior")
