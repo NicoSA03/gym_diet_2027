@@ -463,4 +463,31 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 
 ---
 
+## 9. Catálogo de alimentos (Mercadona, Lidl y Carrefour)
+
+`docs/catalogo.json` reúne los alimentos de las tres tiendas con sus valores por 100 g. Lo usa la app para buscar alimentos sin conexión.
+
+| Tienda | De dónde sale | Qué trae |
+|---|---|---|
+| Mercadona | [MercaAPI](https://mercaapi.sgn.space), una API **no oficial** y gratuita que copia la tienda online | Macros, precio, formato y código de barras |
+| Lidl y Carrefour | [Open Food Facts](https://world.openfoodfacts.org), la base de datos abierta de alimentos | Macros, formato y código de barras (sin precio) |
+
+**Se actualiza solo** cada lunes por la mañana: lo hace GitHub con `.github/workflows/catalogo.yml` y, si hay cambios, deja un commit «catálogo: actualización automática». Por eso, **antes de subir tus cambios haz `git pull`**, o el push te dará error.
+
+Para lanzarlo a mano: en GitHub, pestaña **Actions → Catálogo de alimentos → Run workflow**. O en tu PC:
+
+```bash
+python3 catalogo/actualizar_catalogo.py            # las tres tiendas (unos 10 minutos)
+python3 catalogo/actualizar_catalogo.py --solo M   # solo Mercadona (unos 2 minutos)
+```
+
+Cosas que conviene saber:
+
+- **Nunca se vacía.** Si una fuente falla o trae menos de la mitad de productos que la vez anterior, se conservan sus datos anteriores y queda anotado en `fuentes` dentro del propio archivo.
+- **Datos dudosos.** Si las kcal de un producto no cuadran con sus macros (4/4/9, ±15 %), se marca como dudoso en vez de esconderlo: la app lo enseña con un aviso.
+- **Open Food Facts lo rellenan usuarios.** Están los productos más escaneados de cada tienda, no todos. Lo que falte se podrá añadir desde la app con el escáner.
+- Las piezas están separadas para cambiar una fuente sin tocar las demás: `catalogo/fuente_mercadona.py`, `catalogo/fuente_off.py`, `catalogo/comun.py` (descarga, formato y control de calidad) y `catalogo/actualizar_catalogo.py` (el que lo une todo).
+
+---
+
 *Versión del sistema: 25 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · ciclo de 39 semanas sin fechas fijas, con Registro, app instalable y base de datos de alimentos y platos.*
