@@ -38,14 +38,14 @@
   cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center}
 .esc summary::-webkit-details-marker{display:none}
 .esc summary::after{content:"+";font-family:var(--mono);font-size:17px;color:var(--accent-ink);font-weight:400}
-.esc[open] summary::after{content:"–"}
+.esc[open] summary::after{content:"-"}
 .esc[open] summary{border-bottom:1px solid var(--line);background:var(--surface-2)}
 .esc p{padding:14px 18px;font-size:15.5px;color:var(--ink-2);line-height:1.55}
 </style>
 
 <div class="wrap">
 <header class="masthead">
-  <p class="eyebrow">Cómo funciona el plan · Resumen y reglas · Sistema de tres piezas</p>
+  <p class="eyebrow">Cómo funciona el plan, Resumen y reglas, Sistema de tres piezas</p>
   <h1>Cómo funciona <em>todo esto</em></h1>
   <p class="dek">El porqué de cada decisión, las calorías de cada etapa del macrociclo y qué hacer cuando la vida se cruza. Los menús con los pesos y la lista de la compra están en los otros dos archivos.</p>
   <div class="hermanos">
@@ -65,10 +65,10 @@
       <p class="prose">85 kg al 10 % de grasa son 76,5 kg de masa magra, y hoy tienes unos 68. Eso serían +8,5 kg de músculo en cuarenta semanas, más del doble del techo fisiológico de alguien con tu base, y eso entrenando solo fuerza. Los 85 kg reales llegan repitiendo este mismo ciclo un par de veces más.</p>
       <p class="prose">Además, meter tres carreras semanales en lugar de dos cardios suaves cuesta en torno a un <strong>18 % de la ganancia de músculo</strong>: pasas de +3,7 kg a +3,0 kg. A cambio ganas unos ocho puntos de VDOT y cinco minutos en el 5 km. Es un buen trato si quieres ser híbrido, pero quiero que sepas exactamente qué estás pagando.</p>
       <div class="vg">
-        <div><span class="k">Al empezar</span><span class="v">78,0 kg · 68,2 magra · 12,5 % grasa</span></div>
-        <div><span class="k">Pico de volumen · semana 24</span><span class="v">83,5 kg · 72,3 magra · 13,3 %</span></div>
-        <div><span class="k">Objetivo · semana 39</span><span class="v">78,7 kg · 71,2 magra · 9,5 %</span></div>
-        <div><span class="k">Carrera</span><span class="v">5 km: 27:30 → 22:30 · VDOT 34 → 43</span></div>
+        <div><span class="k">Al empezar</span><span class="v">78,0 kg, 68,2 magra, 12,5 % grasa</span></div>
+        <div><span class="k">Pico de volumen, semana 24</span><span class="v">83,5 kg, 72,3 magra, 13,3 %</span></div>
+        <div><span class="k">Objetivo, semana 39</span><span class="v">78,7 kg, 71,2 magra, 9,5 %</span></div>
+        <div><span class="k">Carrera</span><span class="v">5 km: 27:30 → 22:30, VDOT 34 → 43</span></div>
       </div>
     </div>
   </div>
@@ -81,8 +81,8 @@
     <div class="chips" id="fases" role="tablist" aria-label="Bloque del macrociclo"></div>
     <div class="card">
       <div class="card-top">
-        <h3 id="f-nombre">—</h3>
-        <span class="aside" id="f-fechas">—</span>
+        <h3 id="f-nombre"></h3>
+        <span class="aside" id="f-fechas"></span>
       </div>
       <div class="macro-row" id="f-macros"></div>
       <div class="tscroll" style="border:none;border-radius:0">
@@ -95,7 +95,7 @@
         </table>
       </div>
     </div>
-    <p class="nota" id="f-nota">—</p>
+    <p class="nota" id="f-nota"></p>
   </div>
 </section>
 
@@ -106,8 +106,8 @@
     <div class="chips" id="tipos" role="tablist" aria-label="Tipo de día"></div>
     <div class="card">
       <div class="card-top">
-        <h3 id="t-nombre">—</h3>
-        <span class="aside" id="t-mult">—</span>
+        <h3 id="t-nombre"></h3>
+        <span class="aside" id="t-mult"></span>
       </div>
       <div class="linea" id="t-hor"></div>
     </div>
@@ -121,7 +121,7 @@
     <div class="rule"><span class="i">02</span><p><b>La tarde son dos cosas y ninguna decisión:</b> una bolsita de frutos secos a las cinco y un potito de fruta a las siete y media. Los frutos secos son la pieza clave porque concentran 600 kcal por cada 100 g: un puñado resuelve casi 200 kcal sin que pares a comer. Llévalos pesados desde casa, porque comiendo del paquete grande se van 400 kcal sin enterarte.</p></div>
     <div class="rule"><span class="i">03</span><p><b>La cena es magra y la dejas hecha al mediodía.</b> Unos 34 g de proteína y solo 7 de grasa. Ese perfil no es casual: una hora antes de dormir quieres proteína, que alimenta la recuperación nocturna, y poca grasa, que es lo que retrasa el vaciado del estómago y te complica conciliar el sueño.</p></div>
     <div class="rule"><span class="i">04</span><p><b>El desayuno es post-entreno y es la toma más cargada de carbohidrato del día:</b> unos 157 g con solo 23 de grasa. Vienes de entrenar, el músculo está receptivo, y la grasa a esa hora solo ralentizaría la digestión de lo que sí te interesa reponer.</p></div>
-    <div class="rule"><span class="i">05</span><p><b>El cazo es tu único mando manual.</b> Un cazo son 145 kcal: 40 g de arroz en crudo, 60 g de pasta, 200 g de patata o batata, 100 g de ñoquis, 30 g de avena o 45 g de pan. Si un día te pasas o te quedas corto, ajusta ahí. No toques nunca la proteína ni la verdura.</p></div>
+    <div class="rule"><span class="i">05</span><p><b>La calculadora de Menús ajusta por ti.</b> Si tienes otra cantidad de un alimento, la escribes y el resto del plato se recoloca para mantener las kcal y la proteína. Si un día te pasas o te quedas corto, la diferencia pasa a las comidas que quedan. La verdura no se toca nunca. Sin la app, la referencia de siempre: un cazo son 145 kcal (40 g de arroz en crudo, 60 g de pasta, 200 g de patata o batata, 100 g de ñoquis, 30 g de avena o 45 g de pan).</p></div>
     <div class="rule"><span class="i">06</span><p><b>El sábado se queda corto a propósito y el domingo se pasa a propósito.</b> Entre que te levantas a las once y media y entras a trabajar a las seis no hay horas materiales para meter 4.300 kcal sin que te siente mal en el turno. Esas calorías las recupera el domingo. Cuadra a nivel de semana, que es el nivel que decide.</p></div>
   </div>
 </section>
@@ -153,7 +153,7 @@
     <div class="rule"><span class="i">01</span><p><b>No hace falta instalar nada.</b> Abre esta página en el navegador del móvil y usa «Añadir a pantalla de inicio»: en iPhone está en el botón de compartir de Safari, en Android en el menú de tres puntos de Chrome. Te deja un icono en el escritorio que abre a pantalla completa, sin barra de navegador. Funciona igual que una app, pero sin APK ni tienda.</p></div>
     <div class="rule"><span class="i">02</span><p><b>Hazlo con las tres.</b> Esta, la de menús y la de la compra son tres páginas distintas con tres iconos distintos. Las pastillas de arriba saltan de una a otra, así que con añadir la de menús ya llegas a las demás en un toque.</p></div>
     <div class="rule"><span class="i">03</span><p><b>Lo que marques se queda en ese móvil.</b> La fase, el día, las opciones de cada toma y las casillas de la compra se guardan en el navegador del teléfono donde las marcas. No se sincronizan entre móvil y ordenador: si haces la compra desde el móvil, márcala en el móvil.</p></div>
-    <div class="rule"><span class="i">04</span><p><b>Necesita conexión para cargar.</b> Una vez abierta funciona sola, pero la primera carga baja de internet. Si vas a estar sin cobertura —el súper del sótano, el gimnasio sin datos— ábrela antes de entrar o tira del PDF, que sí es cien por cien offline.</p></div>
+    <div class="rule"><span class="i">04</span><p><b>Necesita conexión para cargar.</b> Una vez abierta funciona sola, pero la primera carga baja de internet. Si vas a estar sin cobertura -el súper del sótano, el gimnasio sin datos- ábrela antes de entrar o tira del PDF, que sí es cien por cien offline.</p></div>
   </div>
 </section>
 

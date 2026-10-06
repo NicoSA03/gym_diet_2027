@@ -7,7 +7,7 @@ const ZONA={casa:"Casa",uni:"Universidad",trabajo:"Trabajo",fuera:""};
 
 function pintaFase(){
   const v = I.fases[fase];
-  document.getElementById("f-nombre").textContent = fase + " · " + v.n;
+  document.getElementById("f-nombre").textContent = fase + ": " + v.n;
   document.getElementById("f-fechas").textContent = v.f;
   const box = document.getElementById("f-macros"); box.replaceChildren();
   [["kcal / día",0,""],["Proteína",1,"g"],["Grasa",2,"g"],["Carbohidrato",3,"g"]].forEach(([n,i,u])=>{
@@ -20,7 +20,7 @@ function pintaFase(){
     const d = v.tipos[t], ti = I.tipos[t];
     const tr = el("tr");
     if(t===tipo) tr.className="destacada";
-    tr.append(el("td","ex", t+" · "+ti.n));
+    tr.append(el("td","ex", t+": "+ti.n));
     tr.append(el("td","dia", ti.d));
     tr.append(el("td","num", nf(d.kcal)));
     tr.append(el("td","num", d.p+" g"));
@@ -36,9 +36,9 @@ function pintaFase(){
 
 function pintaTipo(){
   const t = I.tipos[tipo];
-  document.getElementById("t-nombre").textContent = tipo + " · " + t.n;
+  document.getElementById("t-nombre").textContent = tipo + ": " + t.n;
   document.getElementById("t-mult").textContent =
-    "×" + t.mult.toFixed(2).replace(".",",") + " sobre la media · " + t.d.toLowerCase();
+    "×" + t.mult.toFixed(2).replace(".",",") + " sobre la media, " + t.d.toLowerCase();
   const box = document.getElementById("t-hor"); box.replaceChildren();
   t.hor.forEach(([h,q,z])=>{
     const r = el("div","ln "+z);
@@ -53,14 +53,14 @@ function pintaTipo(){
 function render(){
   const fb=document.getElementById("fases"); fb.replaceChildren();
   Object.keys(I.fases).forEach(f=>{
-    const c=el("button","chip", f+" · "+I.fases[f].n);
+    const c=el("button","chip", f+": "+I.fases[f].n);
     c.setAttribute("role","tab"); c.setAttribute("aria-selected", f===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=f; guarda("fase-info",f); render(); });
     fb.append(c);
   });
   const tb=document.getElementById("tipos"); tb.replaceChildren();
   Object.keys(I.tipos).forEach(t=>{
-    const c=el("button","chip", t+" · "+I.tipos[t].d.split(" y ")[0]);
+    const c=el("button","chip", t+": "+I.tipos[t].d.split(" y ")[0]);
     c.setAttribute("role","tab"); c.setAttribute("aria-selected", t===tipo?"true":"false");
     c.addEventListener("click", ()=>{ tipo=t; guarda("tipo-info",t); render(); });
     tb.append(c);

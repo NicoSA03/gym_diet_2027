@@ -9,13 +9,13 @@ function render(){
   const v = C[fase];
   const fb = document.getElementById("fases"); fb.replaceChildren();
   Object.keys(C).forEach(f=>{
-    const c = el("button","chip", f+" · "+C[f].n);
+    const c = el("button","chip", f+": "+C[f].n);
     c.setAttribute("role","tab"); c.setAttribute("aria-selected", f===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=f; guarda("fase-compra",f); render(); });
     fb.append(c);
   });
   document.getElementById("f-nota").textContent =
-    v.f + " · objetivo de " + v.obj.toLocaleString("es-ES") + " kcal al día de media.";
+    v.f + ", objetivo de " + v.obj.toLocaleString("es-ES") + " kcal al día de media.";
 
   const box = document.getElementById("lista"); box.replaceChildren();
   let total=0, n=0, marcados=0, gastado=0;
@@ -35,7 +35,7 @@ function render(){
         guarda("hechos", JSON.stringify(hechos)); render();
       });
       const lab = el("label"); lab.htmlFor=k; lab.append(document.createTextNode(it.n));
-      const q = el("i","cal "+(it.q==="—" ? "x" : it.q), it.q || "—");
+      const q = el("i","cal "+(!it.q || it.q==="-" ? "x" : it.q), it.q || "?");
       q.title = it.qm || "Faltan datos de la etiqueta";
       lab.append(q);
       if(it.v){ const d=el("span","vf"); d.title="Precio verificado en tienda"; lab.append(d); }
@@ -47,7 +47,7 @@ function render(){
   document.getElementById("total").innerHTML =
     eur(total) + '<small>Total de la semana</small>';
   document.getElementById("cuenta").textContent =
-    marcados + " de " + n + " en el carro · " + eur(gastado) + " gastados";
+    marcados + " de " + n + " en el carro, " + eur(gastado) + " gastados";
   document.getElementById("prog").style.width = (n ? marcados/n*100 : 0) + "%";
 }
 document.getElementById("reset").addEventListener("click", ()=>{

@@ -21,7 +21,7 @@ function cargaDatos(){
 }
 let D = cargaDatos();
 function guarda(){
-  try{ localStorage.setItem(KEY, JSON.stringify(D)); }
+  try{ localStorage.setItem(KEY, JSON.stringify(D)); window.dispatchEvent(new CustomEvent("gd:peso")); }
   catch(e){ aviso("No se ha podido guardar: el navegador tiene el almacenamiento lleno o bloqueado."); }
 }
 let avisoT = null;
@@ -66,7 +66,7 @@ function fmtDur(seg){
 }
 const fmtMS = s=>Math.floor(s/60)+":"+z2(s%60);
 const fmtDesc = s=>s%60 ? Math.floor(s/60)+"min "+s%60+"s" : (s/60)+"min";
-function ritmo(km, min){ if(!(km>0) || !(min>0)) return "—"; const s=Math.round(min*60/km); return fmtMS(s)+"/km"; }
+function ritmo(km, min){ if(!(km>0) || !(min>0)) return "-"; const s=Math.round(min*60/km); return fmtMS(s)+"/km"; }
 
 // ---------------------------------------------------------------- cálculos
 function e1rm(kg, reps){
@@ -126,9 +126,9 @@ function pintaInicio(){
   const w = semanaDe(hoy());
   s.classList.remove("fin");
   if(w === null){ s.textContent = ""; }
-  else if(w < 1){ s.textContent = "· empiezas en " + (1-w) + (1-w===1 ? " semana" : " semanas"); }
-  else if(w > R.semanas){ s.textContent = "· ciclo terminado · elige bloque"; s.classList.add("fin"); }
-  else { s.textContent = "· semana " + w + " de " + R.semanas + " · " + faseDe(hoy()); }
+  else if(w < 1){ s.textContent = ", empiezas en " + (1-w) + (1-w===1 ? " semana" : " semanas"); }
+  else if(w > R.semanas){ s.textContent = ", ciclo terminado, elige bloque"; s.classList.add("fin"); }
+  else { s.textContent = ", semana " + w + " de " + R.semanas + ", " + faseDe(hoy()); }
 }
 document.getElementById("r-ini").addEventListener("change", function(){
   D.inicio = this.value || null;
@@ -157,7 +157,7 @@ function vEntrenar(box){
   card.append(el("p","eyebrow","Bloque"));
   const fc = el("div","chips");
   Object.keys(R.fases).forEach(k=>{
-    const c = el("button","chip sm",k+" · "+R.fases[k].n);
+    const c = el("button","chip sm",k+": "+R.fases[k].n);
     c.setAttribute("aria-selected", k===selFase?"true":"false");
     c.addEventListener("click", ()=>{ selFase=k; render(); });
     fc.append(c);
@@ -177,11 +177,11 @@ function vEntrenar(box){
     card.append(el("p","nota","Has terminado las "+R.semanas+" semanas del ciclo. Elige arriba con qué bloque sigues; si quieres empezar otro ciclo entero, pon la fecha de inicio de hoy."));
   if(diaDe(h)===null) card.append(el("p","nota","Hoy es fin de semana y el plan no entrena. Si aun así vas a recuperar una sesión, elige cuál."));
 
-  card.append(el("h3",null,d.dia+" · "+d.n), el("p","nota",d.sub));
+  card.append(el("h3",null,d.dia+": "+d.n), el("p","nota",d.sub));
   if(d.tipo==="fuerza"){
     const l = el("div","r-prev");
     d.ej.forEach(([t,n])=>{ const p=f.esquema[t]; const r=el("div"); r.append(el("span",null,n), el("b",null,p[0]+" × "+p[1])); l.append(r); });
-    if(d.tabata){ const r=el("div"); r.append(el("span",null,"Abdominales · "+R.tabatas[d.tabata]), el("b",null,"8 × 20 s")); l.append(r); }
+    if(d.tabata){ const r=el("div"); r.append(el("span",null,"Abdominales, "+R.tabatas[d.tabata]), el("b",null,"8 × 20 s")); l.append(r); }
     card.append(l);
     const b = el("button","r-btn full","Empezar entreno");
     b.addEventListener("click", ()=>empezar(selFase, selDia));
@@ -193,14 +193,14 @@ function vEntrenar(box){
   box.append(card);
   if(D.sesiones.length){
     const u = D.sesiones[D.sesiones.length-1];
-    box.append(el("p","nota","Último entreno: "+corta(u.fecha)+" · "+u.nombre+" · "+nf(volumen(u),0)+" kg · "+nSeries(u)+" series"));
+    box.append(el("p","nota","Último entreno: "+corta(u.fecha)+", "+u.nombre+", "+nf(volumen(u),0)+" kg, "+nSeries(u)+" series"));
   }
 }
 
 function empezar(fk, di){
   const d = R.dias[di], f = R.fases[fk];
   D.activa = {
-    id: Date.now(), inicio: Date.now(), fecha: hoy(), fase: fk, dia: d.cod, nombre: d.dia+" · "+d.n,
+    id: Date.now(), inicio: Date.now(), fecha: hoy(), fase: fk, dia: d.cod, nombre: d.dia+": "+d.n,
     abd: d.tabata ? {n:R.tabatas[d.tabata], hecha:false} : null,
     ej: d.ej.map(([t,n])=>({ n, t, notas:"",
       series: Array.from({length:f.esquema[t][0]}, ()=>({kg:"", reps:"", tipo:"N", hecha:false})) }))
@@ -234,11 +234,11 @@ function vSesion(box){
     if(confirm("¿Descartar este entreno? Se pierde todo lo apuntado.")){ D.activa=null; guarda(); paraDescanso(); render(); }
   });
   top.append(fin, x);
-  box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase+" · "+f.n+" · "+corta(a.fecha)));
+  box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase+": "+f.n+", "+corta(a.fecha)));
   a.ej.forEach(e=>box.append(bloqueEj(e, f)));
   if(a.abd){
     const ab = el("div","r-abd");
-    const t = el("div"); t.append(el("b",null,"Abdominales"), el("p","nota",a.abd.n+" · tabata 20-20, 8 rondas"));
+    const t = el("div"); t.append(el("b",null,"Abdominales"), el("p","nota",a.abd.n+", tabata 20-20, 8 rondas"));
     const ok = el("button","r-ok"); ok.innerHTML = CHECK; ok.style.width="44px";
     if(a.abd.hecha){ ok.style.background="var(--accent)"; ok.style.color="#FFFFFF"; }
     ok.addEventListener("click", ()=>{ a.abd.hecha=!a.abd.hecha; guarda(); render(); });
@@ -251,11 +251,11 @@ function vSesion(box){
 
 function bloqueEj(e, f){
   const p = f.esquema[e.t], ant = anterior(e.n) || [], cor = corporal(e.n);
-  const minReps = String(p[1]).split("–")[0];
+  const minReps = String(p[1]).split("-")[0];
   const w = el("div","r-ej");
   w.append(el("h3",null,e.n));
   const meta = el("div","r-meta");
-  meta.append(el("span","r-tier", e.t==="TF" ? "Fijo" : e.t), el("span","r-obj", p[0]+" × "+p[1]+" · "+p[2]));
+  meta.append(el("span","r-tier", e.t==="TF" ? "Fijo" : e.t), el("span","r-obj", p[0]+" × "+p[1]+", "+p[2]));
   w.append(meta);
   if(R.ej[e.n] && R.ej[e.n].cue) w.append(el("p","r-cue",R.ej[e.n].cue));
   const notas = el("textarea","r-notas"); notas.rows=1; notas.placeholder="Agregar notas aquí…"; notas.value=e.notas;
@@ -283,7 +283,7 @@ function filaSerie(e, s, etiqueta, a, minReps, cor){
   const nb = el("button","r-num "+s.tipo, etiqueta);
   nb.title = "Toca para cambiar: normal, calentamiento (C) o al fallo (F)";
   nb.addEventListener("click", ()=>{ s.tipo = s.tipo==="N" ? "C" : s.tipo==="C" ? "F" : "N"; guarda(); render(); });
-  const an = el("span","r-ant", a ? txtSerie(e.n, a) : "—");
+  const an = el("span","r-ant", a ? txtSerie(e.n, a) : "-");
   const kg = el("input","r-in"); kg.inputMode="decimal"; kg.value=s.kg; kg.setAttribute("aria-label","kg");
   kg.placeholder = a ? nf(a.kg) : (cor ? "0" : "kg");
   const rp = el("input","r-in"); rp.inputMode="numeric"; rp.value=s.reps; rp.setAttribute("aria-label","repeticiones");
@@ -333,7 +333,7 @@ function terminar(){
 
 function tarjetaResumen(r){
   const c = el("div","r-card");
-  c.append(el("h3",null,"Entreno guardado · "+r.ses.nombre));
+  c.append(el("h3",null,"Entreno guardado, "+r.ses.nombre));
   const st = el("div","r-stats");
   [[fmtDur(r.ses.dur),"Duración"],[nf(volumen(r.ses),0)+" kg","Volumen"],[String(nSeries(r.ses)),"Series"]].forEach(([v,k])=>{
     const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d);
@@ -380,7 +380,7 @@ function formCarrera(tipoDef){
     if(!(k>0) || !(m>0)){ aviso("Pon los km y los minutos."); return; }
     D.carrera.push({id:Date.now(), f:f.value||hoy(), tipo:tp.value, km:k, min:m});
     D.carrera.sort((x,y)=>x.f<y.f?-1:x.f>y.f?1:0);
-    guarda(); aviso("Carrera guardada · "+ritmo(k,m)); render();
+    guarda(); aviso("Carrera guardada, "+ritmo(k,m)); render();
   });
   w.append(b);
   return w;
@@ -407,8 +407,8 @@ function vCuerpo(box){
   const d7 = iso(new Date(deIso(h).getTime()-7*864e5)), d14 = iso(new Date(deIso(h).getTime()-14*864e5));
   const m1 = media(d7,h), m0 = media(d14,d7);
   const st = el("div","r-stats");
-  [[m1===null?"—":nf(m1)+" kg","Media 7 días"],
-   [m1===null||m0===null?"—":(m1-m0>=0?"+":"")+nf(m1-m0,2)+" kg","Cambio semanal"],
+  [[m1===null?"-":nf(m1)+" kg","Media 7 días"],
+   [m1===null||m0===null?"-":(m1-m0>=0?"+":"")+nf(m1-m0,2)+" kg","Cambio semanal"],
    [f.ritmo===null?"mantener":(f.ritmo>0?"+":"")+nf(f.ritmo)+" kg","Buscado en "+fk]].forEach(([v,k])=>{
     const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d);
   });
@@ -430,7 +430,7 @@ function vCuerpo(box){
   if(D.carrera.length){
     const l = el("div","r-lista");
     D.carrera.slice(-5).reverse().forEach(x=>{
-      const r=el("div"); r.append(el("span",null,corta(x.f)+" · "+x.tipo), el("b",null,nf(x.km)+" km · "+ritmo(x.km,x.min)));
+      const r=el("div"); r.append(el("span",null,corta(x.f)+", "+x.tipo), el("b",null,nf(x.km)+" km, "+ritmo(x.km,x.min)));
       l.append(r);
     });
     c2.append(l);
@@ -509,7 +509,7 @@ function vProgreso(box){
     }));
     c.append(el("div")); c.lastChild.innerHTML = svgLinea(pts, [], "kg");
     const st = el("div","r-stats");
-    [[nf(rec)+" kg","Récord 1RM"],[mejor?nf(mejor.cg)+" × "+mejor.reps:"—","Mejor serie"],[String(pts.length),"Sesiones"]].forEach(([v,k])=>{ const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d); });
+    [[nf(rec)+" kg","Récord 1RM"],[mejor?nf(mejor.cg)+" × "+mejor.reps:"-","Mejor serie"],[String(pts.length),"Sesiones"]].forEach(([v,k])=>{ const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d); });
     c.append(st);
     if(corporal(selEj)) c.append(hueco("En este ejercicio la carga es tu peso corporal del día más el lastre."));
   }
@@ -546,7 +546,7 @@ function vProgreso(box){
   // --- series por grupo esta semana
   const c4 = el("div","r-card");
   const fk = faseHoy(), f = R.fases[fk], l0 = lunes(hoy());
-  c4.append(el("h3",null,"Series por grupo · esta semana"));
+  c4.append(el("h3",null,"Series por grupo, esta semana"));
   const cnt = {}; R.musculos.forEach(m=>{ cnt[m]=0; });
   D.sesiones.filter(s=>s.fecha>=l0).forEach(s=>s.ej.forEach(e=>{
     const k = e.series.filter(cuenta).length;
@@ -577,7 +577,7 @@ function vHistorial(box){
     const d = el("details","r-hist"), s = el("summary"), c = el("div","cuerpo");
     if(it.t==="s"){
       const x = it.o;
-      s.append(el("b",null,x.nombre), el("span",null,corta(x.fecha)+" · "+fmtDur(x.dur)+" · "+nf(volumen(x),0)+" kg · "+nSeries(x)+" series"));
+      s.append(el("b",null,x.nombre), el("span",null,corta(x.fecha)+", "+fmtDur(x.dur)+", "+nf(volumen(x),0)+" kg, "+nSeries(x)+" series"));
       x.ej.forEach(e=>{
         c.append(el("h5",null,e.n));
         let n=0;
@@ -587,7 +587,7 @@ function vHistorial(box){
       if(x.abd!==null) c.append(el("p",null,"Abdominales: "+(x.abd?"hechos":"no")));
     } else {
       const x = it.o;
-      s.append(el("b",null,"Carrera · "+x.tipo), el("span",null,corta(x.f)+" · "+nf(x.km)+" km · "+nf(x.min,0)+" min · "+ritmo(x.km,x.min)));
+      s.append(el("b",null,"Carrera, "+x.tipo), el("span",null,corta(x.f)+", "+nf(x.km)+" km, "+nf(x.min,0)+" min, "+ritmo(x.km,x.min)));
     }
     const del = el("button","r-btn peligro","Borrar");
     del.addEventListener("click", ()=>{
@@ -628,3 +628,5 @@ document.getElementById("r-desc-menos").addEventListener("click", ()=>{ descFin 
 document.getElementById("r-desc-mas").addEventListener("click", ()=>{ descFin += 15000; descTotal = Math.max(descTotal, Math.ceil((descFin-Date.now())/1000)); pintaDescanso(); });
 document.getElementById("r-desc-saltar").addEventListener("click", paraDescanso);
 render();
+// Menús también guarda el peso del día en registro_v1: al hacerlo avisa y aquí se recarga.
+window.addEventListener("gd:registro", ()=>{ D = cargaDatos(); render(); });

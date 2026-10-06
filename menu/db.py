@@ -30,7 +30,7 @@ ROL_POR_GRUPO = {"carb": "base", "prot": "proteina", "grasa": "grasa", "fijo": "
 
 
 def _num(x):
-    """'3,5' -> 3.5 · vacío -> None (dato que falta, no cero)."""
+    """'3,5' -> 3.5, vacío -> None (dato que falta, no cero)."""
     x = (x or "").strip().replace(",", ".")
     return float(x) if x else None
 
@@ -92,4 +92,4 @@ def macros(items):
 if __name__ == "__main__":
     print(f"{len(A)} alimentos en {CSV}")
     sin = [n for n, a in A.items() if calidad(a) is None]
-    print(f"con nota de calidad: {len(A)-len(sin)} · sin datos de etiqueta: {len(sin)}")
+    print(f"con nota de calidad: {len(A)-len(sin)}, sin datos de etiqueta: {len(sin)}")

@@ -44,19 +44,19 @@ print("\n== 4. Notas de calidad ==")
 notas = {}
 for n, a in A.items():
     c = calidad(a)
-    notas.setdefault(c["letra"] if c else "—", []).append(n)
-for l in ("A", "B", "C", "D", "—"):
+    notas.setdefault(c["letra"] if c else "?", []).append(n)
+for l in ("A", "B", "C", "D", "?"):
     if l in notas:
-        print(f"       {l}: {len(notas[l]):2d} · " + ", ".join(sorted(notas[l])[:6]) +
+        print(f"       {l}: {len(notas[l]):2d}, " + ", ".join(sorted(notas[l])[:6]) +
               (" …" if len(notas[l]) > 6 else ""))
-sin = notas.get("—", [])
+sin = notas.get("?", [])
 chk(True, f"{len(A)-len(sin)} alimentos calificados, {len(sin)} pendientes de etiqueta")
 if sin:
     print("\n       Te faltan datos de la etiqueta (azúcares, sal, saturadas o NOVA) en:")
     for n in sorted(sin):
         a = A[n]
         falta = [c for c in CLAVES if a.get(c) is None]
-        print(f"       · línea {a['linea']:2d}  {n}  → {', '.join(falta)}")
+        print(f"      , línea {a['linea']:2d}  {n}  → {', '.join(falta)}")
 
 print("\n== 5. Alimentos que piden revisión (ultraprocesados o mucha azúcar/sal) ==")
 avisos = 0
@@ -65,7 +65,7 @@ for n, a in sorted(A.items()):
     if not c: continue
     if c["letra"] in ("C", "D"):
         avisos += 1
-        print(f"       {c['letra']} {c['puntos']:3d}  {n}: " + " · ".join(m for m in c["motivos"] if m[0] == "−"))
+        print(f"       {c['letra']} {c['puntos']:3d}  {n}: " + ", ".join(m for m in c["motivos"] if m[0] == "−"))
 print(f"       ({avisos} alimentos; no es un fallo, es para que decidas si los cambias)")
 
 print("\n" + (f"HAY FALLOS: {fallos}" if fallos else "TODO OK"))

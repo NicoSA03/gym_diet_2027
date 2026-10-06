@@ -4,12 +4,12 @@
 No es una opinión ni un número mágico: se parte de 100 puntos y se resta por
 cuatro cosas medibles que vienen en la etiqueta, más un punto a favor por fibra.
 
-  · Procesado (clasificación NOVA, de 1 a 4). 1 es el alimento tal cual;
+ , Procesado (clasificación NOVA, de 1 a 4). 1 es el alimento tal cual;
     4 es un ultraprocesado formulado con ingredientes que no tienes en casa.
-  · Azúcares por 100 g, con los cortes del semáforo británico (5 y 22,5).
-  · Sal por 100 g (0,3 y 1,5).
-  · Grasa saturada por 100 g (1,5 y 5).
-  · Fibra por 100 g: suma puntos a partir de 3.
+ , Azúcares por 100 g, con los cortes del semáforo británico (5 y 22,5).
+ , Sal por 100 g (0,3 y 1,5).
+ , Grasa saturada por 100 g (1,5 y 5).
+ , Fibra por 100 g: suma puntos a partir de 3.
 
 Los cortes son por 100 g de producto, así que castigan a los alimentos grasos
 aunque la grasa sea buena: el aceite de oliva y los frutos secos pierden puntos
@@ -60,6 +60,6 @@ def calidad(a):
 
 
 def resumen(a):
-    """Una línea para la app: «B · 78» o «— · faltan datos»."""
+    """Una línea para la app: «B, 78» o «sin nota, faltan datos»."""
     c = calidad(a)
-    return f"{c['letra']} · {c['puntos']}" if c else "— · faltan datos de la etiqueta"
+    return f"{c['letra']}, {c['puntos']}" if c else "sin nota, faltan datos de la etiqueta"

@@ -9,7 +9,7 @@ FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
 
 def pagina(titulo, cuerpo_f, js_f, datos=None, nombre_var=None):
     cuerpo = open(cuerpo_f,encoding='utf8').read()
-    js     = open(js_f,encoding='utf8').read()
+    js     = "\n".join(open(f,encoding='utf8').read() for f in (js_f if isinstance(js_f, tuple) else (js_f,)))
     bloque_datos = ""
     if datos:
         bloque_datos = f"const {nombre_var} = " + open(datos,encoding='utf8').read() + ";\n"
@@ -20,7 +20,7 @@ import sys
 if __name__=="__main__":
     cual = sys.argv[1] if len(sys.argv)>1 else "todos"
     if cual in ("todos","2"):
-        h = pagina("Qué Como Hoy",'menu/a2_menus.html','menu/a2.js','menu/pay_menus.json','M')
+        h = pagina("Qué Como Hoy",'menu/a2_menus.html',('menu/calculadora.js','menu/a2.js'),'menu/pay_menus.json','M')
         open('salida/paginas/menus.html','w',encoding='utf8').write(h)
         print("menus.html:", len(h)//1024, "KB")
     if cual in ("todos","3"):

@@ -5,7 +5,7 @@
 import re, json, hashlib, datetime as dt
 
 SECCIONES = [
-    ("menus",   "Menús",        "menu/a2_menus.html",   "menu/a2.js", "menu/pay_menus.json",   "M"),
+    ("menus",   "Menús",        "menu/a2_menus.html",   ("menu/calculadora.js", "menu/a2.js"), "menu/pay_menus.json",   "M"),
     ("compra",  "La compra",    "menu/a3_compra.html",  "menu/a3.js", "menu/pay_compra.json",  "C"),
     ("entreno", "El entreno",   "menu/a4_entreno.html", "menu/a4.js", "menu/pay_entreno.json", "E"),
     ("registro","Registro",     "menu/a6_registro.html","menu/a6.js", "menu/pay_registro.json","R"),
@@ -53,11 +53,11 @@ def seccion_manual():
     filas = []
     for k, f in FE.items():
         d = FD[f["dieta"]]
-        filas.append(f"<tr><td class='ex'>{k} · {f['n']}</td><td>{cal[k]['s0']}–{cal[k]['s1']}</td>"
+        filas.append(f"<tr><td class='ex'>{k}: {f['n']}</td><td>{cal[k]['s0']}-{cal[k]['s1']}</td>"
                      f"<td class='num'>{d[2]:,}".replace(",", ".") + f"</td><td class='num'>{max(f['km'])}</td></tr>")
     valores = f"""
 <div class="vgrid">
-  <div><div class="v">{str(PESO).replace('.',',')} kg</div><div class="eyebrow">PESO · entreno.py</div></div>
+  <div><div class="v">{str(PESO).replace('.',',')} kg</div><div class="eyebrow">PESO, entreno.py</div></div>
   <div><div class="v">{TEST_5K}</div><div class="eyebrow">TEST_5K</div></div>
   <div><div class="v">{OBJETIVO_5K}</div><div class="eyebrow">OBJETIVO_5K</div></div>
   <div><div class="v">{vdot(5000, seg(TEST_5K)):.0f} → {vdot(5000, seg(OBJETIVO_5K)):.0f}</div><div class="eyebrow">VO₂máx estimado</div></div>
@@ -67,7 +67,7 @@ def seccion_manual():
 <p class="nota">Las kcal se cambian en <code>menu/modelo.py</code>; el resto de valores, en <code>menu/entreno.py</code>.</p>"""
     manual = convertir(open('README.md', encoding='utf-8').read())
     return ('<div class="wrap">\n<header class="masthead">'
-            '<p class="eyebrow">Manual · cómo se actualiza este archivo</p>'
+            '<p class="eyebrow">Manual, cómo se actualiza este archivo</p>'
             '<h1>Cómo se <em>actualiza</em></h1>'
             '<p class="dek">Los valores con los que está generado este archivo y el manual completo para cambiarlos, desde tu ordenador o pidiéndoselo a Claude en el proyecto «gym_dieta».</p>'
             '</header>\n<section><div class="sec-head"><span class="num">01</span><h2>Valores actuales</h2></div>'
@@ -194,7 +194,7 @@ def construir():
         estilos.append("/* === %s === */\n%s" % (cod, css))
         cuerpos.append('<div class="app-sec" id="s-%s">\n%s\n</div>' % (cod, cuerpo))
 
-        codigo = open(js, encoding='utf8').read()
+        codigo = "\n".join(open(f, encoding='utf8').read() for f in (js if isinstance(js, tuple) else (js,)))
         # cada sección busca sus elementos SOLO dentro de su propio contenedor,
         # así los identificadores repetidos entre secciones no chocan
         codigo = codigo.replace('document.getElementById(', '$(')
@@ -239,7 +239,7 @@ def construir():
 {cuerpo_todo}
 </main>
 <div class="sello">
-  versión {firma} · {hoy.day} de {MES[hoy.month]} de {hoy.year}
+  versión {firma}, {hoy.day} de {MES[hoy.month]} de {hoy.year}
 </div>
 <script>
 {NAV_JS % {"lista": lista}}
@@ -254,7 +254,7 @@ def construir():
     destino = 'salida/planificacion_dieta_gym.html'
     open(destino, 'w', encoding='utf8').write(doc)
     open('docs/index.html', 'w', encoding='utf8').write(doc)   # para GitHub Pages
-    print(f"planificacion_dieta_gym.html: {len(doc)//1024} KB · versión {firma} · {len(SECCIONES)} secciones")
+    print(f"planificacion_dieta_gym.html: {len(doc)//1024} KB, versión {firma}, {len(SECCIONES)} secciones")
     return destino
 
 if __name__ == "__main__":

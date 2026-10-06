@@ -225,7 +225,7 @@ def nota(items):
             con += k
             suma += c["puntos"] * k
     if not con or not tot:
-        return ("—", 0, 0)
+        return ("?", 0, 0)
     p = suma / con
     letra = next(l for l, corte in LETRAS.items() if p >= corte)
     return (letra, round(p), round(con / tot * 100))
@@ -332,8 +332,8 @@ def main():
            a.grasa if a.grasa is not None else (base[2] * obj[0] / base[0]),
            a.carbohidrato if a.carbohidrato is not None else (base[3] * obj[0] / base[0]))
 
-    print(f"Toma «{t}» · objetivo {obj[0]:.0f} kcal · {obj[1]:.0f} g P · "
-          f"{obj[2]:.0f} g G · {obj[3]:.0f} g C")
+    print(f"Toma «{t}», objetivo {obj[0]:.0f} kcal, {obj[1]:.0f} g P, "
+          f"{obj[2]:.0f} g G, {obj[3]:.0f} g C")
     if not a.kcal:
         print(f"(son las calorías base medias de los {len(PLATOS[t])} platos que ya tienes "
               f"en esa toma, que es lo que hace falta para que encaje en la app)")
@@ -346,7 +346,7 @@ def main():
         if abs(d) > 0.04:
             continue                                  # no llega a las calorías pedidas
         letra, pts, cobertura = nota(items)
-        if a.nota and (letra == "—" or LETRAS[letra] < LETRAS[a.nota]):
+        if a.nota and (letra == "?" or LETRAS[letra] < LETRAS[a.nota]):
             continue
         pr = precio(items)
         nuevos = sum(1 for n, _ in items if n not in yausados)
@@ -378,12 +378,12 @@ def main():
         m = macros(p["items"])
         d = (m[0] - obj[0]) / obj[0] * 100
         print(f"#{i}  {p['nombre']}")
-        print("    " + " · ".join(f"{n} {g} g" for n, g in p["items"]))
-        print(f"    {m[0]:.0f} kcal ({com(f'{d:+.1f}')} %) · {m[1]:.0f} g P · "
-              f"{m[2]:.0f} g G · {m[3]:.0f} g C")
+        print("    " + ", ".join(f"{n} {g} g" for n, g in p["items"]))
+        print(f"    {m[0]:.0f} kcal ({com(f'{d:+.1f}')} %), {m[1]:.0f} g P, "
+              f"{m[2]:.0f} g G, {m[3]:.0f} g C")
         cob = "" if p["cob"] == 100 else f", con datos del {p['cob']} % del plato"
-        calidad_txt = f" ({p['pts']}{cob})" if p["letra"] != "—" else " (faltan datos de etiqueta)"
-        print(f"    calidad {p['letra']}{calidad_txt} · {com('%.2f' % p['eur'])} € la ración\n")
+        calidad_txt = f" ({p['pts']}{cob})" if p["letra"] != "?" else " (faltan datos de etiqueta)"
+        print(f"    calidad {p['letra']}{calidad_txt}, {com('%.2f' % p['eur'])} € la ración\n")
 
     if a.guardar:
         if not 1 <= a.guardar <= len(props):

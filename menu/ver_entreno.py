@@ -17,7 +17,7 @@ for a,b in zip(cal,cal[1:]):
     chk(b['s0']-a['s1']==1, f"{a['cod']} → {b['cod']} sin hueco ni solape")
 chk(cal[-1]['s1']==SEMANAS, f"el ciclo acaba en la semana {cal[-1]['s1']}")
 for c in cal:
-    print(f"       {c['cod']} {c['n']:24s} {c['sem']:2d} sem · semanas {c['s0']:2d}–{c['s1']:2d} · dieta {c['dieta']}")
+    print(f"       {c['cod']} {c['n']:24s} {c['sem']:2d} sem, semanas {c['s0']:2d}-{c['s1']:2d}, dieta {c['dieta']}")
 
 print("\n== 2. Volumen semanal por grupo dentro de rango útil ==")
 GRANDES={"Cuádriceps","Isquios","Glúteo","Pectoral","Espalda","Hombro"}
@@ -123,13 +123,13 @@ for v in VARIANTES:
 print("\n== 7. Fuerza: cargas de arranque coherentes ==")
 for ej,d in arranque().items():
     ok = 0.5 <= d['s1']/d['ahora'] <= 0.68 and d['s4']>d['s1']
-    chk(ok, f"{ej}: 1RM {d['antes']}→{d['ahora']} kg tras el parón · "
-            f"sem 1 {d['s1']:.1f} kg ({d['s1']/d['ahora']*100:.0f} %) · sem 4 {d['s4']:.1f} kg")
+    chk(ok, f"{ej}: 1RM {d['antes']}→{d['ahora']} kg tras el parón, "
+            f"sem 1 {d['s1']:.1f} kg ({d['s1']/d['ahora']*100:.0f} %), sem 4 {d['s4']:.1f} kg")
 
 print("\n== 8. Carrera: VDOT y zonas ==")
 v_hoy=vdot(5000,seg(TEST_5K)); v_fin=vdot(5000,seg(OBJETIVO_5K))
 chk(v_fin-v_hoy<=10, f"VDOT {v_hoy:.1f} → {v_fin:.1f} en 39 semanas ({v_fin-v_hoy:+.1f} puntos)")
-for z,a,b,_ in zonas(seg(TEST_5K)): print(f"       {z:16s} {a}–{b} min/km")
+for z,a,b,_ in zonas(seg(TEST_5K)): print(f"       {z:16s} {a}-{b} min/km")
 
 print("\n== 9. Cada bloque de entreno tiene su bloque de dieta ==")
 DIETA={"B0","B1","B2","B3","B4","B5"}

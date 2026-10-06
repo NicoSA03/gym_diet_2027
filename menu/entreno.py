@@ -19,7 +19,7 @@ FASES = {
 "F0": dict(n="Rearranque", sem=4,
   lema="Recuperar el tejido, no la fuerza",
   foco="Pesos suaves y lejos del fallo para que tendones y articulaciones se readapten.",
-  esquema={"T1":(3,"8–10","RIR 4"), "T2":(3,"10–12","RIR 4"), "T3":(2,"12–15","RIR 3"), "TF":(3,"15–20","RIR 2")},
+  esquema={"T1":(3,"8-10","RIR 4"), "T2":(3,"10-12","RIR 4"), "T3":(2,"12-15","RIR 3"), "TF":(3,"15-20","RIR 2")},
   pct=0.60, dieta="B0",
   mar="Continuo fácil, todo en Z2. Nada de series.",
   jue="Continuo fácil de 30 a 45 min. Subes 5 minutos por semana y nada más.",
@@ -28,7 +28,7 @@ FASES = {
 "F1": dict(n="Construcción I", sem=8,
   lema="El bloque que más músculo te va a dar",
   foco="Volumen alto y superávit calórico: acumula series de calidad.",
-  esquema={"T1":(4,"6–8","RIR 2"), "T2":(3,"8–12","RIR 2"), "T3":(3,"12–15","RIR 1"), "TF":(3,"15–20","RIR 2")},
+  esquema={"T1":(4,"6-8","RIR 2"), "T2":(3,"8-12","RIR 2"), "T3":(3,"12-15","RIR 1"), "TF":(3,"15-20","RIR 2")},
   pct=0.75, dieta="B1",
   mar="Fartlek y series cortas. Empieza por 6×(2′ fuerte / 2′ suave).",
   jue="Tirada progresiva de 45 a 68 min. Al final del bloque son unos 10 km.",
@@ -37,7 +37,7 @@ FASES = {
 "F2": dict(n="Fuerza y supervivencia", sem=5,
   lema="Menos volumen, más peso",
   foco="Menos series y más peso para conservar lo ganado cuando falta tiempo o descanso.",
-  esquema={"T1":(5,"3–5","RIR 2"), "T2":(3,"6–8","RIR 2"), "T3":(2,"10–12","RIR 2"), "TF":(3,"15–20","RIR 2")},
+  esquema={"T1":(5,"3-5","RIR 2"), "T2":(3,"6-8","RIR 2"), "T3":(2,"10-12","RIR 2"), "TF":(3,"15-20","RIR 2")},
   pct=0.85, dieta="B2",
   mar="5×1.000 m a ritmo de 10k, 2′ de trote entre series.",
   jue="Tirada sostenida de 50 a 62 min, unos 9 km. Sin prisa: el bloque es de sobrevivir.",
@@ -46,7 +46,7 @@ FASES = {
 "F3": dict(n="Construcción II", sem=6,
   lema="El último empujón de volumen antes de definir",
   foco="El bloque con más series, aún en superávit: aprieta.",
-  esquema={"T1":(4,"6–8","RIR 1"), "T2":(4,"8–12","RIR 1"), "T3":(3,"12–15","RIR 0–1"), "TF":(3,"15–20","RIR 2")},
+  esquema={"T1":(4,"6-8","RIR 1"), "T2":(4,"8-12","RIR 1"), "T3":(3,"12-15","RIR 0-1"), "TF":(3,"15-20","RIR 2")},
   pct=0.78, dieta="B3",
   mar="6×1.000 m o 4×1.600 m a ritmo de umbral.",
   jue="Tirada larga de 62 a 75 min, hasta 11,5 km.",
@@ -55,7 +55,7 @@ FASES = {
 "F4": dict(n="Definición natural", sem=12,
   lema="Doce semanas a 300 kcal de déficit, ni una más",
   foco="Déficit de 300 kcal: principales pesadas, menos accesorios.",
-  esquema={"T1":(4,"5–7","RIR 2"), "T2":(3,"8–10","RIR 1"), "T3":(3,"12–15","RIR 1"), "TF":(3,"15–20","RIR 2")},
+  esquema={"T1":(4,"5-7","RIR 2"), "T2":(3,"8-10","RIR 1"), "T3":(3,"12-15","RIR 1"), "TF":(3,"15-20","RIR 2")},
   pct=0.80, dieta="B4",
   mar="Alterna semanas: VO2máx (5×3′) y ritmo de media (3×10′).",
   jue="Tirada larga de 70 a 80 min, hasta 13 km. Es el tope que permite tu hora y veinte.",
@@ -64,7 +64,7 @@ FASES = {
 "F5": dict(n="Pico y verano", sem=4,
   lema="Bajar el ruido y quedarse con la señal",
   foco="Menos volumen y la misma intensidad para llegar fresco.",
-  esquema={"T1":(3,"4–6","RIR 3"), "T2":(3,"8–10","RIR 2"), "T3":(2,"12–15","RIR 2"), "TF":(3,"15–20","RIR 2")},
+  esquema={"T1":(3,"4-6","RIR 3"), "T2":(3,"8-10","RIR 2"), "T3":(2,"12-15","RIR 2"), "TF":(3,"15-20","RIR 2")},
   pct=0.80, dieta="B5",
   mar="4×1.000 m rápidos. Calidad alta, cantidad baja.",
   jue="Tirada que baja de 70 a 50 min según se acerca junio. Ni un minuto más.",
@@ -166,7 +166,7 @@ EJ = {
 
 
 # ------------------------------------------------- cómo se organizan las series
-# Grupo de bloque: V=volumen (F0,F1,F3) · F=fuerza (F2) · D=definición (F4) · P=pico (F5)
+# Grupo de bloque: V=volumen (F0,F1,F3). F=fuerza (F2). D=definición (F4). P=pico (F5)
 GRUPO = {"F0":"V","F1":"V","F2":"F","F3":"V","F4":"D","F5":"P"}
 
 GENERICO = {
@@ -186,18 +186,18 @@ ESTRUCTURA = {
 "Sentadilla trasera": {
  "V":("Series rectas tras aproximación","Dos aproximaciones (barra sola y mitad del peso) y todas las de trabajo al mismo peso."),
  "F":("Aproximación larga y cinco iguales","Sube en cuatro escalones y haz cinco series iguales con 3 min de descanso."),
- "D":("Series rectas pesadas","Cuatro series pesadas de 5–7 al mismo peso, sin suavizar."),
+ "D":("Series rectas pesadas","Cuatro series pesadas de 5-7 al mismo peso, sin suavizar."),
  "P":("Tres series cómodas","Tres series al 80 % de lo que moverías."),
 },
 "Press banca": {
  "V":("Series rectas tras aproximación","Dos aproximaciones y todas las de trabajo al mismo peso."),
- "F":("Serie top y dos descargas","Una serie exigente de 3 y cuatro de 4–5 con un 10 % menos."),
+ "F":("Serie top y dos descargas","Una serie exigente de 3 y cuatro de 4-5 con un 10 % menos."),
  "D":("Series rectas pesadas","Cuatro series al mismo peso, sin bajar la intensidad."),
  "P":("Tres series, RIR 3","Tres series a RIR 3, sin fallar ninguna repetición."),
 },
 "Peso muerto convencional": {
  "V":("Series rectas y menos de las que crees","Cuatro series al mismo peso; ante la duda, para."),
- "F":("Pirámide corta","Tres aproximaciones y tres series de 3–5 al peso de trabajo."),
+ "F":("Pirámide corta","Tres aproximaciones y tres series de 3-5 al peso de trabajo."),
  "D":("Series rectas al 80 %","Cuatro series al 80 %; baja el peso antes que la técnica."),
  "P":("Dos o tres series ligeras","Dos o tres series ligeras para mantener el patrón."),
 },
@@ -235,20 +235,20 @@ def estructura(ej, fase):
 # Tabata 20-20: 20 s de trabajo, 20 s de descanso, 8 rondas alternando dos
 # ejercicios. 5:20 de reloj; con montaje y estiramiento, menos de 8 minutos.
 TABATA = {
-"A": dict(n="Tabla A · Anti-extensión", dur="5:20 de reloj",
+"A": dict(n="Tabla A: Anti-extensión", dur="5:20 de reloj",
   a=("Plancha frontal", "Sobre antebrazos, glúteo apretado y costillas metidas; si aguantas 20 s sin temblar, disco en la espalda."),
   b=("Giro ruso con balón", "Sentado con los pies en el aire, lleva el balón de cadera a cadera girando el pecho."),
   como="Rondas impares plancha, rondas pares giro ruso. Cuatro de cada.",
   sube=[("Plancha", "disco de 5 kg → 10 kg → 15 kg"),
         ("Giro con balón", "balón de 3 kg → 5 kg → 7 kg")],
   regla="Sube una cosa cada dos semanas, nunca las dos a la vez."),
-"B": dict(n="Tabla B · Anti-flexión lateral", dur="5:20 de reloj",
+"B": dict(n="Tabla B: Anti-flexión lateral", dur="5:20 de reloj",
   a=("Plancha lateral", "Cadera alta y hombro sobre el codo, cambiando de lado cada ronda; mejor parar que hundirse."),
   b=("Giro ruso con balón y pies elevados", "Como el giro ruso, con las piernas más altas y estiradas."),
   como="Rondas impares plancha lateral alternando lado, rondas pares giro ruso.",
   sube=[("Plancha lateral", "brazo libre estirado hacia el techo → pie de arriba elevado → disco sobre la cadera"),
         ("Giro con balón", "sube con el peso del balón")]),
-"C": dict(n="Tabla C · Dinámica", dur="5:20 de reloj",
+"C": dict(n="Tabla C: Dinámica", dur="5:20 de reloj",
   a=("Hollow hold", "Lumbar pegada al suelo y brazos y piernas estirados a un palmo; si se despega, sube las piernas."),
   b=("Giro ruso con balón de pie", "De pie y con los pies fijos, dibuja un ocho con el balón alrededor de la cadera."),
   como="Rondas impares hollow, rondas pares giro de pie.",
@@ -263,10 +263,10 @@ TABATA_REGLA = (
 
 # ---------------------------------------------------------------- semana
 DIAS = [
-dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerza", dur="65–80 min",
+dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerza", dur="65-80 min",
   cal=["Bici o remo suave 5 min",
        "Movilidad de cadera y tobillo 3 min",
-       "2 × 5 saltos al cajón bajo — toda la pliometría de la semana empieza aquí"],
+       "2 × 5 saltos al cajón bajo: toda la pliometría de la semana empieza aquí"],
   ej=[("T1","Sentadilla trasera"),("T1","Press banca"),
       ("T2","Peso muerto rumano"),("T2","Remo con barra"),
       ("T3","Flexión clásica"),("T3","Curl de bíceps con barra Z"),
@@ -274,14 +274,14 @@ dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerz
   tabata="A",
   nota="Talones y encogimientos van en superserie: los dos de pie y con las mismas mancuernas, así no suman tiempo."),
 
-dict(cod="M", dia="Martes", n="Carrera de calidad", sub="VO2máx y umbral", tipo="carrera", dur="50–60 min",
+dict(cod="M", dia="Martes", n="Carrera de calidad", sub="VO2máx y umbral", tipo="carrera", dur="50-60 min",
   cal=["Trote muy suave 10 min",
        "4 × 20 m de progresión",
        "Movilidad de tobillo y cadera 2 min"],
   ej=[], tabata=None,
   nota="Martes y jueves entras a la universidad a las 12:30, así que tienes la mañana entera. Es el mejor hueco de la semana para las series."),
 
-dict(cod="X", dia="Miércoles", n="Fuerza B", sub="Tirón y cadena posterior", tipo="fuerza", dur="65–75 min",
+dict(cod="X", dia="Miércoles", n="Fuerza B", sub="Tirón y cadena posterior", tipo="fuerza", dur="65-75 min",
   cal=["Remo suave 5 min",
        "Movilidad de cadera y dorsal 3 min",
        "2 × 10 pogos (saltitos con el tobillo rígido)"],
@@ -291,12 +291,12 @@ dict(cod="X", dia="Miércoles", n="Fuerza B", sub="Tirón y cadena posterior", t
   tabata="B",
   nota="Peso muerto a las siete de la mañana pide diez minutos de calentamiento de verdad. No los recortes. Fondos y curl martillo, en superserie."),
 
-dict(cod="J", dia="Jueves", n="Tirada larga", sub="Base aeróbica en Z2", tipo="carrera", dur="45–80 min",
+dict(cod="J", dia="Jueves", n="Tirada larga", sub="Base aeróbica en Z2", tipo="carrera", dur="45-80 min",
   cal=["Los tres primeros kilómetros SON el calentamiento: sal más lento de lo que te pide el cuerpo"],
   ej=[], tabata=None,
   nota="Toda en Z2: tienes que poder hablar frases completas. Si no puedes, vas demasiado rápido, y una tirada larga rápida no entrena nada y te deja sin el viernes."),
 
-dict(cod="V", dia="Fuerza C", n="Fuerza C", sub="Funcional y densidad", tipo="fuerza", dur="65–75 min",
+dict(cod="V", dia="Fuerza C", n="Fuerza C", sub="Funcional y densidad", tipo="fuerza", dur="65-75 min",
   cal=["Cuerda o bici 5 min",
        "Movilidad global 3 min",
        "3 × 3 saltos horizontales"],
@@ -314,61 +314,61 @@ dict(cod="EX", n="Exámenes", dias="3 días", dur="50 min",
   cuando="Las dos semanas antes de cada convocatoria, y la semana de exámenes.",
   regla="Lunes fuerza, miércoles carrera corta, viernes fuerza. Martes y jueves, nada.",
   detalle=[
-   ("Lunes · Fuerza condensada",
+   ("Lunes: Fuerza condensada",
     "Sentadilla trasera, Press banca, Remo con barra, Peso muerto rumano. "
     "Tres series de cada, mismas repeticiones que el bloque, un RIR más conservador. "
     "Sin accesorios, sin core. 45 minutos de reloj."),
-   ("Miércoles · Carrera corta",
+   ("Miércoles: Carrera corta",
     "30 minutos continuos en Z2 o 6×400 m si la cabeza te pide descargar. "
     "Correr en época de exámenes no es entrenar: es lo que hace que estudies mejor por la tarde."),
-   ("Viernes · Fuerza condensada",
+   ("Viernes: Fuerza condensada",
     "Peso muerto convencional, Dominadas, Press militar, Zancada búlgara. "
     "Mismo formato que el lunes."),
   ],
   conserva="Conservas los seis patrones y alrededor del 60 % de las series. Con eso no se pierde músculo en tres o cuatro semanas: se pierde a partir de la sexta."),
 
-dict(cod="VJ", n="Viaje de una semana", dias="4 días", dur="30–40 min",
+dict(cod="VJ", n="Viaje de una semana", dias="4 días", dur="30-40 min",
   cuando="Una semana fuera, con mochila: banda elástica o TRX y poco más.",
   regla="La carrera es el ancla porque no necesita nada. La fuerza pasa a peso corporal y banda.",
   detalle=[
-   ("Día 1 · Empuje y pierna",
-    "Flexión clásica 5 × máximas−2 · Sentadilla búlgara a una pierna 4×12 · "
-    "Press de hombro con banda 3×15 · Flexión diamante 3×12 · Plancha 3×45 s"),
-   ("Día 2 · Carrera",
-    "Reconoce la ciudad corriendo: 35–45 min en Z2. La mejor forma de no perder el bloque."),
-   ("Día 3 · Tirón y cadena posterior",
-    "Remo con banda anclada a una puerta 4×15 · Peso muerto rumano a una pierna 4×12 · "
-    "Puente de glúteo a una pierna 3×15 · Curl con banda 3×20 · Superman 3×15"),
-   ("Día 4 · Carrera con series",
+   ("Día 1: Empuje y pierna",
+    "Flexión clásica 5 × máximas−2. Sentadilla búlgara a una pierna 4×12. "
+    "Press de hombro con banda 3×15. Flexión diamante 3×12. Plancha 3×45 s"),
+   ("Día 2: Carrera",
+    "Reconoce la ciudad corriendo: 35-45 min en Z2. La mejor forma de no perder el bloque."),
+   ("Día 3: Tirón y cadena posterior",
+    "Remo con banda anclada a una puerta 4×15. Peso muerto rumano a una pierna 4×12. "
+    "Puente de glúteo a una pierna 3×15. Curl con banda 3×20. Superman 3×15"),
+   ("Día 4: Carrera con series",
     "10 min suave + 8 × (1′ fuerte / 1′ suave) + 10 min suave. Sin material y sin excusa."),
   ],
   conserva="Una semana así mantiene todo. La pérdida real de músculo empieza a las dos o tres semanas de parar del todo, y esto no es parar."),
 
-dict(cod="CF", n="Casa de la familia, sin gimnasio", dias="5 días", dur="45–60 min",
+dict(cod="CF", n="Casa de la familia, sin gimnasio", dias="5 días", dur="45-60 min",
   cuando="Navidad y Semana Santa. Tienes tiempo de sobra, banda, TRX y mancuernas de 7,5 kg.",
   regla="Con 7,5 kg no puedes ir pesado, así que vas por repeticiones altas y tiempo bajo tensión. "
         "Cambias la moneda: donde antes ponías kilos, ahora pones lentitud y recorrido.",
   detalle=[
-   ("Lunes · Empuje",
-    "Flexión con pies elevados 4 × máximas−2 · Press de hombro con mancuernas 4×15 · "
-    "Flexión diamante 3×12 · Fondos entre dos sillas 3×12 · Elevaciones laterales 3×20 · Rueda o plancha"),
-   ("Martes · Carrera de calidad",
+   ("Lunes: Empuje",
+    "Flexión con pies elevados 4 × máximas−2. Press de hombro con mancuernas 4×15. "
+    "Flexión diamante 3×12. Fondos entre dos sillas 3×12. Elevaciones laterales 3×20. Rueda o plancha"),
+   ("Martes: Carrera de calidad",
     "Lo mismo que en el plan normal. Las series no necesitan gimnasio."),
-   ("Miércoles · Pierna",
-    "Sentadilla búlgara con mancuernas 4×15 por pierna, bajando en 3 segundos · "
-    "Peso muerto rumano a una pierna 4×12 · Zancadas caminando 3×20 · "
-    "Puente de glúteo a una pierna 3×15 · Elevación de talones a una pierna 3×20"),
-   ("Jueves · Tirada larga",
+   ("Miércoles: Pierna",
+    "Sentadilla búlgara con mancuernas 4×15 por pierna, bajando en 3 segundos. "
+    "Peso muerto rumano a una pierna 4×12. Zancadas caminando 3×20. "
+    "Puente de glúteo a una pierna 3×15. Elevación de talones a una pierna 3×20"),
+   ("Jueves: Tirada larga",
     "Igual que en el plan normal."),
-   ("Viernes · Tirón y core",
-    "Dominadas en el parque o remo invertido bajo una mesa 5 × máximas−1 · "
-    "Remo con banda 4×15 · Face pull con banda 3×20 · Curl con mancuernas 3×15 · "
+   ("Viernes: Tirón y core",
+    "Dominadas en el parque o remo invertido bajo una mesa 5 × máximas−1. "
+    "Remo con banda 4×15. Face pull con banda 3×20. Curl con mancuernas 3×15. "
     "Circuito de core 3 rondas"),
   ],
   conserva="Tres semanas así te cuestan poco si mantienes la carrera y las repeticiones cerca del fallo. "
            "Lo que se pierde en estos bloques casi nunca es músculo: es la coordinación con la barra, y vuelve en dos sesiones."),
 
-dict(cod="MN", n="Sesión mínima", dias="1 día", dur="25–30 min",
+dict(cod="MN", n="Sesión mínima", dias="1 día", dur="25-30 min",
   cuando="El día que todo se tuerce: dormiste mal, se alargó el turno, se te fue la mañana.",
   regla="La regla del día malo es entrenar poco, no saltártelo. Una sesión de 25 minutos mantiene "
         "la costumbre, que es lo que realmente se rompe cuando fallas un día.",
@@ -436,13 +436,13 @@ def zonas(seg5k):
     """Ritmos por zona a partir del 5k actual, en segundos por km."""
     base = seg5k/5
     return [
-      ("Z2 · Fácil",   ritmo(base+85), ritmo(base+115),
+      ("Z2: Fácil",   ritmo(base+85), ritmo(base+115),
        "Hablas frases completas. Aquí va el 80 % de tus kilómetros."),
-      ("Z3 · Medio",   ritmo(base+45), ritmo(base+70),
+      ("Z3: Medio",   ritmo(base+45), ritmo(base+70),
        "Frases cortas. Es la zona que más se usa por error y la que menos aporta."),
-      ("Z4 · Umbral",  ritmo(base+15), ritmo(base+30),
+      ("Z4: Umbral",  ritmo(base+15), ritmo(base+30),
        "Palabras sueltas. Ritmo de 10 km. Es donde se gana la media maratón."),
-      ("Z5 · VO2máx",  ritmo(base-25), ritmo(base-5),
+      ("Z5: VO2máx",  ritmo(base-25), ritmo(base-5),
        "No hablas. Series de 3 a 5 minutos. Es donde sube el techo."),
     ]
 

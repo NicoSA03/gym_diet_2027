@@ -42,12 +42,12 @@ CENA = PLATOS["N"]
 SEMANA_OPC = 7           # en la comida y la cena, los 7 primeros = lunes a domingo
 
 FASES = {
- "B0": ("Rearranque",     "Sem 1–4",    3050,170,80,413),
- "B1": ("Construcción I", "Sem 5–12",   3300,175,85,459),
- "B2": ("Fuerza",         "Sem 13–17",  3300,178,90,445),
- "B3": ("Construcción II","Sem 18–23",  3500,185,92,483),
- "B4": ("Definición",     "Sem 24–35",   2950,200,72,375),
- "B5": ("Pico",           "Sem 36–39",  3050,190,76,401),
+ "B0": ("Rearranque",     "Sem 1-4",    3050,170,80,413),
+ "B1": ("Construcción I", "Sem 5-12",   3300,175,85,459),
+ "B2": ("Fuerza",         "Sem 13-17",  3300,178,90,445),
+ "B3": ("Construcción II","Sem 18-23",  3500,185,92,483),
+ "B4": ("Definición",     "Sem 24-35",   2950,200,72,375),
+ "B5": ("Pico",           "Sem 36-39",  3050,190,76,401),
 }
 TIPOS = {
  "A": ("Fuerza + universidad por la tarde",  "Lunes y miércoles", 0.91, ["P","D","C","S1","S2","N"]),
@@ -145,4 +145,4 @@ if __name__=="__main__":
     for key,(fc,fg,fp) in FACT.items():
         NORM[key]={b: normas(b,fc,fg,fp) for b in BLOQUES}
     json.dump(NORM, open('menu/normas.json','w'))
-    print("\nfactores guardados:", len(FACT), "· normas:", len(NORM))
+    print("\nfactores guardados:", len(FACT), ", normas:", len(NORM))

@@ -32,7 +32,7 @@
   font-family:var(--sans);font-weight:700;font-size:16.5px;list-style:none}
 .ejcard summary::-webkit-details-marker{display:none}
 .ejcard summary::after{content:"+";font-family:var(--mono);font-size:19px;color:var(--accent-ink)}
-.ejcard[open] summary::after{content:"–"}
+.ejcard[open] summary::after{content:"-"}
 .ejcard summary .pat{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink-3);border:1px solid var(--line-2);border-radius:999px;
   padding:3px 9px;white-space:nowrap;margin-left:auto;margin-right:8px}
@@ -87,7 +87,7 @@
 
 <div class="wrap">
 <header class="masthead">
-  <p class="eyebrow">La teoría · el porqué de cada decisión</p>
+  <p class="eyebrow">La teoría, el porqué de cada decisión</p>
   <h1>Por qué el plan es <em>así</em></h1>
   <p class="dek">Todo lo que no hace falta leer un martes a las siete de la mañana: qué se puede conseguir y qué no, cómo está construido cada bloque, el desglose de los dieciocho ejercicios y qué mirar cada semana.</p>
   <div class="hermanos">
@@ -106,13 +106,13 @@
       <p class="tit">Con cinco días y hora y veinte de tope puedes tener <b>un cuerpo funcional y vistoso</b>. Lo que no cabe entero es <b>la media maratón</b>.</p>
       <p>Cinco sesiones a la semana dan de sobra para hipertrofiar, ganar fuerza y tener un motor aeróbico decente. Donde el presupuesto se queda corto es en carrera: con dos salidas semanales y un tope de ochenta minutos, la tirada larga se queda en unos trece kilómetros. Eso te deja capaz de <em>acabar</em> una media maratón sobre las dos horas, pasándolo mal a partir del kilómetro dieciséis. No te deja capaz de correrla bien.</p>
       <p>Hay una salida y está en tu propio horario: los jueves entras a la universidad a las 12:30. Si en el último bloque estiras esa tirada de ochenta minutos a una hora cuarenta y cinco, el kilometraje sube a treinta por semana, la tirada llega a casi diecisiete kilómetros y la media pasa de «la acabo» a «la corro». Es la única sesión del plan que se sale del tope que me diste, y por eso te la dejo como decisión tuya y no como parte del plan.</p>
-      <p>El resto llega sin peros. El tenis, el pádel, el fútbol sala y el baloncesto salen gratis: quien tiene fuerza, capacidad aeróbica y algo de trabajo de salto los juega bien sin entrenarlos. Y la parte estética —volumen con definición, no delgadez— es exactamente lo que persigue esta periodización: nueve meses construyendo y doce semanas de déficit suave al final.</p>
+      <p>El resto llega sin peros. El tenis, el pádel, el fútbol sala y el baloncesto salen gratis: quien tiene fuerza, capacidad aeróbica y algo de trabajo de salto los juega bien sin entrenarlos. Y la parte estética -volumen con definición, no delgadez- es exactamente lo que persigue esta periodización: nueve meses construyendo y doce semanas de déficit suave al final.</p>
     </div>
     <div class="vg">
-      <div><span class="v" id="v-peso">—</span><span class="l">Peso de partida</span></div>
+      <div><span class="v" id="v-peso"></span><span class="l">Peso de partida</span></div>
       <div><span class="v">39</span><span class="l">Semanas de plan</span></div>
-      <div><span class="v" id="v-vdot">—</span><span class="l">VO₂máx estimado hoy</span></div>
-      <div><span class="v" id="v-vdotf">—</span><span class="l">Objetivo en junio</span></div>
+      <div><span class="v" id="v-vdot"></span><span class="l">VO₂máx estimado hoy</span></div>
+      <div><span class="v" id="v-vdotf"></span><span class="l">Objetivo en junio</span></div>
     </div>
   </div>
 </section>
@@ -122,10 +122,10 @@
   <div class="stack">
     <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
     <div>
-      <div class="bloque-hd"><h3 id="b-n">—</h3><span class="meta" id="b-meta">—</span></div>
+      <div class="bloque-hd"><h3 id="b-n"></h3><span class="meta" id="b-meta"></span></div>
       <div class="bloque-bd">
-        <p class="lema" id="b-lema">—</p>
-        <p id="b-foco">—</p>
+        <p class="lema" id="b-lema"></p>
+        <p id="b-foco"></p>
       </div>
     </div>
     <div class="tscroll">
@@ -168,9 +168,9 @@
       <label><span>Repeticiones</span><input id="rm-reps" type="number" inputmode="numeric" min="1" max="30" step="1" value="4"><i>reps</i></label>
     </div>
     <ol class="rm-pipe">
-      <li><span class="n">Epley</span><code id="rm-ep-f">kg × (1 + reps ÷ 30)</code><b id="rm-ep">—</b></li>
-      <li id="rm-br-li"><span class="n">Brzycki</span><code id="rm-br-f">kg × 36 ÷ (37 − reps)</code><b id="rm-br">—</b></li>
-      <li class="fin"><span class="n">1RM</span><code id="rm-fin-f">(Epley + Brzycki) ÷ 2</code><b id="rm-fin">—</b></li>
+      <li><span class="n">Epley</span><code id="rm-ep-f">kg × (1 + reps ÷ 30)</code><b id="rm-ep"></b></li>
+      <li id="rm-br-li"><span class="n">Brzycki</span><code id="rm-br-f">kg × 36 ÷ (37 − reps)</code><b id="rm-br"></b></li>
+      <li class="fin"><span class="n">1RM</span><code id="rm-fin-f">(Epley + Brzycki) ÷ 2</code><b id="rm-fin"></b></li>
     </ol>
     <div class="rm-exp">
       <p><b>Para qué sirve.</b> El 1RM es el peso máximo que podrías levantar una sola vez. Estimarlo te dice cuánta fuerza tienes sin arriesgarte a probarlo, y te deja comparar series con pesos y repeticiones distintos.</p>
@@ -197,7 +197,7 @@
   <div class="stack">
     <div class="veredicto" style="border-left-color:var(--amber)">
       <p class="tit">Ocho rondas, <b>cinco minutos y veinte</b>.</p>
-      <p id="tab-regla">—</p>
+      <p id="tab-regla"></p>
       <p>El formato es el tuyo: tabata 20-20 con una isometría y un giro ruso con balón. Lo único que he cambiado es que en vez de una tabla única hay tres, una por día de fuerza, y cada una ataca una función distinta del core. La razón es que el abdominal se adapta rapidísimo a un estímulo repetido: con tres tablas rotando, la misma inversión de tiempo rinde bastante más durante bastante más tiempo.</p>
       <p>El orden importa: los abdominales van siempre al final. Si los pones antes de la sentadilla o del peso muerto, el core llega fatigado al ejercicio que más lo necesita como estabilizador, y eso es exactamente al revés de lo que interesa.</p>
     </div>
@@ -210,7 +210,7 @@
   <div class="stack">
     <div class="tscroll">
       <table>
-        <caption>Ritmos a partir de tu 5k actual · recalcula después del test de la semana 4</caption>
+        <caption>Ritmos a partir de tu 5k actual, recalcula después del test de la semana 4</caption>
         <thead><tr><th>Zona</th><th class="num">Ritmo</th><th>Cómo se reconoce</th></tr></thead>
         <tbody id="t-zonas"></tbody>
       </table>

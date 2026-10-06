@@ -100,7 +100,7 @@
   font-family:var(--sans);font-weight:700;font-size:16px;list-style:none}
 .varcard summary::-webkit-details-marker{display:none}
 .varcard summary::after{content:"+";font-family:var(--mono);font-size:19px;color:var(--accent-ink)}
-.varcard[open] summary::after{content:"–"}
+.varcard[open] summary::after{content:"-"}
 .varcard summary .tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);
   border:1px solid var(--line-2);border-radius:999px;padding:3px 9px;white-space:nowrap;
   margin-left:auto;margin-right:8px}
@@ -131,9 +131,9 @@
   <div class="sec-head"><span class="num">01</span><h2>La sesión de hoy</h2></div>
   <div class="stack">
     <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
-    <div class="fase-nota"><b id="f-n">—</b><span id="f-f">—</span></div>
+    <div class="fase-nota"><b id="f-n"></b><span id="f-f"></span></div>
     <div class="dia-grid" id="dias"></div>
-    <div class="finde">Sábado y domingo · descanso completo</div>
+    <div class="finde">Sábado y domingo, descanso completo</div>
     <div class="ses" id="sesion"></div>
   </div>
 </section>
@@ -143,7 +143,7 @@
   <div class="stack">
     <div class="zmini" id="zmini"></div>
     <div class="ses">
-      <div class="ses-top"><h3>Kilómetros por semana</h3><span class="dur" id="km-tope">—</span></div>
+      <div class="ses-top"><h3>Kilómetros por semana</h3><span class="dur" id="km-tope"></span></div>
       <div class="carrera-caja">
         <div class="kmline" id="kmline"></div>
         <p class="nota">Las barras grises son semanas de descarga.</p>

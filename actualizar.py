@@ -32,6 +32,7 @@ FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "paylo
           "a1_info.html", "a1.js", "a2_menus.html", "a2.js", "a3_compra.html", "a3.js",
           "a4_entreno.html", "a4.js", "a5_teoria.html", "a5.js",
           "payload_registro.py", "a6_registro.html", "a6.js", "pwa.py",
+          "calculadora.js", "calculadora.py", "ver_calculadora.py",
           "factores.json", "normas.json", "md.py"]
 RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore",
                "datos/alimentos.csv", "datos/platos.csv"]
@@ -43,7 +44,7 @@ def paso(titulo, script, *args, obligatorio=True, silencioso=False):
     r = subprocess.run([sys.executable, os.path.join("menu", script), *args],
                        capture_output=silencioso, text=True, encoding="utf-8")
     if silencioso:
-        claves = ("FALLO", "TODO OK", "HAY FALLOS")
+        claves = ("FALLO", "TODO OK", "HAY FALLOS", "AVISO")
         utiles = [l for l in r.stdout.splitlines() if any(k in l for k in claves)]
         if utiles:                      # verificación: solo el resumen y los fallos
             for l in utiles: print("  " + l.strip())
@@ -95,7 +96,8 @@ def main():
 
     ok1 = paso("Verificando el entreno", "ver_entreno.py", obligatorio=False, silencioso=True)
     ok2 = paso("Verificando la dieta", "ver_menu.py", obligatorio=False, silencioso=True)
-    if not (ok0 and okp and ok1 and ok2) and not a.forzar:
+    ok3 = paso("Verificando la calculadora de Menús", "ver_calculadora.py", obligatorio=False, silencioso=True)
+    if not (ok0 and okp and ok1 and ok2 and ok3) and not a.forzar:
         sys.exit("\n✗ La verificación ha encontrado fallos. No se ha generado nada nuevo.\n"
                  "  Mira las líneas FALLO de arriba. Si sabes lo que haces: --forzar")
 

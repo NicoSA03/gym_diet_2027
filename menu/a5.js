@@ -12,7 +12,7 @@ const TIER = {
   TF:["Fijo","Gemelo: la misma prescripción todo el año, porque la carrera ya lo castiga"]
 };
 const GRUPOS = [
-  ["V","Volumen","F0 · F1 · F3"],
+  ["V","Volumen","F0, F1, F3"],
   ["F","Fuerza","F2"],
   ["D","Definición","F4"],
   ["P","Pico","F5"]
@@ -29,7 +29,7 @@ function pintaFases(){
   const box = document.getElementById("fases");
   box.replaceChildren();
   Object.keys(T.fases).forEach(k=>{
-    const c = el("button","chip", k+" · "+T.fases[k].n);
+    const c = el("button","chip", k+": "+T.fases[k].n);
     c.setAttribute("role","tab");
     c.setAttribute("aria-selected", k===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=k; guarda("t_fase",k); pintaFases(); pintaBloque(); });
@@ -39,9 +39,9 @@ function pintaFases(){
 
 function pintaBloque(){
   const f = T.fases[fase];
-  document.getElementById("b-n").textContent = fase + " · " + f.n;
+  document.getElementById("b-n").textContent = fase + ": " + f.n;
   document.getElementById("b-meta").textContent =
-    f.sem + " semanas · sem " + f.s0 + "–" + f.s1 +
+    f.sem + " semanas, sem " + f.s0 + "-" + f.s1 +
     "\nDieta: bloque " + f.dieta;
   document.getElementById("b-lema").textContent = f.lema;
   document.getElementById("b-foco").textContent = f.foco;
@@ -108,7 +108,7 @@ function pintaEjercicios(){
 
 function pintaTablas(){
   const box = document.getElementById("tablas");
-  const DIA = {A:"Lunes · Fuerza A", B:"Miércoles · Fuerza B", C:"Viernes · Fuerza C"};
+  const DIA = {A:"Lunes, Fuerza A", B:"Miércoles, Fuerza B", C:"Viernes, Fuerza C"};
   Object.keys(T.tabata).forEach(k=>{
     const t = T.tabata[k];
     const d = el("details","ejcard");
@@ -116,7 +116,7 @@ function pintaTablas(){
     s.append(el("span",null,t.n), el("span","pat", DIA[k]));
     d.append(s);
     const c = el("div","cuerpo");
-    c.append(el("p","sus", t.como + " · " + t.dur));
+    c.append(el("p","sus", t.como + ", " + t.dur));
     [t.a,t.b].forEach(par=>{
       const p = el("p","tec");
       p.append(el("b",null,par[0]+". "), document.createTextNode(par[1]));
@@ -144,7 +144,7 @@ function pintaEstaticos(){
   const tz = document.getElementById("t-zonas");
   T.zonas.forEach(([z,a,b,desc])=>{
     const tr = el("tr");
-    tr.append(el("td","ex",z), el("td","num",a+"–"+b), el("td","cue",desc));
+    tr.append(el("td","ex",z), el("td","num",a+"-"+b), el("td","cue",desc));
     tz.append(tr);
   });
   const ts = document.getElementById("t-seguimiento");
@@ -170,7 +170,7 @@ function calculadora1RM(){
   const calc = ()=>{
     const kg = parseFloat(String(kgI.value).replace(",", ".")), r = parseInt(rI.value, 10);
     if(!(kg>0) || !(r>=1 && r<=30)){
-      ["rm-ep","rm-br","rm-fin"].forEach(id=>document.getElementById(id).textContent="—");
+      ["rm-ep","rm-br","rm-fin"].forEach(id=>document.getElementById(id).textContent="-");
       document.getElementById("rm-ep-f").textContent = "kg × (1 + reps ÷ 30)";
       document.getElementById("rm-br-f").textContent = "kg × 36 ÷ (37 − reps)";
       document.getElementById("rm-fin-f").textContent = "(Epley + Brzycki) ÷ 2";

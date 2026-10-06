@@ -87,9 +87,9 @@ def iconos_del_manifiesto(propios):
                         "type": "image/png", "purpose": p})
     return out
 
-SW = """// Service worker de «Junio 2027» · versión %(v)s (lo genera menu/pwa.py)
+SW = """// Service worker de «Junio 2027», versión %(v)s (lo genera menu/pwa.py)
 const V = "junio2027-%(v)s";
-const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./catalogo.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(BASE)).then(() => self.skipWaiting()));
@@ -110,6 +110,16 @@ self.addEventListener("fetch", e => {
     });
     const espera = new Promise((_, no) => setTimeout(no, 3000));
     e.respondWith(Promise.race([red, espera]).catch(() => caches.match("./index.html")));
+    return;
+  }
+  // el catálogo de alimentos cambia cada semana sin que cambie la app: se sirve
+  // la copia guardada al momento y se pide la nueva por detrás para la próxima vez
+  if (new URL(r.url).pathname.endsWith("/catalogo.json")) {
+    const nueva = fetch(r).then(res => {
+      if (res.ok) { const c = res.clone(); caches.open(V).then(ca => ca.put(r, c)); }
+      return res;
+    });
+    e.respondWith(caches.match(r).then(hit => hit || nueva));
     return;
   }
   // iconos, tipografías y demás: primero la copia guardada
@@ -155,7 +165,7 @@ def main():
     assert not faltan, f"faltan archivos de la app: {faltan}"
     detalle = ", ".join(f"{s}: " + ("tuyo " if s in propios else "dibujado ") +
                         "%d×%d" % medida(os.path.join(DOCS, f"icon-{s}.png")) for s in (192, 512))
-    print(f"PWA lista en docs/ · versión {v} · iconos {detalle} · sin conexión")
+    print(f"PWA lista en docs/, versión {v}, iconos {detalle}, sin conexión")
 
 
 if __name__ == "__main__":

@@ -39,7 +39,7 @@ for t, ops in PLATOS.items():
         for n, g in items:
             lo, hi = racion(n)
             if g > hi * 1.25 or g < lo * 0.5:
-                malos.append(f"{t}/{nom}: {n} {g} g (lo normal son {lo:.0f}–{hi:.0f} g)")
+                malos.append(f"{t}/{nom}: {n} {g} g (lo normal son {lo:.0f}-{hi:.0f} g)")
 chk(not malos, "todas las raciones dentro de lo razonable" +
     ("" if not malos else ":\n       " + "\n       ".join(malos)))
 
@@ -58,8 +58,8 @@ for t in ORDEN_TOMAS:
     filas = []
     for nom, items in PLATOS[t]:
         l, p, c = nota(items)
-        filas.append(f"{l}{'' if l=='—' else str(p)}" + ("" if c >= 100 else f"({c}%)"))
-    print(f"       {t:3} " + " · ".join(filas))
+        filas.append(f"{l}{'' if l=='?' else str(p)}" + ("" if c >= 100 else f"({c}%)"))
+    print(f"       {t:3} " + ", ".join(filas))
 flojos = [(t, nom, nota(items)) for t, ops in PLATOS.items() for nom, items in ops
           if nota(items)[0] in ("C", "D")]
 for t, nom, (l, p, c) in flojos:

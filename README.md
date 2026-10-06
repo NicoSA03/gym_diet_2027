@@ -8,11 +8,11 @@ Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, q
 | Registro | Apuntar series como en Hevy, peso corporal, carrera, gráficas de progreso e historial |
 | La teoría | El porqué de todo, el desglose de cada ejercicio y el seguimiento semanal |
 | Cómo funciona | La dieta: calorías por bloque y tipo de día, y qué hacer cuando la vida se cruza |
-| Menús | Qué comer hoy, con los gramos exactos y todas las alternativas |
+| Menús | El día de hoy con sus comidas, la calculadora que ajusta las raciones y tu diario (sección 5) |
 | La compra | La lista de Mercadona de la semana, con casillas |
 | Actualizar | Este manual y los valores con los que está generado el archivo |
 
-El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de datos en Python. Cambias un dato, ejecutas una orden y sale un `planificacion_dieta_gym.html` nuevo. Para eso solo necesitas **Python 3.8 o superior**, sin librerías extra. Todo lo que se calcula (el plan, los datos del registro, la app instalable y sus iconos) se hace en Python; en el móvil solo corre el JavaScript mínimo para pintar y guardar. Y si no quieres tocar código, pídeselo a Claude en el proyecto «gym_dieta» (sección 7).
+El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de datos en Python. Cambias un dato, ejecutas una orden y sale un `planificacion_dieta_gym.html` nuevo. Para eso solo necesitas **Python 3.8 o superior**, sin librerías extra. Todo lo que se calcula (el plan, los datos del registro, la app instalable y sus iconos) se hace en Python; en el móvil solo corre el JavaScript mínimo para pintar y guardar. Y si no quieres tocar código, pídeselo a Claude en el proyecto «gym_dieta» (sección 8).
 
 ---
 
@@ -34,33 +34,38 @@ Si la verificación encuentra un problema, **no se genera nada** y te dice qué 
 ## 2. Qué hay en cada sitio
 
 ```
-junio2027/
+gym_diet_2027/
 ├── actualizar.py        ← la única orden que necesitas
 ├── restaurar.py         ← reconstruye menu/ desde el paquete del proyecto de Claude
 ├── README.md
 ├── datos/
 │   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
 │   └── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
+├── catalogo/            ← descarga los alimentos de Mercadona, Lidl y Carrefour (sección 10)
 ├── menu/
 │   ├── entreno.py       ← TODO el entreno: peso, bloques, ejercicios, series, tabata, carrera, variantes
 │   ├── modelo.py        ← la dieta: calorías por bloque, tomas del día, tipos de día
 │   ├── db.py            ← carga datos/alimentos.csv y lo deja listo para el resto
 │   ├── platos.py        ← carga datos/platos.csv y comprueba que todo cuadre
 │   ├── generar.py       ← INVENTA PLATOS: tú pides calorías, él resuelve los gramos
-│   ├── calidad.py       ← la nota A–D de cada alimento, con sus reglas a la vista
+│   ├── calidad.py       ← la nota de la A a la D de cada alimento, con sus reglas a la vista
+│   ├── calculadora.js   ← la cuenta de raciones de la pestaña Menús (y calculadora.py, la misma en Python)
+│   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
 │   ├── ver_alimentos.py ← verificación de la base de datos y lista de datos que faltan
 │   ├── ver_platos.py    ← verificación de los platos: que encajen en su toma y las raciones sean de verdad
 │   ├── payload_registro.py ← datos del Registro: descansos, ejercicios de peso corporal, volumen y km del plan
 │   ├── pwa.py           ← convierte docs/ en app instalable: manifiesto, iconos y modo sin conexión
 │   ├── ver_entreno.py   ← verificación del entreno
 │   ├── ver_menu.py      ← verificación de la dieta
-│   ├── a1…a6 *.html/.js ← diseño e interacción de cada pestaña (a6 es el Registro)
+│   ├── a1 a a6 *.html/.js ← diseño e interacción de cada pestaña (a2 es Menús, a6 el Registro)
 │   └── …                ← el resto son piezas internas del montaje
 ├── salida/
 │   └── planificacion_dieta_gym.html   ← EL ARCHIVO DEL MÓVIL
 └── docs/                ← LA APP: esto es lo que publica GitHub Pages
     ├── index.html       ← el mismo archivo
+    ├── catalogo.json    ← los alimentos de las tres tiendas (se actualiza solo cada lunes)
     ├── manifest.webmanifest, sw.js, icon-192.png, icon-512.png
+└── obsoleto/            ← lo que la app ya no usa, guardado por versión (mira su LEEME.md)
 ```
 
 **Regla de oro:** los cambios de entreno se hacen en `menu/entreno.py`; los de dieta, en los dos CSV de `datos/`. Solo hace falta tocar Python para cambiar las calorías de un bloque o las horas de las tomas (`menu/modelo.py`).
@@ -91,7 +96,7 @@ Usa la **media de 7 días**, nunca el dato de un día suelto. Este número se mu
 Las calorías están en `menu/modelo.py`, en `FASES`. El tercer número de cada línea son las kcal medias del bloque:
 
 ```python
-"B1": ("Construcción I", "Sem 5–12",   3400,175,85,484),
+"B1": ("Construcción I", "Sem 5-12",   3300,175,85,459),
 #                                      kcal  P   G   C
 ```
 
@@ -113,7 +118,7 @@ Pon el tiempo nuevo y todas las zonas (Z2 a Z5) y el VO₂máx estimado se recal
 En `FASES`, dentro de cada bloque (`F0` a `F5`):
 
 ```python
-esquema={"T1":(4,"6–8","RIR 2"), "T2":(3,"8–12","RIR 2"), "T3":(3,"12–15","RIR 1"), "TF":(3,"15–20","RIR 2")},
+esquema={"T1":(4,"6-8","RIR 2"), "T2":(3,"8-12","RIR 2"), "T3":(3,"12-15","RIR 1"), "TF":(3,"15-20","RIR 2")},
 #              series reps  esfuerzo
 ```
 
@@ -122,7 +127,7 @@ esquema={"T1":(4,"6–8","RIR 2"), "T2":(3,"8–12","RIR 2"), "T3":(3,"12–15",
 - **T3:** accesorios.
 - **TF:** gemelo, que lleva la misma pauta todo el año.
 
-La verificación comprueba que ningún grupo muscular se quede fuera del rango útil (10–22 series semanales en los grandes) y que ninguna sesión pase de 80 minutos.
+La verificación comprueba que ningún grupo muscular se quede fuera del rango útil (de 10 a 22 series semanales en los grandes) y que ninguna sesión pase de 80 minutos.
 
 ### Cambiar un ejercicio por otro
 
@@ -291,7 +296,7 @@ Cada alimento lleva una letra que se calcula sola en `menu/calidad.py` y aparece
 - **Grasa saturada por 100 g:** hasta 1,5 no resta, de 1,5 a 5 resta 6, por encima resta 15.
 - **Fibra por 100 g:** de 3 a 6 suma 4, a partir de 6 suma 8.
 
-A partir de 85 es A, de 70 a 84 B, de 50 a 69 C, y por debajo D. Si falta algún dato de la etiqueta el alimento sale como «—» y no se inventa nota.
+A partir de 85 es A, de 70 a 84 B, de 50 a 69 C, y por debajo D. Si falta algún dato de la etiqueta el alimento sale como «?» y no se inventa nota.
 
 Los cortes son por 100 g de producto, así que castigan a los alimentos grasos aunque la grasa sea buena: el aceite de oliva se queda en B por sus saturadas. Es el precio de una regla simple y comprobable. Lo que de verdad decide es **cuánto** comes de cada cosa, y de eso se encarga el menú. Si algún criterio no te convence, cámbialo en `menu/calidad.py` y se recalcula todo.
 
@@ -309,7 +314,45 @@ Las horas y los nombres de las tomas (no los platos) están en el diccionario `T
 
 ---
 
-## 5. La app en el móvil (Android)
+## 5. La pestaña Menús (v2.0)
+
+Una pantalla por día con todas las comidas en orden. Arriba, lo que llevas comido frente al objetivo del día; debajo, cada toma con su hora, su plato y sus kcal.
+
+### Qué día y qué bloque
+
+- Se abre en **hoy**. Con las flechas pasas de día.
+- El **bloque** sale solo de la fecha de inicio que pones en el Registro. Si no la has puesto, lo eliges en el desplegable.
+- El **tipo de día** sale del día de la semana (lunes A, martes B...). Si un día cambia tu plan, por ejemplo porque no entrenas, cámbialo en el desplegable y los objetivos se ajustan.
+
+### La calculadora
+
+Toca una comida y se abre. Eliges el plato y la app propone los gramos para clavar las kcal y la proteína de esa toma.
+
+- **Todos los platos valen para la comida y para la cena.** En la cena se aplica la cena ligera: se mantiene la proteína y se recorta primero el pan y el aceite.
+- **Si tienes otra cantidad** (descongelaste 137 g de pollo y tocaban 120), escríbela. Ese alimento queda fijado (candado rojo) y el resto se reajusta. Toca el candado para soltarlo.
+- **La verdura no se toca nunca.** La X quita un alimento del plato.
+- **Añadir alimento** busca primero entre tus alimentos y después en el catálogo de Mercadona, Lidl y Carrefour (solo en la app instalada). Lo que añades entra fijado con una ración normal.
+- Si un plato se queda corto (una cena usada como comida, por ejemplo), la app propone el acompañante que mejor lo completa con un toque.
+
+### El margen y el arrastre
+
+Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las tomas pequeñas). Si te pasas o te quedas corto y la comes así, no pasa nada: al pulsar **Hecho, lo he comido** la diferencia se reparte entre las tomas que quedan del día, en proporción a su tamaño. Lo que decide es el total del día y la media de la semana.
+
+### El diario y el peso
+
+- Lo que confirmas se guarda en el móvil. Se guardan **14 días con detalle**; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.
+- **Peso de hoy** se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.
+- **Guardar copia** descarga el diario en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; **Recuperar copia** lo restaura en cualquier móvil.
+
+### Cómo funciona la cuenta
+
+`menu/calculadora.js` busca, por mínimos cuadrados con límites, los gramos que más se acercan al objetivo sin deformar el plato. Importan, por este orden, las kcal, la proteína (como mínimo, no como techo) y después la grasa y el hidrato. Cada alimento se queda dentro de su ración razonable (`RACION` en `menu/generar.py`). Es aritmética exacta: siempre da lo mismo.
+
+`menu/calculadora.py` es la misma cuenta en Python. La usa la verificación para probar todos los platos en todas las tomas, bloques y tipos de día, y comprueba que las dos dan exactamente lo mismo.
+
+---
+
+## 6. La app en el móvil (Android)
 
 ### Publicarla en GitHub Pages (una vez)
 
@@ -354,7 +397,7 @@ Doble clic en `planificacion_dieta_gym.html`, o abre la dirección de GitHub Pag
 
 ### Qué pasa con lo que tienes marcado
 
-El bloque, el día, las opciones de cada toma y las casillas de la compra se guardan en el navegador, asociados a la **dirección** desde la que abres el archivo. Si actualizas en la misma dirección (el mismo archivo local o la misma web de GitHub Pages), se conservan. Si cambias de dirección, empiezas de cero.
+El diario de Menús, el Registro y las casillas de la compra se guardan en el navegador, asociados a la **dirección** desde la que abres el archivo. Si actualizas en la misma dirección (el mismo archivo local o la misma web de GitHub Pages), se conservan. Si cambias de dirección, empiezas de cero.
 
 ### Cómo saber qué versión tienes
 
@@ -362,9 +405,9 @@ En el pie del archivo aparece `versión xxxxxxxx`: una huella de todo su conteni
 
 ---
 
-## 6. La verificación
+## 7. La verificación
 
-`actualizar.py` ejecuta cuatro baterías de comprobaciones antes de construir nada.
+`actualizar.py` ejecuta cinco baterías de comprobaciones antes de construir nada.
 
 **Entreno** (`ver_entreno.py`):
 
@@ -399,6 +442,14 @@ En el pie del archivo aparece `versión xxxxxxxx`: una huella de todo su conteni
 - Proteína de al menos 1,8 g por kilo.
 - Ninguna porción absurda (1,3 kg de patata no cuenta como comida).
 
+**Calculadora de Menús** (`ver_calculadora.py`):
+
+- Cada plato en su toma de siempre sale a ±5 % (o ±25 kcal) del objetivo, en todos los bloques y tipos de día.
+- Ninguna ración pasa de su máximo razonable.
+- Cuenta los platos que como comida piden acompañante (solo informa).
+- Avisa, sin parar la construcción, de los platos que van cortos de proteína.
+- Si tienes Node instalado, comprueba que `calculadora.js` y `calculadora.py` dan los mismos gramos.
+
 Si algo falla verás líneas que empiezan por `FALLO` con el motivo. Puedes ejecutar cualquiera por separado para ver el informe completo:
 
 ```bash
@@ -406,13 +457,14 @@ python3 menu/ver_entreno.py
 python3 menu/ver_alimentos.py
 python3 menu/ver_platos.py
 python3 menu/ver_menu.py
+python3 menu/ver_calculadora.py
 ```
 
 `--forzar` construye aunque haya fallos. Úsalo solo si entiendes exactamente qué falla y por qué no importa.
 
 ---
 
-## 7. Vinculado al proyecto «gym_dieta» de Claude
+## 8. Vinculado al proyecto «gym_dieta» de Claude
 
 El proyecto guarda siempre la versión vigente de tres cosas:
 
@@ -445,7 +497,7 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 
 ---
 
-## 8. Problemas frecuentes
+## 9. Problemas frecuentes
 
 | Qué ves | Qué pasa | Qué hacer |
 |---|---|---|
@@ -455,7 +507,7 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 | `FALLO F1: 7 semanas de kilometraje para 8 semanas de bloque` | `km` no tiene un valor por semana | Iguala la longitud de `km` a `sem` |
 | `FALLO … subidas … F1s3: 12→15 km` | Subida de más del 10 % | Reparte la subida en más semanas |
 | `FALLO Patata: 1345 g en B3/D` | Un plato nuevo pesa mucho más o menos que el resto y el escalado lo lleva a una porción absurda | Ajusta sus gramos base para que ronde lo mismo que los otros, o reparte el carbohidrato entre dos alimentos |
-| Los botones no hacen nada en el iPhone | Lo estás abriendo desde Archivos | Usa GitHub Pages (sección 5) |
+| Los botones no hacen nada en el iPhone | Lo estás abriendo desde Archivos | Usa GitHub Pages (sección 6) |
 | Chrome no ofrece «Instalar aplicación» | Lo abres como archivo o Pages aún no ha publicado | Abre la dirección https de GitHub Pages y espera un par de minutos tras subirlo |
 | El Registro está vacío en otro móvil o en el PC | Los datos viven en cada navegador | Historial → Exportar copia en uno, Importar copia en el otro |
 | Has perdido lo que tenías marcado | Has abierto el archivo desde otra dirección | Ábrelo siempre desde el mismo sitio |
@@ -463,7 +515,7 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 
 ---
 
-## 9. Catálogo de alimentos (Mercadona, Lidl y Carrefour)
+## 10. Catálogo de alimentos (Mercadona, Lidl y Carrefour)
 
 `docs/catalogo.json` reúne los alimentos de las tres tiendas con sus valores por 100 g. Lo usa la app para buscar alimentos sin conexión.
 
@@ -486,8 +538,16 @@ Cosas que conviene saber:
 - **Nunca se vacía.** Si una fuente falla o trae menos de la mitad de productos que la vez anterior, se conservan sus datos anteriores y queda anotado en `fuentes` dentro del propio archivo.
 - **Datos dudosos.** Si las kcal de un producto no cuadran con sus macros (4/4/9, ±15 %), se marca como dudoso en vez de esconderlo: la app lo enseña con un aviso.
 - **Open Food Facts lo rellenan usuarios.** Están los productos más escaneados de cada tienda, no todos. Lo que falte se podrá añadir desde la app con el escáner.
-- Las piezas están separadas para cambiar una fuente sin tocar las demás: `catalogo/fuente_mercadona.py`, `catalogo/fuente_off.py`, `catalogo/comun.py` (descarga, formato y control de calidad) y `catalogo/actualizar_catalogo.py` (el que lo une todo).
+- Las piezas están separadas para cambiar una fuente sin tocar las demás: `catalogo/fuente_mercadona.py`, `catalogo/fuente_openFood.py`, `catalogo/comun.py` (descarga, formato y control de calidad) y `catalogo/actualizar_catalogo.py` (el que lo une todo).
 
 ---
 
-*Versión del sistema: 25 de septiembre de 2026 · peso de partida 79,5 kg · 5 km en 27:30 · ciclo de 39 semanas sin fechas fijas, con Registro, app instalable y base de datos de alimentos y platos.*
+## 11. Versiones
+
+| Versión | Qué trae |
+|---|---|
+| v1.0 | Siete pestañas, menús por tipo de día, Registro y app instalable |
+| v1.1 | Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin |
+| v2.0 | Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia |
+
+*Versión del sistema: v2.0, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*

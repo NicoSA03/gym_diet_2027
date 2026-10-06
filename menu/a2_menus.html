@@ -1,111 +1,191 @@
 <style>
-.dia-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
-@media (max-width:620px){.dia-grid{grid-template-columns:repeat(4,1fr)}}
-.dia-btn{font-family:var(--sans);font-size:13px;font-weight:700;padding:10px 4px;border-radius:3px;
-  border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer;
-  display:flex;flex-direction:column;gap:2px;align-items:center;transition:all .12s}
-.dia-btn small{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.06em;color:var(--ink-3)}
-.dia-btn:hover{border-color:var(--accent)}
-.dia-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
-.dia-btn[aria-selected="true"] small{color:rgba(255,255,255,.75)}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"]{color:#FFFFFF}
-  :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:rgba(255,255,255,.75)}
-}
-:root[data-theme="dark"] .dia-btn[aria-selected="true"]{color:#FFFFFF}
-:root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:rgba(255,255,255,.75)}
+/* Menús v2.0: lista del día + calculadora + diario */
+.m2{--ok:#3DDC84;--ok-soft:#0C2A18;--p:var(--accent-ink);--g:var(--amber);--c:var(--clay)}
+.m2 .wrap-in{display:flex;flex-direction:column;gap:14px;padding-top:18px}
+.m2 section{padding-block:0}
 
-.toma{border-bottom:1px solid var(--line);padding:16px 20px}
-.toma:last-child{border-bottom:none}
-.toma-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:9px}
-.toma-top h4{font-size:16px;font-weight:700;letter-spacing:-.01em}
-.toma-top .h{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:600}
-.toma-top .nota{font-size:13px;color:var(--ink-3);font-style:italic}
-.toma-top .kc{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--ink-3);
-  font-variant-numeric:tabular-nums;white-space:nowrap}
-.toma .opciones{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.ing{display:flex;flex-direction:column;gap:3px;background:var(--surface-2);
-  border-radius:3px;padding:11px 14px}
-.ing div{display:flex;justify-content:space-between;gap:12px;font-size:15.5px;line-height:1.4}
-.ing b{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);
-  font-variant-numeric:tabular-nums;white-space:nowrap}
+/* cabecera: fecha y bloque */
+.m-fecha{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px}
+.m-fecha h1{font-size:24px;font-weight:800;letter-spacing:-.02em;text-align:center;line-height:1.1}
+.m-fecha p{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);text-align:center;margin-top:3px}
+.m-flecha{width:44px;height:44px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);
+  color:var(--ink);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.m-flecha:hover{border-color:var(--accent)}
+.m-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.m-pill{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink-2);background:var(--surface);
+  border:1px solid var(--line-2);border-radius:999px;padding:7px 30px 7px 12px;appearance:none;-webkit-appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat;max-width:100%}
+.m-hoy{font-family:var(--sans);font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:999px;
+  border:1px solid var(--accent);background:transparent;color:var(--accent-ink);cursor:pointer}
 
-.total{background:var(--surface-2);border-top:2px solid var(--line-2);padding:16px 20px}
-.total-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.total-top h4{font-size:17px;font-weight:700}
-.total-top .big{font-family:var(--mono);font-size:24px;font-weight:600;letter-spacing:-.02em;
-  font-variant-numeric:tabular-nums}
-.barras{display:flex;flex-direction:column;gap:7px}
-.barra{display:grid;grid-template-columns:96px 1fr 120px;gap:12px;align-items:center}
-.barra .et{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--ink-3)}
-.barra .pista{height:7px;background:var(--line);border-radius:4px;overflow:hidden;position:relative}
-.barra .fill{height:100%;border-radius:4px;background:var(--accent);transition:width .18s}
-.barra .fill.alto{background:var(--clay)}
-.barra .marca{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink-3);opacity:.55}
-.barra .cif{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);text-align:right;
-  font-variant-numeric:tabular-nums;white-space:nowrap}
-@media (max-width:560px){.barra{grid-template-columns:78px 1fr;row-gap:2px}.barra .cif{grid-column:1/3;text-align:left}}
-.reset{font-family:var(--sans);font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px;
-  border:1px solid var(--line-2);background:transparent;color:var(--ink-3);cursor:pointer}
-.reset:hover{border-color:var(--clay);color:var(--clay)}
-.cal{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;line-height:1;
-  padding:2px 5px;border-radius:4px;margin-left:6px;font-style:normal;vertical-align:1px;
-  background:var(--accent-soft);color:var(--accent-ink);cursor:help}
+/* resumen del día */
+.m-res{display:grid;grid-template-columns:132px 1fr;gap:18px;align-items:center;padding:18px}
+.m-anillo{position:relative;width:132px;height:132px}
+.m-anillo svg{width:132px;height:132px;transform:rotate(-90deg)}
+.m-anillo .centro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.m-anillo .centro b{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.m-anillo .centro span{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.m-macros{display:flex;flex-direction:column;gap:11px;min-width:0;overflow:hidden}
+.m-mac{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:baseline}
+.m-mac .et{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--ink-2)}
+.m-mac .cif{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-mac .pista{grid-column:1/3;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.m-mac .fill{height:100%;border-radius:4px;transition:width .2s}
+.m-peso{grid-column:1/3;display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:14px;flex-wrap:wrap}
+.m-peso label{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ink-2)}
+.m-peso input{width:84px;font-family:var(--mono);font-size:15px;padding:8px 10px;border-radius:8px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.m-peso small{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:auto}
+@media (max-width:380px){.m-res{grid-template-columns:1fr;justify-items:center}.m-macros{width:100%}}
+
+/* botones */
+.m-btn{font-family:var(--sans);font-size:13.5px;font-weight:700;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.m-btn:hover{border-color:var(--accent)}
+.m-btn.prim{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.m-btn.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.m-btn.peq{font-size:12.5px;padding:7px 11px;border-radius:999px}
+.m-btn:disabled{opacity:.5;cursor:default}
+
+/* lista de tomas */
+.m-tomas{display:flex;flex-direction:column;gap:8px}
+.m-toma{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.m-toma.abierta{border-color:var(--line-2)}
+.m-fila{width:100%;display:grid;grid-template-columns:50px 1fr auto 30px;gap:10px;align-items:center;
+  padding:14px 14px;background:none;border:0;color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.m-fila .h{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent-ink)}
+.m-fila .tx{min-width:0;display:flex;flex-direction:column;gap:1px}
+.m-fila .tx b{font-family:var(--sans);font-size:15.5px;font-weight:700}
+.m-fila .tx small{font-size:13.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-fila .kc{font-family:var(--mono);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-fila .kc small{display:block;font-size:10.5px;font-weight:500;color:var(--ink-3);text-align:right}
+.m-est{width:26px;height:26px;border-radius:999px;border:2px solid var(--line-2);display:grid;place-items:center}
+.m-est.ok{background:var(--ok);border-color:var(--ok);color:#06140B}
+.m-est.aviso{border-color:var(--amber);color:var(--amber);font-family:var(--sans);font-weight:800;font-size:14px}
+
+/* calculadora */
+.m-calc{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:12px}
+.m-calc select.m-plato{width:100%;font-family:var(--sans);font-size:15px;font-weight:700;padding:11px 12px;border-radius:10px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.m-items{display:flex;flex-direction:column;gap:6px}
+.m-it{display:grid;grid-template-columns:1fr 92px 40px;gap:8px;align-items:center;background:var(--surface-2);
+  border-radius:10px;padding:8px 8px 8px 12px}
+.m-it .nom{font-size:15px;line-height:1.3;min-width:0}
+.m-it .nom small{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.m-it.cero .nom{color:var(--ink-3);text-decoration:line-through}
+.m-it.fijo{box-shadow:inset 3px 0 0 var(--accent)}
+.m-it .gr{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:0 8px}
+.m-it .gr input{width:100%;min-width:0;font-family:var(--mono);font-size:16px;font-weight:600;padding:9px 0;border:0;background:transparent;
+  color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.m-it .gr span{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.m-it.fijo .gr{border-color:var(--accent)}
+.m-ic{width:40px;height:40px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-3);
+  cursor:pointer;display:grid;place-items:center}
+.m-ic[aria-pressed="true"]{color:var(--accent-ink);border-color:var(--accent)}
+.m-ic svg{width:18px;height:18px}
+.cal{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;line-height:1;padding:2px 5px;border-radius:4px;
+  margin-left:6px;vertical-align:1px;background:var(--accent-soft);color:var(--accent-ink)}
 .cal.C{background:var(--amber-soft);color:var(--amber)}
 .cal.D{background:var(--clay-soft);color:var(--clay)}
-.cal.x{background:var(--surface-2);color:var(--ink-3)}
+
+.m-pie{display:flex;flex-direction:column;gap:8px;background:var(--surface-2);border-radius:12px;padding:12px}
+.m-pie .fila1{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.m-pie .fila1 b{font-family:var(--mono);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.m-pie .fila1 span{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.m-pie .pista{height:8px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
+.m-pie .pista i{position:absolute;top:0;bottom:0;background:rgba(61,220,132,.22)}
+.m-pie .pista em{position:absolute;top:0;bottom:0;left:0;border-radius:4px;background:var(--accent)}
+.m-pie .mini{display:flex;gap:12px;font-family:var(--mono);font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+.m-estado{font-size:14.5px;line-height:1.4;display:flex;gap:8px;align-items:flex-start}
+.m-estado.ok{color:var(--ok)}
+.m-estado.aviso{color:var(--amber)}
+.m-acc{display:flex;gap:8px;flex-wrap:wrap}
+.m-acc .m-btn{flex:1}
+
+/* añadir alimento */
+.m-buscar{display:flex;flex-direction:column;gap:8px}
+.m-buscar input{font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.m-res-lista{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto}
+.m-res-it{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;
+  background:var(--surface-2);border:1px solid transparent;color:var(--ink);cursor:pointer;text-align:left;font:inherit;font-size:14.5px}
+.m-res-it:hover{border-color:var(--accent)}
+.m-res-it small{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+.m-tag{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-3);margin-left:6px}
+.m-tag.dud{border-color:var(--amber);color:var(--amber)}
+
+/* semana y copia */
+.m-sem{padding:16px}
+.m-sem h3{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:12px}
+.m-barras{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:96px}
+.m-barras div{display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+.m-barras .b{width:100%;max-width:30px;height:4px;border-radius:6px 6px 2px 2px;background:var(--line-2)}
+.m-barras .b.curso{background:var(--accent);opacity:.55}
+.m-barras .b.ok{background:var(--ok)}
+.m-barras .b.alto{background:var(--clay)}
+.m-barras .b.bajo{background:var(--amber)}
+.m-barras span{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.m-barras .sel span{color:var(--ink);font-weight:600}
+.m-leyenda{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.m-leyenda i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.m-copia{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
+.m-aviso{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--ground);
+  font-family:var(--sans);font-size:14px;font-weight:700;padding:11px 16px;border-radius:999px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.m-nota{font-size:13.5px;color:var(--ink-3)}
 </style>
 
-<div class="wrap">
-<header class="masthead">
-  <p class="eyebrow">Menús y catálogo · Mercadona · Entreno 07:00 · 6 tomas</p>
-  <h1>Qué como <em>hoy</em></h1>
-  <p class="dek">Elige el bloque del macrociclo y el día de la semana. Cada toma tiene varias versiones que valen lo mismo: cambia la que quieras y los gramos y el total se recalculan solos. Lo que ves son los pesos exactos que tienes que comer.</p>
-  <div class="hermanos">
-    <a class="hermano" href="https://claude.ai/artifact/RqGzzc6vLLoseYuJYQgjNr" target="_top">El entreno</a>
-    <a class="hermano" href="https://claude.ai/artifact/T36P6b5juBiQMHdDgRE2SM" target="_top">La teoría</a>
-    <a class="hermano" href="https://claude.ai/artifact/S9WiFnMkqmqLgYucuWMgV9" target="_top">Cómo funciona</a>
-    <span class="hermano yo">Menús</span>
-    <a class="hermano" href="https://claude.ai/artifact/4qgvgmpPLgZtqEuXXpY8fe" target="_top">La compra</a>
-  </div>
-</header>
-
-<section>
-  <div class="sec-head"><span class="num">01</span><h2>Tu día</h2></div>
-  <div class="stack">
-    <div>
-      <p class="eyebrow" style="margin-bottom:8px">Bloque del macrociclo</p>
-      <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
-    </div>
-    <div>
-      <p class="eyebrow" style="margin-bottom:8px">Día de la semana</p>
-      <div class="dia-grid" id="dias" role="tablist" aria-label="Día"></div>
-      <p class="nota" id="tipo-nota">—</p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <h3 id="d-nombre">—</h3>
-        <button class="reset" id="reset">Volver a las opciones por defecto</button>
+<div class="wrap m2">
+  <div class="wrap-in">
+    <header class="stack" style="gap:12px">
+      <div class="m-fecha">
+        <button class="m-flecha" id="m-prev" aria-label="Día anterior">&#8249;</button>
+        <div><h1 id="m-dia">Hoy</h1><p id="m-sub">Hoy</p></div>
+        <button class="m-flecha" id="m-next" aria-label="Día siguiente">&#8250;</button>
       </div>
-      <div id="tomas"></div>
-      <div class="total">
-        <div class="total-top">
-          <h4>Total del día</h4>
-          <span class="big" id="t-kcal">—</span>
-        </div>
-        <div class="barras" id="barras"></div>
+      <div class="m-pills">
+        <select class="m-pill" id="m-fase" aria-label="Bloque del plan"></select>
+        <select class="m-pill" id="m-tipo" aria-label="Tipo de día"></select>
+        <button class="m-hoy" id="m-hoy" hidden>Ir a hoy</button>
       </div>
-    </div>
+    </header>
 
-    <p class="nota">Las barras comparan lo que suma tu selección con el objetivo de ese día. Mientras la barra de calorías se quede dentro de la marca, el día está bien: un margen del 5 % arriba o abajo no cambia nada, porque lo que decide es la media de la semana. Si te pasas mucho, quita carbohidrato de la comida; si te quedas corto, añádelo ahí mismo.</p>
+    <section class="card m-res" style="padding-block:18px" aria-label="Resumen del día">
+      <div class="m-anillo">
+        <svg viewBox="0 0 132 132" aria-hidden="true">
+          <circle cx="66" cy="66" r="56" fill="none" stroke="var(--line)" stroke-width="12"/>
+          <circle id="m-arco" cx="66" cy="66" r="56" fill="none" stroke="var(--accent)" stroke-width="12"
+            stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+        </svg>
+        <div class="centro"><b id="m-kc">0</b><span id="m-kc-obj">de 0 kcal</span></div>
+      </div>
+      <div class="m-macros" id="m-macros"></div>
+      <div class="m-peso">
+        <label for="m-peso">Peso de hoy</label>
+        <input id="m-peso" inputmode="decimal" placeholder="kg" aria-label="Peso de esta mañana en kg">
+        <button class="m-btn peq" id="m-peso-ok">Guardar</button>
+        <small id="m-peso-media"></small>
+      </div>
+    </section>
+
+    <section class="m-tomas" id="m-tomas" aria-label="Comidas del día"></section>
+
+    <section class="card m-sem" aria-label="Tu semana">
+      <h3>Tu semana</h3>
+      <div class="m-barras" id="m-barras"></div>
+      <div class="m-leyenda">
+        <span><i style="background:var(--ok)"></i>Dentro</span>
+        <span><i style="background:var(--clay)"></i>Por encima</span>
+        <span><i style="background:var(--amber)"></i>Por debajo</span>
+        <span><i style="background:var(--accent);opacity:.55"></i>A medias</span>
+      </div>
+      <div class="m-copia">
+        <button class="m-btn peq" id="m-exp">Guardar copia</button>
+        <button class="m-btn peq" id="m-imp">Recuperar copia</button>
+        <input type="file" id="m-imp-f" accept="application/json,.json" hidden>
+      </div>
+      <p class="m-nota" style="margin-top:10px" id="m-guardado"></p>
+    </section>
   </div>
-</section>
-
-<footer>
-  Menús calculados para Abraham · parte 2 de 3<br>
-  Todos los pesos son en crudo: arroz, pasta y avena sin cocer; carne y pescado sin cocinar; patata y batata crudas y peladas.<br>
-  Valores nutricionales de tablas de composición estándar. La energía de las etiquetas y la suma de macronutrientes difieren ligeramente entre sí, como en cualquier etiqueta real.
-</footer>
+  <div class="m-aviso" id="m-aviso" role="status" hidden></div>
 </div>

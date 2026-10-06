@@ -91,5 +91,5 @@ if __name__ == "__main__":
     from db import macros
     for toma, ops in PLATOS.items():
         ks = [macros(it)[0] for _, it in ops]
-        print(f"{toma:3} {len(ops):2} platos · base media {sum(ks)/len(ks):6.0f} kcal")
+        print(f"{toma:3} {len(ops):2} platos, base media {sum(ks)/len(ks):6.0f} kcal")
     print(f"\n{sum(len(v) for v in PLATOS.values())} platos en {CSV}")

@@ -14,7 +14,7 @@
 import sys, os, json, argparse, hashlib, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from comun import CAMPOS, SUPER
-import fuente_mercadona, catalogo.fuente_openFood as fuente_openFood
+import fuente_mercadona, fuente_openFood
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SALIDA = os.path.join(RAIZ, "docs", "catalogo.json")
