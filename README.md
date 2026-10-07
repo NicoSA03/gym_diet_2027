@@ -326,7 +326,7 @@ Una pantalla por día con todas las comidas en orden. Arriba, lo que llevas comi
 
 ### La calculadora
 
-Toca una comida y se abre. Eliges el plato y la app propone los gramos para clavar las kcal y la proteína de esa toma.
+Toca una comida y se abre. Tocas el nombre del plato y sale la lista de platos con un buscador arriba: encuentra por nombre o por ingrediente («salmón», «garbanzos»). Al elegir uno, la app propone los gramos para clavar las kcal y la proteína de esa toma.
 
 - **Todos los platos valen para la comida y para la cena.** En la cena se aplica la cena ligera: se mantiene la proteína y se recorta primero el pan y el aceite.
 - **Si tienes otra cantidad** (descongelaste 137 g de pollo y tocaban 120), escríbela. Ese alimento queda fijado (candado rojo) y el resto se reajusta. Toca el candado para soltarlo.

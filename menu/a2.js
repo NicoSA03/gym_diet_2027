@@ -67,7 +67,7 @@ function guardaPeso(fecha, kg){
 }
 
 // ---------------------------------------------------------------- qué toca cada día
-let fecha = hoy(), abierta = null, buscando = null;
+let fecha = hoy(), abierta = null, buscando = null, eligiendo = null;
 let faseManual = leeJSON("menu_fase", null);
 
 function faseDe(f){
@@ -204,7 +204,7 @@ function pintaTomas(){
     if(st.ok){ e.classList.add("ok"); e.innerHTML = CHECK; e.setAttribute("aria-label","Hecha"); }
     else if(!dentro(r.tot[0], r.obj[0])){ e.classList.add("aviso"); e.textContent="!"; e.setAttribute("aria-label","Fuera del margen"); }
     fila.append(el("span","h",M.horas[b]), tx, k, e);
-    fila.addEventListener("click", ()=>{ abierta = abierta===b ? null : b; buscando=null; render(); });
+    fila.addEventListener("click", ()=>{ abierta = abierta===b ? null : b; buscando=null; eligiendo=null; render(); });
     art.append(fila);
     if(abierta===b) art.append(calculadora(b));
     box.append(art);
@@ -213,22 +213,15 @@ function pintaTomas(){
 
 function calculadora(b){
   const st = estado(fecha, b), cont = el("div","m-calc");
-  // plato
-  const sel = el("select","m-plato"); sel.setAttribute("aria-label","Plato");
-  const ops = opciones(b);
-  if(b==="C"||b==="N"){
-    [["C","Recetas de comida"],["N","Recetas de cena"]].forEach(([de,et])=>{
-      const g = el("optgroup"); g.label = et;
-      ops.filter(o=>o.de===de).forEach(o=>{ const x=el("option",null,o.n); x.value=o.clave; g.append(x); });
-      sel.append(g);
-    });
-  } else ops.forEach(o=>{ const x=el("option",null,o.n); x.value=o.clave; sel.append(x); });
-  sel.value = st.p; sel.disabled = st.ok;
-  sel.addEventListener("change", ()=>{
-    guardaEstado(fecha, b, {p:sel.value, it:opcion(b, sel.value).it.map(([n,g])=>[n,g,false,null]), ok:false});
-    render();
-  });
-  cont.append(sel);
+  // plato: botón con el nombre; al tocarlo se abre la lista con un buscador arriba
+  const actual = opcion(b, st.p);
+  const bp = el("button","m-plato");
+  bp.setAttribute("aria-expanded", eligiendo===b ? "true" : "false");
+  bp.append(el("span",null,actual.n), el("span","flecha",eligiendo===b ? "\u25B4" : "\u25BE"));
+  bp.disabled = st.ok;
+  bp.addEventListener("click", ()=>{ eligiendo = eligiendo===b ? null : b; buscando = null; render(); });
+  cont.append(bp);
+  if(eligiendo===b && !st.ok) cont.append(selectorPlato(b, actual));
 
   const r = calcula(fecha, b);
   const lista = el("div","m-items");
@@ -317,6 +310,45 @@ function calculadora(b){
   }
   cont.append(acc);
   return cont;
+}
+
+// Lista de platos para elegir. Comida y cena comparten platos: si un nombre existe
+// en las dos, se queda una sola vez (la receta de esta toma).
+function platosDe(b){
+  const ops = opciones(b);
+  if(b!=="C" && b!=="N") return ops;
+  const vistos = {};
+  ops.forEach(o=>{ if(!vistos[o.n] || o.de===b) vistos[o.n] = o; });
+  return Object.values(vistos).sort((x,y)=>x.n.localeCompare(y.n,"es"));
+}
+function selectorPlato(b, actual){
+  const box = el("div","m-elegir");
+  const inp = el("input"); inp.type="search"; inp.placeholder="Busca un plato o un ingrediente";
+  inp.setAttribute("aria-label","Buscar plato");
+  const lista = el("div","m-res-lista");
+  const todos = platosDe(b);
+  const pinta = ()=>{
+    lista.replaceChildren();
+    const pal = sinTildes(inp.value.trim()).split(/\s+/).filter(Boolean);
+    const vale = o => { const t = sinTildes(o.n+" "+o.it.map(x=>x[0]).join(" ")); return pal.every(w=>t.indexOf(w)>=0); };
+    const res = todos.filter(vale);
+    res.forEach(o=>{
+      const it = el("button","m-res-it"+(o.n===actual.n ? " sel" : ""));
+      it.append(el("span",null,o.n));
+      if(o.n===actual.n) it.append(el("small",null,"elegido"));
+      it.addEventListener("click", ()=>{
+        guardaEstado(fecha, b, {p:o.clave, it:o.it.map(([n,g])=>[n,g,false,null]), ok:false});
+        eligiendo = null; render();
+      });
+      lista.append(it);
+    });
+    if(!res.length) lista.append(el("p","m-nota","Ningún plato con eso. Prueba con otra palabra."));
+  };
+  inp.addEventListener("input", pinta);
+  box.append(inp, lista);
+  pinta();
+  setTimeout(()=>inp.focus(), 0);
+  return box;
 }
 
 // Si un plato se queda corto (por ejemplo, una cena usada como comida), propone el
@@ -441,8 +473,8 @@ document.getElementById("m-imp-f").addEventListener("change", function(){
 });
 
 // ---------------------------------------------------------------- controles
-document.getElementById("m-prev").addEventListener("click", ()=>{ fecha=sumaDias(fecha,-1); abierta=null; render(); });
-document.getElementById("m-next").addEventListener("click", ()=>{ fecha=sumaDias(fecha,1); abierta=null; render(); });
+document.getElementById("m-prev").addEventListener("click", ()=>{ fecha=sumaDias(fecha,-1); abierta=null; eligiendo=null; render(); });
+document.getElementById("m-next").addEventListener("click", ()=>{ fecha=sumaDias(fecha,1); abierta=null; eligiendo=null; render(); });
 document.getElementById("m-hoy").addEventListener("click", ()=>{ fecha=hoy(); abierta=null; render(); });
 document.getElementById("m-fase").addEventListener("change", function(){
   faseManual = this.value; try{ localStorage.setItem("menu_fase", JSON.stringify(this.value)); }catch(e){}

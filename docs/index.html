@@ -245,8 +245,16 @@ body{padding-top:0}
 
 /* calculadora */
 .m-calc{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:12px}
-.m-calc select.m-plato{width:100%;font-family:var(--sans);font-size:15px;font-weight:700;padding:11px 12px;border-radius:10px;
-  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.m-plato{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--sans);font-size:15px;
+  font-weight:700;padding:11px 14px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);
+  cursor:pointer;text-align:left}
+.m-plato[aria-expanded="true"]{border-color:var(--accent)}
+.m-plato .flecha{color:var(--ink-3);font-size:13px}
+.m-plato:disabled{opacity:.6;cursor:default}
+.m-elegir{display:flex;flex-direction:column;gap:8px;margin-top:-4px;padding:10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line-2)}
+.m-elegir .m-res-it{background:var(--surface)}
+.m-elegir input{font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.m-res-it.sel{border-color:var(--accent)}
 .m-items{display:flex;flex-direction:column;gap:6px}
 .m-it{display:grid;grid-template-columns:1fr 92px 40px;gap:8px;align-items:center;background:var(--surface-2);
   border-radius:10px;padding:8px 8px 8px 12px}
@@ -1431,7 +1439,7 @@ python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"</code></pr
 <h4>Qué día y qué bloque</h4>
 <ul><li>Se abre en <b>hoy</b>. Con las flechas pasas de día.</li><li>El <b>bloque</b> sale solo de la fecha de inicio que pones en el Registro. Si no la has puesto, lo eliges en el desplegable.</li><li>El <b>tipo de día</b> sale del día de la semana (lunes A, martes B...). Si un día cambia tu plan, por ejemplo porque no entrenas, cámbialo en el desplegable y los objetivos se ajustan.</li></ul>
 <h4>La calculadora</h4>
-<p>Toca una comida y se abre. Eliges el plato y la app propone los gramos para clavar las kcal y la proteína de esa toma.</p>
+<p>Toca una comida y se abre. Tocas el nombre del plato y sale la lista de platos con un buscador arriba: encuentra por nombre o por ingrediente («salmón», «garbanzos»). Al elegir uno, la app propone los gramos para clavar las kcal y la proteína de esa toma.</p>
 <ul><li><b>Todos los platos valen para la comida y para la cena.</b> En la cena se aplica la cena ligera: se mantiene la proteína y se recorta primero el pan y el aceite.</li><li><b>Si tienes otra cantidad</b> (descongelaste 137 g de pollo y tocaban 120), escríbela. Ese alimento queda fijado (candado rojo) y el resto se reajusta. Toca el candado para soltarlo.</li><li><b>La verdura no se toca nunca.</b> La X quita un alimento del plato.</li><li><b>Añadir alimento</b> busca primero entre tus alimentos y después en el catálogo de Mercadona, Lidl y Carrefour (solo en la app instalada). Lo que añades entra fijado con una ración normal.</li><li>Si un plato se queda corto (una cena usada como comida, por ejemplo), la app propone el acompañante que mejor lo completa con un toque.</li></ul>
 <h4>El margen y el arrastre</h4>
 <p>Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las tomas pequeñas). Si te pasas o te quedas corto y la comes así, no pasa nada: al pulsar <b>Hecho, lo he comido</b> la diferencia se reparte entre las tomas que quedan del día, en proporción a su tamaño. Lo que decide es el total del día y la media de la semana.</p>
@@ -1517,7 +1525,7 @@ python3 catalogo/actualizar_catalogo.py --solo M   # solo Mercadona (unos 2 minu
 </div>
 </main>
 <div class="sello">
-  versión f6855657, 6 de octubre de 2026
+  versión 08fcd0db, 7 de octubre de 2026
 </div>
 <script>
 
@@ -1752,7 +1760,7 @@ function guardaPeso(fecha, kg){
 }
 
 // ---------------------------------------------------------------- qué toca cada día
-let fecha = hoy(), abierta = null, buscando = null;
+let fecha = hoy(), abierta = null, buscando = null, eligiendo = null;
 let faseManual = leeJSON("menu_fase", null);
 
 function faseDe(f){
@@ -1889,7 +1897,7 @@ function pintaTomas(){
     if(st.ok){ e.classList.add("ok"); e.innerHTML = CHECK; e.setAttribute("aria-label","Hecha"); }
     else if(!dentro(r.tot[0], r.obj[0])){ e.classList.add("aviso"); e.textContent="!"; e.setAttribute("aria-label","Fuera del margen"); }
     fila.append(el("span","h",M.horas[b]), tx, k, e);
-    fila.addEventListener("click", ()=>{ abierta = abierta===b ? null : b; buscando=null; render(); });
+    fila.addEventListener("click", ()=>{ abierta = abierta===b ? null : b; buscando=null; eligiendo=null; render(); });
     art.append(fila);
     if(abierta===b) art.append(calculadora(b));
     box.append(art);
@@ -1898,22 +1906,15 @@ function pintaTomas(){
 
 function calculadora(b){
   const st = estado(fecha, b), cont = el("div","m-calc");
-  // plato
-  const sel = el("select","m-plato"); sel.setAttribute("aria-label","Plato");
-  const ops = opciones(b);
-  if(b==="C"||b==="N"){
-    [["C","Recetas de comida"],["N","Recetas de cena"]].forEach(([de,et])=>{
-      const g = el("optgroup"); g.label = et;
-      ops.filter(o=>o.de===de).forEach(o=>{ const x=el("option",null,o.n); x.value=o.clave; g.append(x); });
-      sel.append(g);
-    });
-  } else ops.forEach(o=>{ const x=el("option",null,o.n); x.value=o.clave; sel.append(x); });
-  sel.value = st.p; sel.disabled = st.ok;
-  sel.addEventListener("change", ()=>{
-    guardaEstado(fecha, b, {p:sel.value, it:opcion(b, sel.value).it.map(([n,g])=>[n,g,false,null]), ok:false});
-    render();
-  });
-  cont.append(sel);
+  // plato: botón con el nombre; al tocarlo se abre la lista con un buscador arriba
+  const actual = opcion(b, st.p);
+  const bp = el("button","m-plato");
+  bp.setAttribute("aria-expanded", eligiendo===b ? "true" : "false");
+  bp.append(el("span",null,actual.n), el("span","flecha",eligiendo===b ? "\u25B4" : "\u25BE"));
+  bp.disabled = st.ok;
+  bp.addEventListener("click", ()=>{ eligiendo = eligiendo===b ? null : b; buscando = null; render(); });
+  cont.append(bp);
+  if(eligiendo===b && !st.ok) cont.append(selectorPlato(b, actual));
 
   const r = calcula(fecha, b);
   const lista = el("div","m-items");
@@ -2002,6 +2003,45 @@ function calculadora(b){
   }
   cont.append(acc);
   return cont;
+}
+
+// Lista de platos para elegir. Comida y cena comparten platos: si un nombre existe
+// en las dos, se queda una sola vez (la receta de esta toma).
+function platosDe(b){
+  const ops = opciones(b);
+  if(b!=="C" && b!=="N") return ops;
+  const vistos = {};
+  ops.forEach(o=>{ if(!vistos[o.n] || o.de===b) vistos[o.n] = o; });
+  return Object.values(vistos).sort((x,y)=>x.n.localeCompare(y.n,"es"));
+}
+function selectorPlato(b, actual){
+  const box = el("div","m-elegir");
+  const inp = el("input"); inp.type="search"; inp.placeholder="Busca un plato o un ingrediente";
+  inp.setAttribute("aria-label","Buscar plato");
+  const lista = el("div","m-res-lista");
+  const todos = platosDe(b);
+  const pinta = ()=>{
+    lista.replaceChildren();
+    const pal = sinTildes(inp.value.trim()).split(/\s+/).filter(Boolean);
+    const vale = o => { const t = sinTildes(o.n+" "+o.it.map(x=>x[0]).join(" ")); return pal.every(w=>t.indexOf(w)>=0); };
+    const res = todos.filter(vale);
+    res.forEach(o=>{
+      const it = el("button","m-res-it"+(o.n===actual.n ? " sel" : ""));
+      it.append(el("span",null,o.n));
+      if(o.n===actual.n) it.append(el("small",null,"elegido"));
+      it.addEventListener("click", ()=>{
+        guardaEstado(fecha, b, {p:o.clave, it:o.it.map(([n,g])=>[n,g,false,null]), ok:false});
+        eligiendo = null; render();
+      });
+      lista.append(it);
+    });
+    if(!res.length) lista.append(el("p","m-nota","Ningún plato con eso. Prueba con otra palabra."));
+  };
+  inp.addEventListener("input", pinta);
+  box.append(inp, lista);
+  pinta();
+  setTimeout(()=>inp.focus(), 0);
+  return box;
 }
 
 // Si un plato se queda corto (por ejemplo, una cena usada como comida), propone el
@@ -2126,8 +2166,8 @@ $("m-imp-f").addEventListener("change", function(){
 });
 
 // ---------------------------------------------------------------- controles
-$("m-prev").addEventListener("click", ()=>{ fecha=sumaDias(fecha,-1); abierta=null; render(); });
-$("m-next").addEventListener("click", ()=>{ fecha=sumaDias(fecha,1); abierta=null; render(); });
+$("m-prev").addEventListener("click", ()=>{ fecha=sumaDias(fecha,-1); abierta=null; eligiendo=null; render(); });
+$("m-next").addEventListener("click", ()=>{ fecha=sumaDias(fecha,1); abierta=null; eligiendo=null; render(); });
 $("m-hoy").addEventListener("click", ()=>{ fecha=hoy(); abierta=null; render(); });
 $("m-fase").addEventListener("change", function(){
   faseManual = this.value; try{ localStorage.setItem("menu_fase", JSON.stringify(this.value)); }catch(e){}
