@@ -12,7 +12,9 @@ BASE = "https://world.openfoodfacts.org/api/v2/search"
 CAMPOS = ("code,product_name_es,product_name,brands,stores_tags,nutriments,"
           "product_quantity,categories_tags_es,categories")
 POR_PAGINA = 100
-MAX_PAGINAS = 40          # los 4.000 productos más escaneados de cada tienda
+MAX_PAGINAS = 10          # los 1.000 productos más escaneados de cada tienda.
+                          # Open Food Facts corta las búsquedas a partir de la página 11
+                          # (error 503 o 401), así que no tiene sentido pedir más.
 PAUSA = 6.5               # segundos entre búsquedas (límite: 10 por minuto)
 
 TIENDAS = {"L": "lidl", "C": "carrefour"}
@@ -30,7 +32,15 @@ def obtener_tienda(letra, log=print):
         q = urllib.parse.urlencode({
             "countries_tags_en": "spain", "stores_tags": tienda,
             "fields": CAMPOS, "page_size": POR_PAGINA, "page": pagina})
-        datos = descargar(f"{BASE}?{q}", espera=10)
+        try:
+            datos = descargar(f"{BASE}?{q}", espera=10)
+        except RuntimeError as e:
+            # Si ya hay productos de las páginas anteriores, se guardan esos y se
+            # para aquí. Solo es un fallo de verdad si no ha llegado ninguno.
+            if not filas:
+                raise
+            log(f"  {tienda.capitalize()}: paro en la página {pagina} ({str(e).split(' (')[0]})")
+            break
         lote = datos.get("products") or []
         for x in lote:
             n = x.get("nutriments") or {}

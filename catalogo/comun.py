@@ -28,7 +28,7 @@ def descargar(url, intentos=4, espera=5, timeout=60):
                 json.JSONDecodeError) as e:
             ultimo = e
             time.sleep(espera * (i + 1))
-    raise RuntimeError(f"{url}: {ultimo}")
+    raise RuntimeError(f"{ultimo} ({url})")   # el motivo primero: es lo que se lee
 
 
 def num(x, dec=1):
