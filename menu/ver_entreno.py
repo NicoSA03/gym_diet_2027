@@ -135,5 +135,18 @@ print("\n== 9. Cada bloque de entreno tiene su bloque de dieta ==")
 DIETA={"B0","B1","B2","B3","B4","B5"}
 chk({f['dieta'] for f in FASES.values()}==DIETA, "los seis bloques de entreno mapean a los seis de la dieta")
 
+print("\n== 10. Base de ejercicios (datos/ejercicios.csv) ==")
+from ejercicios import EJS
+del_plan = {n for n, r in EJS.items() if r["uso"] == "plan"}
+chk(not (set(EJ) - del_plan), "los ejercicios del plan están en la base"
+    + ("" if not (set(EJ) - del_plan) else ": faltan " + ", ".join(sorted(set(EJ) - del_plan))))
+chk(not (del_plan - set(EJ)), "no hay ejercicios marcados como plan que el plan no use"
+    + ("" if not (del_plan - set(EJ)) else ": sobran " + ", ".join(sorted(del_plan - set(EJ)))))
+malos = [n for n, r in EJS.items() if r["uso"] == "sustituto" and r["sustituye_a"] not in EJ]
+chk(not malos, "cada sustituto apunta a un ejercicio del plan" + ("" if not malos else ": " + ", ".join(malos)))
+sin_gif = sorted(n for n in EJ if not EJS.get(n, {}).get("gif"))
+print(f"       {sum(1 for n in EJ if EJS.get(n, {}).get('gif'))} de {len(EJ)} del plan con animación"
+      + (f" (sin ella: {', '.join(sin_gif)})" if sin_gif else ""))
+
 print("\n" + (f"HAY FALLOS: {fallos}" if fallos else "TODO OK"))
 sys.exit(1 if fallos else 0)

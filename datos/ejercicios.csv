@@ -1,0 +1,78 @@
+nombre;grupo;musculos;secundarios;patron;material;series;reps;garmin;gif;uso;sustituye_a;notas
+Sentadilla trasera;Pierna;Cuádriceps|Glúteo;Isquios|Core;Rodilla;Barra;3-4;6-10;squat/barbell_back_squat;qXTaZnJ;plan;;
+Press banca;Pecho;Pectoral|Tríceps;Hombro;Empuje horizontal;Barra;3-4;6-10;bench_press/barbell_bench_press;EIeI8Vf;plan;;
+Peso muerto rumano;Pierna;Isquios|Glúteo;Espalda baja;Cadera;Barra;3-4;8-12;deadlift/romanian_deadlift;wQ2c4XD;plan;;
+Remo con barra;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Barra;3-4;8-12;row/bent_over_row_with_barbell;eZyBC3j;plan;;
+Flexión clásica;Pecho;Pectoral|Tríceps;Hombro|Core;Empuje horizontal;Peso corporal;3-4;máximas-2;push_up/push_up;I4hDWkc;plan;;
+Curl de bíceps con barra Z;Brazo;Bíceps;Antebrazo;Aislamiento;Barra Z;3-4;8-12;curl/standing_ez_bar_biceps_curl;6TG6x2w;plan;;
+Peso muerto convencional;Pierna;Isquios|Glúteo|Espalda;Trapecio|Antebrazo;Cadera;Barra;3-4;3-6;deadlift/barbell_deadlift;ila4NZS;plan;;
+Dominadas lastradas;Espalda;Espalda|Bíceps;Antebrazo;Tirón vertical;Barra fija y lastre;3-4;5-8;pull_up/weighted_pull_up;HMzLjXx;plan;;
+Zancada búlgara;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla unilateral;Mancuernas y banco;3-4;8-12;lunge/dumbbell_bulgarian_split_squat;qx4fgX7;plan;;El GIF es la zancada con el pie de atrás en el banco
+Press militar de pie;Hombro;Hombro|Tríceps;Core|Trapecio;Empuje vertical;Barra;3-4;6-10;shoulder_press/military_press;Kyd9Rz5;plan;;
+Extensión de tríceps en polea;Brazo;Tríceps;;Aislamiento;Polea;3-4;10-15;triceps_extension/triceps_pressdown;3ZflifB;plan;;
+Elevación de talones;Pierna;Gemelo;;Aislamiento;Máquina;3-4;12-20;calf_raise/standing_calf_raise;ykUOVze;plan;;
+Sentadilla frontal;Pierna;Cuádriceps;Glúteo|Core;Rodilla;Barra;3-4;6-10;squat/barbell_front_squat;zG0zs85;plan;;
+Press inclinado con mancuernas;Pecho;Pectoral|Hombro;Tríceps;Empuje inclinado;Mancuernas;3-4;8-12;bench_press/incline_dumbbell_bench_press;ns0SIbU;plan;;
+Hip thrust;Pierna;Glúteo|Isquios;Core;Cadera;Barra y banco;3-4;8-12;hip_raise/barbell_hip_thrust_with_bench;qg2PGl6;plan;;
+Remo con mancuerna a una mano;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Mancuerna y banco;3-4;8-12;row/one_arm_bent_over_row;C0MA9bC;plan;;
+Elevaciones laterales;Hombro;Hombro;Trapecio;Aislamiento;Mancuernas;3-4;10-15;lateral_raise/dumbbell_lateral_raise;DsgkuIt;plan;;
+Face pull;Hombro;Hombro|Espalda|Trapecio;;Tirón alto;Polea con cuerda;3-4;12-15;row/face_pull;ZfyAGhK;plan;;ExerciseDB no tiene face pull: el GIF es un remo alto con cuerda, el más parecido
+Encogimientos con mancuernas;Espalda;Trapecio;Antebrazo;Aislamiento;Mancuernas;3-4;10-15;shrug/dumbbell_shrug;NJzBsGJ;plan;;
+Fondos en paralelas;Pecho;Pectoral|Tríceps;Hombro;Empuje vertical;Paralelas;3-4;6-12;triceps_extension/body_weight_dip;9WTm7dq;plan;;También son los «triceps dips» de Workout.csv
+Curl martillo;Brazo;Bíceps;Antebrazo;Aislamiento;Mancuernas;3-4;8-12;curl/dumbbell_hammer_curl;slDvUAU;plan;;
+Crunch en polea alta;Core;Abdomen;;Aislamiento;Polea;3-4;10-15;crunch/kneeling_cable_crunch;WW95auq;plan;;
+Sentadilla en máquina Smith;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla;Máquina Smith;3-4;8-12;;NNoHCEA;sustituto;Sentadilla trasera;Garmin no la tiene como ejercicio propio
+Prensa a 45°;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla;Máquina;3-4;8-12;squat/leg_press;2Qh2J1e;sustituto;Sentadilla trasera;
+Press con mancuernas en banco plano;Pecho;Pectoral|Tríceps;Hombro;Empuje horizontal;Mancuernas;3-4;8-12;bench_press/dumbbell_bench_press;SpYC0Kp;sustituto;Press banca;
+Peso muerto rumano con mancuernas;Pierna;Isquios|Glúteo;Espalda baja;Cadera;Mancuernas;3-4;8-12;deadlift/romanian_deadlift;rR0LJzx;sustituto;Peso muerto rumano;
+Remo en punta;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Barra en T o máquina;3-4;8-12;row/t_bar_row;aaXr7ld;sustituto;Remo con barra;
+Curl con mancuernas;Brazo;Bíceps;Antebrazo;Aislamiento;Mancuernas;3-4;8-12;curl/dumbbell_biceps_curl;BU15nH4;sustituto;Curl de bíceps con barra Z;
+Peso muerto con trap bar;Pierna;Cuádriceps|Glúteo|Isquios;Espalda|Trapecio;Cadera;Barra hexagonal;3-4;3-6;deadlift/trap_bar_deadlift;jQGwmxN;sustituto;Peso muerto convencional;
+Jalón al pecho;Espalda;Espalda|Bíceps;Hombro;Tirón vertical;Polea;3-4;8-12;pull_up/lat_pulldown;eYnzaCm;sustituto;Dominadas lastradas;
+Zancadas caminando;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla unilateral;Peso corporal o mancuernas;3-4;10-12 por pierna;lunge/walking_lunge;IZVHb27;sustituto;Zancada búlgara;
+Press con mancuernas sentado;Hombro;Hombro|Tríceps;Trapecio;Empuje vertical;Mancuernas;3-4;8-12;shoulder_press/seated_dumbbell_shoulder_press;znQUdHY;sustituto;Press militar de pie;
+Press francés con barra Z;Brazo;Tríceps;;Aislamiento;Barra Z;3-4;8-12;triceps_extension/lying_ez_bar_triceps_extension;h8LFzo9;sustituto;Extensión de tríceps en polea;Es el «skull crusher» de Workout.csv; el GIF es con barra recta
+Elevación de talones de pie con mancuerna;Pierna;Gemelo;;Aislamiento;Mancuerna;3-4;12-20;calf_raise/standing_dumbbell_calf_raise;dPmaUaU;sustituto;Elevación de talones;
+Sentadilla goblet;Pierna;Cuádriceps|Glúteo;Core;Rodilla;Mancuerna;3-4;8-12;squat/goblet_squat;yn8yg1r;sustituto;Sentadilla frontal;
+Press inclinado en máquina;Pecho;Pectoral|Hombro;Tríceps;Empuje inclinado;Máquina;3-4;8-12;;jHAnWmT;sustituto;Press inclinado con mancuernas;Garmin no lo tiene como ejercicio propio
+Puente de glúteo con barra;Pierna;Glúteo|Isquios;Core;Cadera;Barra;3-4;8-12;hip_raise/barbell_hip_thrust_on_floor;qKBpF7I;sustituto;Hip thrust;
+Remo en polea baja unilateral;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Polea;3-4;10-12;row/single_arm_cable_row;vpp9Ku2;sustituto;Remo con mancuerna a una mano;
+Elevaciones laterales en polea;Hombro;Hombro;Trapecio;Aislamiento;Polea;3-4;12-15;lateral_raise/one_arm_cable_lateral_raise;goJ6ezq;sustituto;Elevaciones laterales;
+Pájaros con mancuernas;Hombro;Hombro|Espalda;Trapecio;Aislamiento;Mancuernas y banco inclinado;3-4;10-15;flye/incline_reverse_flye;vYk8lqw;sustituto;Face pull;También son los «bent-over lateral raises» de Workout.csv
+Encogimientos con barra;Espalda;Trapecio;Antebrazo;Aislamiento;Barra;3-4;10-15;shrug/barbell_shrug;dG7tG5y;sustituto;Encogimientos con mancuernas;
+Fondos asistidos en máquina;Pecho;Pectoral|Tríceps;Hombro;Empuje vertical;Máquina;3-4;8-12;;PAgTVaK;sustituto;Fondos en paralelas;Garmin no lo tiene como ejercicio propio
+Press declinado con barra;Pecho;Pectoral|Tríceps;Hombro;Empuje horizontal;Barra;3-4;8-12;;GrO65fd;sustituto;Fondos en paralelas;Garmin solo tiene el declinado con mancuernas
+Curl en polea con cuerda;Brazo;Bíceps;Antebrazo;Aislamiento;Polea con cuerda;3-4;10-12;curl/cable_hammer_curl;HPlPoQA;sustituto;Curl martillo;
+Crunch con disco en el suelo;Core;Abdomen;;Aislamiento;Disco;3-4;12-15;crunch/weighted_crunch;s8nrDXF;sustituto;Crunch en polea alta;
+Dominadas;Espalda;Espalda|Bíceps;Antebrazo;Tirón vertical;Barra fija;3-4;8-12;pull_up/pull_up;lBDjFxJ;extra;;Sin lastre
+Remo sentado en polea;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Polea;3-4;8-12;row/seated_cable_row;fUBheHs;extra;;
+Hiperextensiones;Espalda;Espalda baja|Glúteo;Isquios;Cadera;Banco de lumbares;3-4;10-15;hyperextension/static_back_extension;zhMwOwE;extra;;
+Bird dog;Core;Espalda baja|Core;Glúteo|Hombro;Estabilidad;Peso corporal;3;10-15 por lado;;;extra;;No está en ExerciseDB ni en Garmin con ese nombre
+Press banca agarre estrecho;Brazo;Tríceps|Pectoral;Hombro;Empuje horizontal;Barra;3-4;8-12;bench_press/close_grip_barbell_bench_press;J6Dx1Mu;extra;;
+Press declinado con mancuernas;Pecho;Pectoral|Tríceps;Hombro;Empuje horizontal;Mancuernas;3-4;8-12;bench_press/decline_dumbbell_bench_press;DwhEmmE;extra;;
+Aperturas con mancuernas;Pecho;Pectoral;Hombro;Aislamiento;Mancuernas;3-4;10-15;flye/dumbbell_flye;yz9nUhF;extra;;
+Aperturas inclinadas con mancuernas;Pecho;Pectoral|Hombro;;Aislamiento;Mancuernas;3-4;10-15;flye/incline_dumbbell_flye;ESOd5Pl;extra;;
+Aperturas declinadas con mancuernas;Pecho;Pectoral;;Aislamiento;Mancuernas;3-4;10-15;flye/decline_dumbbell_flye;xXm4nYq;extra;;
+Aperturas en máquina;Pecho;Pectoral;Hombro;Aislamiento;Máquina;3-4;10-15;;v3xmPAR;extra;;Garmin no lo tiene como ejercicio propio
+Cruce de poleas;Pecho;Pectoral;Hombro;Aislamiento;Polea;3-4;10-15;flye/cable_crossover;Pr9Rhf4;extra;;
+Cruce de poleas de abajo arriba;Pecho;Pectoral|Hombro;;Aislamiento;Polea;3-4;10-15;flye/cable_crossover;tBWXbIT;extra;;Pecho alto
+Cruce de poleas de arriba abajo;Pecho;Pectoral;;Aislamiento;Polea;3-4;10-15;flye/cable_crossover;7saC5zz;extra;;Pecho bajo
+Curl con barra;Brazo;Bíceps;Antebrazo;Aislamiento;Barra;3-4;8-12;curl/barbell_biceps_curl;25GPyDY;extra;;
+Curl predicador;Brazo;Bíceps;;Aislamiento;Barra Z y banco Scott;3-4;8-12;curl/ez_bar_preacher_curl;qOgPVf6;extra;;
+Curl concentrado;Brazo;Bíceps;;Aislamiento;Mancuerna;3-4;8-12;curl/one_arm_concentration_curl;gvsWLQw;extra;;
+Extensión de tríceps sobre la cabeza;Brazo;Tríceps;;Aislamiento;Polea con cuerda;3-4;8-12;triceps_extension/cable_overhead_triceps_extension;2IxROQ1;extra;;
+Extensión de cuádriceps;Pierna;Cuádriceps;;Aislamiento;Máquina;3-4;10-15;;my33uHU;extra;;Garmin no lo tiene como ejercicio propio
+Curl femoral tumbado;Pierna;Isquios;Gemelo;Aislamiento;Máquina;3-4;10-15;leg_curl/leg_curl;17lJ1kr;extra;;
+Patada de glúteo;Pierna;Glúteo;Isquios;Aislamiento;Peso corporal o polea;3;10-15 por pierna;hip_stability/quadruped_hip_extension;Kpajagk;extra;;Los «donkey kicks» de Workout.csv; el GIF es la versión de pie en polea
+Elevación de talones sentado;Pierna;Gemelo;;Aislamiento;Máquina;3;15-20;calf_raise/seated_calf_raise;bOOdeyc;extra;;
+Elevación frontal con mancuernas;Hombro;Hombro;Pectoral;Aislamiento;Mancuernas;3-4;8-12;shoulder_press/dumbbell_front_raise;3eGE2JC;extra;;
+Crunch;Core;Abdomen;;Aislamiento;Peso corporal;3-4;10-15;crunch/crunch;TFqbd8t;extra;;
+Elevación de piernas tumbado;Core;Abdomen;Cadera;Aislamiento;Banco;3-4;10-15;;WhuFnR7;extra;;Garmin no lo tiene como ejercicio propio
+Crunch bicicleta;Core;Abdomen|Oblicuos;;Aislamiento;Peso corporal;3-4;10-15 por lado;crunch/bicycle_crunch;1ZFqTDN;extra;;
+Giro ruso;Core;Oblicuos|Abdomen;;Aislamiento;Peso corporal o disco;3-4;10-15 por lado;core/russian_twist;XVDdcoj;extra;;
+Elevación de piernas colgado;Core;Abdomen;Cadera|Antebrazo;Aislamiento;Barra fija;3-4;10-15;leg_raise/hanging_leg_raise;I3tsCnC;extra;;
+Plancha;Core;Abdomen|Core;Hombro;Estabilidad;Peso corporal;3;30-60 s;plank/plank;VBAWRPG;extra;;El GIF es la plancha con peso: sin él es igual
+Curl de muñeca;Antebrazo;Antebrazo;;Aislamiento;Barra;3-4;10-15;curl/barbell_wrist_curl;82LxxkW;extra;;
+Extensión de muñeca;Antebrazo;Antebrazo;;Aislamiento;Barra;3-4;10-15;curl/barbell_reverse_wrist_curl;LsZkfU6;extra;;
+Pinza con discos;Antebrazo;Antebrazo;;Agarre;Discos;3-4;15-20 s;;;extra;;No está en ExerciseDB ni en Garmin con ese nombre
+Dominada con toalla;Espalda;Antebrazo|Espalda;Bíceps;Agarre;Barra fija y toalla;3-4;5-10;pull_up/towel_pull_up;;extra;;Sin GIF en ExerciseDB

@@ -4,6 +4,8 @@ from entreno import (FASES, EJ, DIAS, VARIANTES, REGLAS, SEGUIMIENTO, TABATA,
                      TABATA_REGLA, ESTRUCTURA, GENERICO, GRUPO, TEST_5K, OBJETIVO_5K, seg,
                      calendario, SEMANAS, arranque, zonas, vdot, PESO)
 
+from ejercicios import EJS, GIF_URL
+
 cal = {c["cod"]: c for c in calendario()}
 
 PAY = {
@@ -18,8 +20,10 @@ PAY = {
  "dias": [dict(cod=d["cod"], dia=d["dia"], n=d["n"], sub=d["sub"], tipo=d["tipo"],
                dur=d["dur"], cal=d["cal"], ej=[list(x) for x in d["ej"]],
                tabata=d["tabata"], nota=d["nota"]) for d in DIAS],
- "ej": {k: dict(m=v["m"], p=v["p"], cue=v["cue"], nota=v["nota"], sus=v["sus"])
+ "ej": {k: dict(m=v["m"], p=v["p"], cue=v["cue"], nota=v["nota"], sus=v["sus"],
+               gif=EJS.get(k, {}).get("gif", ""))
         for k, v in EJ.items()},
+ "gif_url": GIF_URL,
  "tabata": {k: dict(n=v["n"], dur=v["dur"], a=list(v["a"]), b=list(v["b"]),
                     como=v["como"], sube=[list(s) for s in v["sube"]], regla=v.get("regla","")) for k, v in TABATA.items()},
  "tabata_regla": TABATA_REGLA,

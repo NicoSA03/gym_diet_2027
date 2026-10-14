@@ -75,6 +75,7 @@ function pintaSesion(){
       const est = el("div","est");
       est.append(el("b",null,es[0]), document.createTextNode(es[1]));
       row.append(est);
+      if(ej.gif) row.append(comoSeHace(nombre, ej.gif));
       box.append(row);
     });
     if(d.tabata){
@@ -109,6 +110,24 @@ function pintaSesion(){
     box.append(c);
   }
   if(d.nota) box.append(el("p","ses-nota", d.nota));
+}
+
+// «Cómo se hace» (v2.2): animación del ejercicio, plegada. La imagen solo se pide
+// a ExerciseDB cuando la abres, así no gasta datos ni hace la página más lenta.
+function comoSeHace(nombre, gif){
+  const d = el("details","gif-ej");
+  d.append(el("summary",null,"Cómo se hace"));
+  d.addEventListener("toggle", ()=>{
+    if(!d.open || d.dataset.cargado) return;
+    d.dataset.cargado = "1";
+    const img = new Image(180, 180);
+    img.alt = "Animación de " + nombre.toLowerCase();
+    img.decoding = "async";
+    img.onerror = ()=>img.replaceWith(el("p","gif-err","No se ha podido cargar la animación: hace falta internet."));
+    img.src = E.gif_url + gif + ".gif";
+    d.append(img);
+  });
+  return d;
 }
 
 function pintaZonas(){

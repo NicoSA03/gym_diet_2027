@@ -41,6 +41,7 @@ gym_diet_2027/
 ├── datos/
 │   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
 │   ├── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
+│   ├── ejercicios.csv   ← LOS EJERCICIOS: músculos, material, nombre en Garmin y animación (sección 3)
 │   └── *.pdf, Workout.csv, exercises.sql ← material de contexto: no se sube (está en .gitignore)
 ├── catalogo/            ← descarga los alimentos de Mercadona, Lidl y Carrefour (sección 10)
 ├── menu/
@@ -53,6 +54,7 @@ gym_diet_2027/
 │   ├── calculadora.js   ← la cuenta de raciones de la pestaña Menús (y calculadora.py, la misma en Python)
 │   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
 │   ├── escaner.js       ← la cámara que lee códigos de barras en Menús (sección 5, Mis productos)
+│   ├── ejercicios.py    ← carga datos/ejercicios.csv para El entreno y la verificación
 │   ├── ver_alimentos.py ← verificación de la base de datos y lista de datos que faltan
 │   ├── ver_platos.py    ← verificación de los platos: que encajen en su toma y las raciones sean de verdad
 │   ├── payload_registro.py ← datos del Registro: descansos, ejercicios de peso corporal, volumen y km del plan
@@ -154,6 +156,24 @@ ej=[("T1","Sentadilla trasera"),("T1","Press banca"), ... ("T2","Press Arnold"),
 ```
 
 **Opcional:** si quieres explicar cómo organizar sus series (pirámide, series iguales, una pesada y el resto más ligeras…), añádelo en `ESTRUCTURA`. Si no lo pones, usa la regla genérica de series rectas.
+
+**3. Marcarlo como `plan` en `datos/ejercicios.csv`** (y el que sale, como `extra` o `sustituto`). La verificación avisa si un ejercicio del plan no está en la base.
+
+### La base de ejercicios (v2.2)
+
+`datos/ejercicios.csv` tiene 77 ejercicios: los 22 del plan, sus 23 sustitutos y 32 más para cambiar si quieres. Se edita con Excel o con el Bloc de notas (punto y coma como separador, `|` entre varios músculos). Cada fila lleva:
+
+- **nombre, grupo, músculos, patrón y material**, en español.
+- **series y reps** de referencia. En el plan mandan las del bloque; estas sirven para los extra.
+- **garmin**: cómo se llama en tu reloj, con el nombre oficial del kit de Garmin (`squat/barbell_back_squat`). Es el mismo que eliges en el fénix al apuntar una serie.
+- **gif**: el código de su animación en ExerciseDB. En El entreno sale un desplegable **Cómo se hace** debajo de cada ejercicio; la animación solo se descarga al abrirlo y hace falta internet.
+- **uso**: `plan`, `sustituto` (con `sustituye_a`) o `extra`.
+
+De dónde sale: la lista oficial de Garmin (1.846 ejercicios del kit FIT de Garmin), las animaciones de `datos/exercises.sql` (ExerciseDB, 1.324 ejercicios) y los rangos de series de `datos/Workout.csv`. `datos/GYM.csv` no aporta nada: de sus 80.000 filas solo 16 son distintas.
+
+Para buscar el código de otra animación: abre `datos/exercises.sql` con el Bloc de notas, busca el ejercicio en inglés (por ejemplo `barbell curl`) y copia el código de 7 letras que va antes del nombre (`25GPyDY`). Puedes comprobarlo abriendo `https://static.exercisedb.dev/media/25GPyDY.gif`.
+
+Tres ejercicios del plan no tienen animación exacta y llevan la más parecida: el face pull (un remo alto con cuerda), la zancada búlgara (zancada con el pie de atrás en el banco) y el press francés (con barra recta).
 
 ### Cómo se organizan las series de un ejercicio
 
@@ -569,5 +589,6 @@ Cosas que conviene saber:
 | v1.1 | Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin |
 | v2.0 | Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia |
 | v2.1 | Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil |
+| v2.2 | Base de ejercicios propia (`datos/ejercicios.csv`) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno |
 
-*Versión del sistema: v2.1, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*
+*Versión del sistema: v2.2, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*

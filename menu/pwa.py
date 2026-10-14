@@ -115,6 +115,9 @@ self.addEventListener("fetch", e => {
   }
   // Open Food Facts (buscar un código escaneado): siempre a la red, nunca a la copia
   if (new URL(r.url).hostname.endsWith("openfoodfacts.org")) return;
+  // las animaciones de los ejercicios (ExerciseDB) tampoco: se piden solo al abrir
+  // «Cómo se hace» y guardarlas ocuparía mucho sitio en el móvil
+  if (new URL(r.url).hostname.endsWith("exercisedb.dev")) return;
   // el catálogo de alimentos cambia cada semana sin que cambie la app: se sirve
   // la copia guardada al momento y se pide la nueva por detrás para la próxima vez
   if (new URL(r.url).pathname.endsWith("/catalogo.json")) {
