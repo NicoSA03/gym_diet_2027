@@ -32,7 +32,7 @@ FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "paylo
           "a1_info.html", "a1.js", "a2_menus.html", "a2.js", "a3_compra.html", "a3.js",
           "a4_entreno.html", "a4.js", "a5_teoria.html", "a5.js",
           "payload_registro.py", "a6_registro.html", "a6.js", "pwa.py",
-          "calculadora.js", "calculadora.py", "ver_calculadora.py",
+          "calculadora.js", "calculadora.py", "ver_calculadora.py", "escaner.js",
           "factores.json", "normas.json", "md.py"]
 RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore",
                "datos/alimentos.csv", "datos/platos.csv"]

@@ -1,5 +1,5 @@
 <style>
-/* Menús v2.0: lista del día + calculadora + diario */
+/* Menús v2.1: lista del día + calculadora + diario + mis productos */
 .m2{--ok:#3DDC84;--ok-soft:#0C2A18;--p:var(--accent-ink);--g:var(--amber);--c:var(--clay)}
 .m2 .wrap-in{display:flex;flex-direction:column;gap:14px;padding-top:18px}
 .m2 section{padding-block:0}
@@ -141,6 +141,61 @@
 .m-aviso{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--ground);
   font-family:var(--sans);font-size:14px;font-weight:700;padding:11px 16px;border-radius:999px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
 .m-nota{font-size:13.5px;color:var(--ink-3)}
+
+/* escáner y mis productos (v2.1) */
+.m-buscar-fila{display:flex;gap:8px}
+.m-buscar-fila input{flex:1;min-width:0}
+.m-esc-btn,#m-prod-esc{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.m-esc-btn svg,#m-prod-esc svg{width:18px;height:18px;flex:none}
+.m-prod{padding:16px;display:flex;flex-direction:column;gap:10px}
+.m-prod-cab{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.m-prod-cab h3{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:2px}
+.m-prod-cab .m-nota{font-size:13px}
+#m-prod-ver{align-self:flex-start}
+.m-prod-filtro{width:100%;font-size:16px;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);margin-bottom:6px}
+#m-prod-lista .m-res-lista{max-height:360px}
+
+.esc-capa,.prod-capa{position:fixed;inset:0;z-index:70;background:rgba(6,7,10,.92);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;padding:16px;overflow-y:auto}
+.esc-vista{position:relative;width:100%;max-width:440px;aspect-ratio:4/3;max-height:62vh;border-radius:16px;overflow:hidden;background:#000}
+.esc-vista video,.esc-vista canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.esc-vista canvas.drawingBuffer{display:none}
+.esc-vista[hidden]{display:none}
+.esc-marco{position:absolute;left:8%;right:8%;top:30%;height:40%;border:3px solid #3DDC84;border-radius:12px;z-index:2;
+  box-shadow:0 0 0 999px rgba(0,0,0,.35)}
+.esc-texto{color:#F2EFE8;font-family:var(--sans);font-size:15px;font-weight:700;text-align:center;max-width:440px}
+.esc-manual{display:flex;gap:8px;width:100%;max-width:440px}
+.esc-manual input{flex:1;min-width:0;font-family:var(--mono);font-size:18px;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);
+  background:var(--surface-2);color:var(--ink)}
+.esc-pie{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+.prod-capa{justify-content:flex-start}
+.prod-panel{width:100%;max-width:460px;margin:auto 0;background:var(--surface);border:1px solid var(--line-2);border-radius:16px;
+  padding:18px;display:flex;flex-direction:column;gap:14px}
+.prod-panel h2{font-family:var(--sans);font-size:19px;font-weight:800;letter-spacing:-.01em}
+.prod-cod{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:-10px}
+.prod-buscando{color:var(--ink-2);font-family:var(--sans);font-size:15px;font-weight:700;text-align:center;padding:18px 0}
+.prod-campo{display:flex;flex-direction:column;gap:7px}
+.prod-campo>span{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.prod-campo>input,.prod-nueva input{font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.prod-etqs{display:flex;gap:6px;flex-wrap:wrap}
+.prod-chip{font-family:var(--sans);font-size:13.5px;font-weight:700;padding:8px 13px;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--surface-2);color:var(--ink-2);cursor:pointer}
+.prod-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.prod-chip.mas{border-style:dashed;color:var(--ink-3)}
+.prod-nueva{display:flex;gap:8px}
+.prod-nueva input{flex:1;min-width:0}
+.prod-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.prod-macros label{display:flex;flex-direction:column;gap:4px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--ink-3)}
+.prod-macros input{width:100%;min-width:0;font-family:var(--mono);font-size:16px;font-weight:600;padding:10px 8px;border-radius:10px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);text-align:right}
+.prod-macros small{font-family:var(--mono);font-size:10.5px;font-weight:500;text-align:right}
+@media (max-width:360px){.prod-macros{grid-template-columns:repeat(2,1fr)}}
+.prod-aviso{font-size:13.5px;color:var(--amber)}
+.prod-err{font-size:14px;font-weight:700;color:var(--clay)}
+.prod-acc{display:flex;gap:8px;flex-wrap:wrap}
+.prod-acc .m-btn{flex:1 1 auto}
+.m-btn.borrar{color:var(--clay);border-color:var(--clay);background:transparent}
 </style>
 
 <div class="wrap m2">
@@ -177,6 +232,15 @@
     </section>
 
     <section class="m-tomas" id="m-tomas" aria-label="Comidas del día"></section>
+
+    <section class="card m-prod" aria-label="Mis productos">
+      <div class="m-prod-cab">
+        <div><h3>Mis productos</h3><p class="m-nota" id="m-prod-n"></p></div>
+        <button class="m-btn prim" id="m-prod-esc">Escanear</button>
+      </div>
+      <button class="m-btn peq" id="m-prod-ver" hidden>Ver la lista</button>
+      <div id="m-prod-lista" hidden></div>
+    </section>
 
     <section class="card m-sem" aria-label="Tu semana">
       <h3>Tu semana</h3>

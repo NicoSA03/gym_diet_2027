@@ -1,12 +1,13 @@
-// Menús v2.0: lista del día, calculadora de raciones y diario.
+// Menús v2.1: lista del día, calculadora de raciones, diario y tus productos escaneados.
 // Los datos del plan (M) los genera menu/payload3.py. La cuenta de raciones está
-// en menu/calculadora.js (CALC). Aquí solo se pinta y se guarda en el navegador.
+// en menu/calculadora.js (CALC) y la cámara en menu/escaner.js (ESCANER). Aquí solo
+// se pinta y se guarda en el navegador.
 
 const DIAS_SEM = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const CORTO = ["D","L","M","X","J","V","S"];
 const MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 const TIPO_DE = {1:"A",2:"B",3:"A",4:"B",5:"C",6:"D",0:"E"};   // getDay() -> tipo de día
-const KEY = "diario_v1", KEY_EXTRA = "menu_extra_v1", KEY_REG = "registro_v1";
+const KEY = "diario_v1", KEY_EXTRA = "menu_extra_v1", KEY_REG = "registro_v1", KEY_PROD = "mis_productos_v1";
 const DETALLE_DIAS = 14;          // días con detalle; lo anterior se resume por semanas
 const MARGEN = 0.05, MARGEN_MIN = 25;
 
@@ -67,7 +68,7 @@ function guardaPeso(fecha, kg){
 }
 
 // ---------------------------------------------------------------- qué toca cada día
-let fecha = hoy(), abierta = null, buscando = null, eligiendo = null;
+let fecha = hoy(), abierta = null, buscando = null, eligiendo = null, verProductos = false;
 let faseManual = leeJSON("menu_fase", null);
 
 function faseDe(f){
@@ -368,16 +369,21 @@ function acompanante(b, obj){
 }
 
 // ---------------------------------------------------------------- añadir alimento
-let CAT = null, catEstado = "sin";      // sin | cargando | ok | error
+let CAT = null, CAT_EAN = {}, catEstado = "sin", catPromesa = null;   // sin | cargando | ok | error
 function cargaCatalogo(){
-  if(catEstado!=="sin") return;
+  if(catPromesa) return catPromesa;
   catEstado = "cargando";
-  fetch("catalogo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
+  catPromesa = fetch("catalogo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{ const c=j.campos; const ix=k=>c.indexOf(k);
-      CAT = j.items.map(x=>({n:x[ix("nombre")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")],
+      CAT = j.items.map(x=>({n:x[ix("nombre")], m:x[ix("marca")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")],
                              dud:x[ix("dudoso")], q:sinTildes(x[ix("nombre")]+" "+(x[ix("marca")]||""))}));
+      // índice por código de barras, para el escáner (los UPC de 12 cifras, con un 0 delante)
+      CAT_EAN = {};
+      j.items.forEach((x,i)=>{ let e = x[ix("ean")]; if(!e) return; e = String(e); if(e.length===12) e = "0"+e;
+        if(!CAT_EAN[e]) CAT_EAN[e] = CAT[i]; });
       catEstado = "ok"; if(buscando) render(); })
     .catch(()=>{ catEstado = "error"; if(buscando) render(); });
+  return catPromesa;
 }
 const TIENDA = {M:"Mercadona", L:"Lidl", C:"Carrefour"};
 // Papel que se le supone a un producto del catálogo, por sus macros
@@ -390,7 +396,12 @@ function rolDe(k,p,g,c){
 function buscador(b){
   cargaCatalogo();
   const box = el("div","m-buscar");
+  const fila = el("div","m-buscar-fila");
   const inp = el("input"); inp.type="search"; inp.placeholder="Busca: pollo, yogur, arroz..."; inp.setAttribute("aria-label","Buscar alimento");
+  const esc = el("button","m-btn m-esc-btn"); esc.innerHTML = BARRAS; esc.append(document.createTextNode("Escanear"));
+  esc.setAttribute("aria-label","Escanear el código de barras de un producto");
+  esc.addEventListener("click", ()=>escanea(b));
+  fila.append(inp, esc);
   const lista = el("div","m-res-lista"), pie = el("p","m-nota");
   const cerrar = el("button","m-btn peq","Cerrar");
   cerrar.addEventListener("click", ()=>{ buscando=null; render(); });
@@ -398,10 +409,18 @@ function buscador(b){
     lista.replaceChildren();
     const q = sinTildes(inp.value.trim()), pal = q.split(/\s+/).filter(Boolean);
     const vale = t => pal.every(w=>t.indexOf(w)>=0);
-    const mios = Object.keys(M.foods).concat(Object.keys(EXTRA)).filter(n=>!pal.length || vale(sinTildes(n))).slice(0, pal.length?12:8);
-    mios.forEach(n=>{ const f=ficha(n); const it=el("button","m-res-it");
-      const a=el("span",null,n); a.append(el("span","m-tag","tuyo"));
-      it.append(a, el("small",null,nf(f[0])+" kcal")); it.addEventListener("click", ()=>anade(b, n, f)); lista.append(it); });
+    const fila = (n, f, tag, accion) => { const it=el("button","m-res-it");
+      const a=el("span",null,n); a.append(el("span","m-tag",tag));
+      it.append(a, el("small",null,nf(f[0])+" kcal")); it.addEventListener("click", accion); lista.append(it); };
+    // 1. tus productos escaneados
+    const mp = Object.keys(PROD.p).filter(e=>!pal.length || vale(sinTildes(PROD.p[e][0]))).slice(0, pal.length?12:6);
+    const deProductos = new Set(Object.keys(PROD.p).map(claveProducto));
+    mp.forEach(e=>{ const x = PROD.p[e]; fila(x[0], x.slice(2,6), nombreEtq(x[1]), ()=>anadeProducto(b, e)); });
+    // 2. los alimentos del plan y los que ya añadiste del catálogo
+    const mios = Object.keys(M.foods).concat(Object.keys(EXTRA).filter(n=>!deProductos.has(n)))
+      .filter(n=>!pal.length || vale(sinTildes(n))).slice(0, pal.length?12:6);
+    mios.forEach(n=>{ const f=ficha(n); fila(n, f, M.foods[n] ? "del plan" : "añadido", ()=>anade(b, n, f)); });
+    // 3. el catálogo de las tiendas
     if(pal.length && CAT){
       CAT.filter(x=>vale(x.q)).slice(0,25).forEach(x=>{ const it=el("button","m-res-it");
         const a=el("span",null,x.n); a.append(el("span","m-tag",x.s.split("").map(l=>TIENDA[l]).join(", ")));
@@ -414,10 +433,10 @@ function buscador(b){
     }
     pie.textContent = catEstado==="cargando" ? "Cargando el catálogo de Mercadona, Lidl y Carrefour..."
       : catEstado==="error" ? "El catálogo de las tiendas solo está en la app instalada. Mientras, elige entre tus alimentos."
-      : catEstado==="ok" ? "Tus alimentos primero; después, los de Mercadona, Lidl y Carrefour." : "";
+      : catEstado==="ok" ? "Primero lo tuyo; después, los de Mercadona, Lidl y Carrefour." : "";
   };
   inp.addEventListener("input", pinta);
-  box.append(inp, lista, pie, cerrar);
+  box.append(fila, lista, pie, cerrar);
   pinta();
   setTimeout(()=>inp.focus(), 0);
   return box;
@@ -431,6 +450,250 @@ function anade(b, n, f){
   t.it.push([n, g, true, g]);
   buscando = null; guardaEstado(fecha, b, t); aviso(n+": "+g+" g. Cambia los gramos si quieres"); render();
 }
+
+// ---------------------------------------------------------------- mis productos (v2.1)
+// Lo que escaneas se guarda en este móvil, en la clave mis_productos_v1, así de corto:
+//   {v:1, etq:[[id, nombre], ...], p:{código: [nombre, etiqueta, kcal, P, G, C, fecha]}}
+// Macros por 100 g con un decimal. Las etiquetas fijas (Tuyo, Mercadona, Lidl,
+// Carrefour) no se guardan: solo las que creas tú. Cada producto ocupa unos 80 bytes,
+// así que mil productos son menos de 100 KB.
+const ETQ_FIJAS = [["T","Tuyo"],["M","Mercadona"],["L","Lidl"],["C","Carrefour"]];
+const BARRAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>';
+// Marcas propias de cada tienda, para adivinar la etiqueta de lo que viene de Open Food Facts
+const MARCAS = {M:["hacendado","deliplus","bosque verde"], L:["milbona","pilos","alesto","crownfield","solevita","chef select","combino","baresa","freeway","vitasia"], C:["carrefour"]};
+
+function esFija(id){ return ETQ_FIJAS.some(f=>f[0]===id); }
+function normalizaProd(d){
+  d = d || {};
+  return {v:1, etq: ETQ_FIJAS.concat((d.etq||[]).filter(e=>Array.isArray(e) && !esFija(e[0]))), p: d.p || {}};
+}
+let PROD = normalizaProd(leeJSON(KEY_PROD, null));
+function prodParaGuardar(){ return {v:1, etq:PROD.etq.filter(e=>!esFija(e[0])), p:PROD.p}; }
+function guardaProductos(){
+  try{ localStorage.setItem(KEY_PROD, JSON.stringify(prodParaGuardar())); return true; }
+  catch(e){ aviso("No se ha podido guardar: el navegador tiene el almacenamiento lleno o bloqueado."); return false; }
+}
+function nombreEtq(id){ const e = PROD.etq.find(x=>x[0]===id); return e ? e[1] : "Tuyo"; }
+// Nombre con el que entra en un plato: «Yogur natural (Mercadona)»; los tuyos, sin apellido
+function claveProducto(e){
+  const x = PROD.p[e]; let k = x[1]==="T" ? x[0] : x[0]+" ("+nombreEtq(x[1])+")";
+  if(M.foods[k]) k += " (escaneado)";
+  return k;
+}
+// Al añadirlo a un plato se copia a EXTRA: así el diario sigue bien aunque luego lo
+// cambies o lo borres de Mis productos.
+function anadeProducto(b, e){
+  const x = PROD.p[e], k = claveProducto(e), [rol,lo,hi] = rolDe(x[2],x[3],x[4],x[5]);
+  EXTRA[k] = [x[2],x[3],x[4],x[5],rol,"","",lo,hi];
+  anade(b, k, EXTRA[k]);
+}
+
+function sugiereNombre(n, marca){
+  n = (n||"").replace(/\s+/g," ").trim(); marca = (marca||"").trim();
+  if(marca && sinTildes(n).indexOf(sinTildes(marca)) < 0) n = (n ? n+" " : "")+marca;
+  return (n.charAt(0).toUpperCase()+n.slice(1)).slice(0, 60);
+}
+function etqDeOFF(tiendas, marcas){
+  const slug = t => sinTildes(t).trim().replace(/\s+/g,"-");
+  const ts = tiendas.map(t=>String(t).replace(/^[a-z]{2}:/,""));
+  const porTienda = PROD.etq.find(e=>e[0]!=="T" && ts.some(t=>t===slug(e[1]) || t.indexOf(slug(e[1])+"-")===0));
+  if(porTienda) return porTienda[0];
+  const m = sinTildes(marcas);
+  for(const id in MARCAS) if(MARCAS[id].some(x=>m.indexOf(x)>=0)) return id;
+  return "T";
+}
+function buscaOFF(c){
+  const ctl = window.AbortController ? new AbortController() : null;
+  const t = setTimeout(()=>{ if(ctl) ctl.abort(); }, 8000);
+  const url = "https://world.openfoodfacts.org/api/v2/product/"+c+".json?fields=product_name_es,product_name,brands,stores_tags,nutriments";
+  return fetch(url, ctl ? {signal:ctl.signal} : {})
+    .then(r=>r.ok ? r.json() : null)
+    .then(j=>{
+      clearTimeout(t);
+      if(!j || j.status!==1 || !j.product) return null;
+      const p = j.product, n = p.nutriments || {};
+      const num = v => { const x = parseFloat(v); return isFinite(x) && x>=0 ? Math.round(x*10)/10 : null; };
+      let k = num(n["energy-kcal_100g"]);
+      if(k===null && num(n["energy_100g"])!==null) k = Math.round(num(n["energy_100g"])/4.184);   // viene en kJ
+      return {nombre: sugiereNombre(p.product_name_es || p.product_name, (p.brands||"").split(",")[0]),
+              etq: etqDeOFF(p.stores_tags||[], p.brands||""),
+              m: [k, num(n.proteins_100g), num(n.fat_100g), num(n.carbohydrates_100g)]};
+    })
+    .catch(()=>{ clearTimeout(t); return null; });
+}
+
+// Capa a pantalla completa para la ficha del producto (se cierra con Cancelar o Esc)
+function abreCapa(titulo){
+  const capa = el("div","prod-capa"), panel = el("div","prod-panel");
+  panel.setAttribute("role","dialog"); panel.setAttribute("aria-modal","true"); panel.setAttribute("aria-label", titulo);
+  capa.append(panel); document.body.append(capa);
+  const tecla = e=>{ if(e.key==="Escape") cierra(); };
+  function cierra(){ document.removeEventListener("keydown", tecla); capa.remove(); }
+  document.addEventListener("keydown", tecla);
+  return {capa, panel, cierra};
+}
+
+// Escanear: b es la toma a la que se añadirá (o null si vienes de Mis productos)
+function escanea(b){ ESCANER.abrir(c=>buscaCodigo(c, b)); }
+async function buscaCodigo(c, b){
+  if(PROD.p[c]) return fichaProducto({ean:c, b, editar:true});
+  const v = abreCapa("Buscando el producto");
+  v.panel.append(el("p","prod-buscando","Buscando el código "+c+"..."));
+  await cargaCatalogo();
+  const x = CAT_EAN[c];
+  let o;
+  if(x) o = {nombre: sugiereNombre(x.n, x.m), etq: x.s[0], m:[x.k,x.p,x.g,x.c],
+             origen: "Está en el catálogo de "+x.s.split("").map(l=>TIENDA[l]).join(", ")+". Pon el nombre que quieras."};
+  else {
+    const off = await buscaOFF(c);
+    o = off ? Object.assign(off, {origen:"Datos de Open Food Facts, una base abierta: comprueba que cuadran con la etiqueta."})
+            : {nombre:"", etq:"T", m:[null,null,null,null],
+               origen: navigator.onLine===false ? "Sin conexión no puedo buscarlo fuera. Copia los datos de la etiqueta (por 100 g)."
+                                                : "No lo encuentro en ningún sitio. Copia los datos de la etiqueta (por 100 g)."};
+  }
+  v.cierra();
+  fichaProducto(Object.assign(o, {ean:c, b}));
+}
+
+// Ficha de un producto: nombre, etiqueta y macros por 100 g
+function fichaProducto(o){
+  const viejo = o.editar ? PROD.p[o.ean] : null;
+  if(viejo) Object.assign(o, {nombre:viejo[0], etq:viejo[1], m:viejo.slice(2,6),
+    origen:"Guardado el "+deIso(viejo[6]||hoy()).toLocaleDateString("es-ES")+"."});
+  const v = abreCapa(viejo ? "Editar producto" : "Producto nuevo"), p = v.panel;
+  let etq = PROD.etq.some(e=>e[0]===o.etq) ? o.etq : "T";
+  p.append(el("h2",null, viejo ? "Editar producto" : "Producto nuevo"),
+           el("p","prod-cod","Código "+o.ean), el("p","m-nota",o.origen));
+
+  const cNom = el("label","prod-campo"), nom = el("input");
+  nom.value = o.nombre || ""; nom.maxLength = 60; nom.placeholder = "Por ejemplo: Yogur griego ligero";
+  cNom.append(el("span",null,"Nombre"), nom);
+
+  const cEtq = el("div","prod-campo"), chips = el("div","prod-etqs");
+  const nueva = el("form","prod-nueva"); nueva.hidden = true;
+  const inpN = el("input"); inpN.maxLength = 20; inpN.placeholder = "Por ejemplo: Dia"; inpN.setAttribute("aria-label","Nombre de la etiqueta nueva");
+  const okN = el("button","m-btn peq","Crear"); okN.type = "submit";
+  nueva.append(inpN, okN);
+  const pintaChips = ()=>{
+    chips.replaceChildren();
+    PROD.etq.forEach(([id, n])=>{
+      const ch = el("button","prod-chip", n); ch.type = "button";
+      ch.setAttribute("aria-pressed", id===etq ? "true" : "false");
+      ch.addEventListener("click", ()=>{ etq = id; pintaChips(); });
+      chips.append(ch);
+    });
+    const mas = el("button","prod-chip mas","+ Nueva"); mas.type = "button";
+    mas.addEventListener("click", ()=>{ nueva.hidden = false; inpN.focus(); });
+    chips.append(mas);
+  };
+  nueva.addEventListener("submit", e=>{
+    e.preventDefault();
+    const n = inpN.value.replace(/\s+/g," ").trim(); if(!n) return;
+    const ya = PROD.etq.find(x=>sinTildes(x[1])===sinTildes(n));
+    if(ya) etq = ya[0];
+    else {
+      let i = 1; while(PROD.etq.some(x=>x[0]==="X"+i)) i++;
+      PROD.etq.push(["X"+i, n.charAt(0).toUpperCase()+n.slice(1)]); etq = "X"+i;
+      guardaProductos();
+    }
+    inpN.value = ""; nueva.hidden = true; pintaChips();
+  });
+  pintaChips();
+  cEtq.append(el("span",null,"Etiqueta"), chips, nueva);
+
+  const cMac = el("div","prod-campo"), rej = el("div","prod-macros");
+  const campos = [["Kcal","kcal"],["Proteína","g"],["Grasa","g"],["Hidratos","g"]].map(([n,u],i)=>{
+    const l = el("label"), inp = el("input"); inp.inputMode = "decimal";
+    inp.value = o.m && o.m[i]!==null && o.m[i]!==undefined ? String(o.m[i]).replace(".",",") : "";
+    l.append(el("span",null,n), inp, el("small",null,u)); rej.append(l); return inp;
+  });
+  const avisoM = el("p","prod-aviso"); avisoM.hidden = true;
+  cMac.append(el("span",null,"Por cada 100 g"), rej, avisoM);
+
+  const lee = ()=>campos.map(x=>{ const t = x.value.replace(",",".").trim(); return t==="" ? null : parseFloat(t); });
+  const revisa = ()=>{
+    const [k,pp,g,c] = lee();
+    if(k>0 && pp!==null && g!==null && c!==null){
+      const cuenta = 4*pp+4*c+9*g;
+      if(Math.abs(cuenta-k) > Math.max(15, 0.2*k)){
+        avisoM.textContent = "Las kcal no cuadran con los macros (darían unas "+nf(cuenta)+"). Revisa la etiqueta."; avisoM.hidden = false; return;
+      }
+    }
+    avisoM.hidden = true;
+  };
+  campos.forEach(x=>x.addEventListener("input", revisa));
+  revisa();
+
+  const err = el("p","prod-err"); err.hidden = true;
+  const acc = el("div","prod-acc");
+  const guardar = anadir=>{
+    const n = nom.value.replace(/\s+/g," ").trim();
+    let [k,pp,g,c] = lee();
+    const fallo = t=>{ err.textContent = t; err.hidden = false; };
+    if(!n) return fallo("Ponle un nombre.");
+    if([k,pp,g,c].some(x=>x!==null && !(x>=0))) return fallo("Revisa los números: solo cifras.");
+    pp = pp||0; g = g||0; c = c||0;
+    if(k===null) k = Math.round(4*pp+4*c+9*g);
+    if(!(k>0 && k<=900)) return fallo("Faltan las kcal por 100 g (están en la etiqueta).");
+    if(pp+g+c > 100.5) return fallo("Proteína, grasa e hidratos suman más de 100 g: revisa que sean por 100 g.");
+    const r1 = x=>Math.round(x*10)/10;
+    const choca = Object.keys(PROD.p).find(e=>e!==o.ean && PROD.p[e][1]===etq && sinTildes(PROD.p[e][0])===sinTildes(n));
+    if(choca) return fallo("Ya tienes otro producto con ese nombre y esa etiqueta.");
+    PROD.p[o.ean] = [n, etq, r1(k), r1(pp), r1(g), r1(c), viejo ? viejo[6] : hoy()];
+    if(!guardaProductos()) return;
+    v.cierra();
+    if(anadir && o.b){ anadeProducto(o.b, o.ean); }
+    else { aviso(viejo ? "Producto actualizado" : "Guardado en Mis productos"); render(); }
+  };
+  if(viejo){
+    const borra = el("button","m-btn borrar","Borrar"); let seguro = false;
+    borra.addEventListener("click", ()=>{
+      if(!seguro){ seguro = true; borra.textContent = "Toca otra vez para borrar"; return; }
+      delete PROD.p[o.ean]; guardaProductos(); v.cierra(); aviso("Producto borrado"); render();
+    });
+    acc.append(borra);
+  }
+  const cancel = el("button","m-btn","Cancelar"); cancel.addEventListener("click", v.cierra);
+  const bg = el("button","m-btn"+(o.b ? "" : " prim"),"Guardar"); bg.addEventListener("click", ()=>guardar(false));
+  acc.append(cancel, bg);
+  if(o.b){ const ba = el("button","m-btn prim","Guardar y añadir a "+M.nombres[o.b].toLowerCase()); ba.addEventListener("click", ()=>guardar(true)); acc.append(ba); }
+  p.append(cNom, cEtq, cMac, err, acc);
+  // sin poner el cursor en el nombre: en el móvil sacaría el teclado y taparía la ficha
+}
+
+// Tarjeta «Mis productos» en la página
+function pintaProductos(){
+  const ks = Object.keys(PROD.p), n = ks.length;
+  document.getElementById("m-prod-n").textContent = n ? n+(n===1 ? " producto guardado" : " productos guardados")+" en este móvil."
+    : "Escanea un producto para tenerlo a mano al añadir alimentos.";
+  const ver = document.getElementById("m-prod-ver"), box = document.getElementById("m-prod-lista");
+  ver.hidden = !n; ver.textContent = verProductos ? "Ocultar la lista" : "Ver la lista";
+  box.hidden = !(n && verProductos); box.replaceChildren();
+  if(!n || !verProductos) return;
+  let filtro = "";
+  const lista = el("div","m-res-lista");
+  const pinta = ()=>{
+    lista.replaceChildren();
+    const pal = sinTildes(filtro.trim()).split(/\s+/).filter(Boolean);
+    ks.filter(e=>{ const t = sinTildes(PROD.p[e][0]+" "+nombreEtq(PROD.p[e][1])); return pal.every(w=>t.indexOf(w)>=0); })
+      .sort((a,b)=>(PROD.p[b][6]||"").localeCompare(PROD.p[a][6]||"") || PROD.p[a][0].localeCompare(PROD.p[b][0],"es"))
+      .forEach(e=>{ const x = PROD.p[e], it = el("button","m-res-it");
+        const a = el("span",null,x[0]); a.append(el("span","m-tag",nombreEtq(x[1])));
+        it.append(a, el("small",null,nf(x[2])+" kcal"));
+        it.addEventListener("click", ()=>fichaProducto({ean:e, b:null, editar:true}));
+        lista.append(it); });
+    if(!lista.children.length) lista.append(el("p","m-nota","Ninguno con eso."));
+  };
+  if(n > 8){
+    const inp = el("input","m-prod-filtro"); inp.type = "search"; inp.placeholder = "Busca en tus productos"; inp.setAttribute("aria-label","Buscar en tus productos");
+    inp.addEventListener("input", ()=>{ filtro = inp.value; pinta(); });
+    box.append(inp);
+  }
+  box.append(lista); pinta();
+}
+document.getElementById("m-prod-esc").innerHTML = BARRAS + "Escanear";
+document.getElementById("m-prod-esc").addEventListener("click", ()=>escanea(null));
+document.getElementById("m-prod-ver").addEventListener("click", ()=>{ verProductos = !verProductos; pintaProductos(); });
 
 // ---------------------------------------------------------------- semana
 function pintaSemana(){
@@ -457,7 +720,7 @@ function pintaSemana(){
 
 // ---------------------------------------------------------------- copia de seguridad
 document.getElementById("m-exp").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA}, null, 1)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar()}, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "diario_"+hoy()+".json";
   document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   aviso("Copia descargada: guárdala en tu carpeta del gimnasio");
@@ -467,7 +730,9 @@ document.getElementById("m-imp-f").addEventListener("change", function(){
   const f = this.files && this.files[0]; if(!f) return;
   f.text().then(t=>{ const j=JSON.parse(t);
     if(!j || j.tipo!=="diario" || !j.diario || !j.diario.dias) throw 0;
-    D = Object.assign(vacio(), j.diario); EXTRA = j.extra || {}; guarda(); compacta(); render(); aviso("Copia recuperada");
+    D = Object.assign(vacio(), j.diario); EXTRA = j.extra || {};
+    if(j.productos){ PROD = normalizaProd(j.productos); guardaProductos(); }
+    guarda(); compacta(); render(); aviso("Copia recuperada");
   }).catch(()=>aviso("Ese archivo no es una copia del diario"));
   this.value = "";
 });
@@ -490,6 +755,6 @@ document.getElementById("m-peso-ok").addEventListener("click", ()=>{
 });
 window.addEventListener("gd:peso", ()=>pintaResumen());
 
-function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaSemana(); }
+function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaProductos(); pintaSemana(); }
 compacta();
 render();

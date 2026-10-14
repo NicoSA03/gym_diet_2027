@@ -177,7 +177,7 @@ body{padding-top:0}
 
 /* === menus === */
 
-/* Menús v2.0: lista del día + calculadora + diario */
+/* Menús v2.1: lista del día + calculadora + diario + mis productos */
 .m2{--ok:#3DDC84;--ok-soft:#0C2A18;--p:var(--accent-ink);--g:var(--amber);--c:var(--clay)}
 .m2 .wrap-in{display:flex;flex-direction:column;gap:14px;padding-top:18px}
 .m2 section{padding-block:0}
@@ -319,6 +319,61 @@ body{padding-top:0}
 .m-aviso{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--ground);
   font-family:var(--sans);font-size:14px;font-weight:700;padding:11px 16px;border-radius:999px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
 .m-nota{font-size:13.5px;color:var(--ink-3)}
+
+/* escáner y mis productos (v2.1) */
+.m-buscar-fila{display:flex;gap:8px}
+.m-buscar-fila input{flex:1;min-width:0}
+.m-esc-btn,#m-prod-esc{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.m-esc-btn svg,#m-prod-esc svg{width:18px;height:18px;flex:none}
+.m-prod{padding:16px;display:flex;flex-direction:column;gap:10px}
+.m-prod-cab{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.m-prod-cab h3{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:2px}
+.m-prod-cab .m-nota{font-size:13px}
+#m-prod-ver{align-self:flex-start}
+.m-prod-filtro{width:100%;font-size:16px;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);margin-bottom:6px}
+#m-prod-lista .m-res-lista{max-height:360px}
+
+.esc-capa,.prod-capa{position:fixed;inset:0;z-index:70;background:rgba(6,7,10,.92);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;padding:16px;overflow-y:auto}
+.esc-vista{position:relative;width:100%;max-width:440px;aspect-ratio:4/3;max-height:62vh;border-radius:16px;overflow:hidden;background:#000}
+.esc-vista video,.esc-vista canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.esc-vista canvas.drawingBuffer{display:none}
+.esc-vista[hidden]{display:none}
+.esc-marco{position:absolute;left:8%;right:8%;top:30%;height:40%;border:3px solid #3DDC84;border-radius:12px;z-index:2;
+  box-shadow:0 0 0 999px rgba(0,0,0,.35)}
+.esc-texto{color:#F2EFE8;font-family:var(--sans);font-size:15px;font-weight:700;text-align:center;max-width:440px}
+.esc-manual{display:flex;gap:8px;width:100%;max-width:440px}
+.esc-manual input{flex:1;min-width:0;font-family:var(--mono);font-size:18px;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);
+  background:var(--surface-2);color:var(--ink)}
+.esc-pie{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+.prod-capa{justify-content:flex-start}
+.prod-panel{width:100%;max-width:460px;margin:auto 0;background:var(--surface);border:1px solid var(--line-2);border-radius:16px;
+  padding:18px;display:flex;flex-direction:column;gap:14px}
+.prod-panel h2{font-family:var(--sans);font-size:19px;font-weight:800;letter-spacing:-.01em}
+.prod-cod{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:-10px}
+.prod-buscando{color:var(--ink-2);font-family:var(--sans);font-size:15px;font-weight:700;text-align:center;padding:18px 0}
+.prod-campo{display:flex;flex-direction:column;gap:7px}
+.prod-campo>span{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.prod-campo>input,.prod-nueva input{font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.prod-etqs{display:flex;gap:6px;flex-wrap:wrap}
+.prod-chip{font-family:var(--sans);font-size:13.5px;font-weight:700;padding:8px 13px;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--surface-2);color:var(--ink-2);cursor:pointer}
+.prod-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.prod-chip.mas{border-style:dashed;color:var(--ink-3)}
+.prod-nueva{display:flex;gap:8px}
+.prod-nueva input{flex:1;min-width:0}
+.prod-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.prod-macros label{display:flex;flex-direction:column;gap:4px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--ink-3)}
+.prod-macros input{width:100%;min-width:0;font-family:var(--mono);font-size:16px;font-weight:600;padding:10px 8px;border-radius:10px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);text-align:right}
+.prod-macros small{font-family:var(--mono);font-size:10.5px;font-weight:500;text-align:right}
+@media (max-width:360px){.prod-macros{grid-template-columns:repeat(2,1fr)}}
+.prod-aviso{font-size:13.5px;color:var(--amber)}
+.prod-err{font-size:14px;font-weight:700;color:var(--clay)}
+.prod-acc{display:flex;gap:8px;flex-wrap:wrap}
+.prod-acc .m-btn{flex:1 1 auto}
+.m-btn.borrar{color:var(--clay);border-color:var(--clay);background:transparent}
 
 /* === compra === */
 
@@ -823,6 +878,15 @@ body{padding-top:0}
 
     <section class="m-tomas" id="m-tomas" aria-label="Comidas del día"></section>
 
+    <section class="card m-prod" aria-label="Mis productos">
+      <div class="m-prod-cab">
+        <div><h3>Mis productos</h3><p class="m-nota" id="m-prod-n"></p></div>
+        <button class="m-btn prim" id="m-prod-esc">Escanear</button>
+      </div>
+      <button class="m-btn peq" id="m-prod-ver" hidden>Ver la lista</button>
+      <div id="m-prod-lista" hidden></div>
+    </section>
+
     <section class="card m-sem" aria-label="Tu semana">
       <h3>Tu semana</h3>
       <div class="m-barras" id="m-barras"></div>
@@ -1310,6 +1374,7 @@ python3 actualizar.py
 │   ├── calidad.py       ← la nota de la A a la D de cada alimento, con sus reglas a la vista
 │   ├── calculadora.js   ← la cuenta de raciones de la pestaña Menús (y calculadora.py, la misma en Python)
 │   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
+│   ├── escaner.js       ← la cámara que lee códigos de barras en Menús (sección 5, Mis productos)
 │   ├── ver_alimentos.py ← verificación de la base de datos y lista de datos que faltan
 │   ├── ver_platos.py    ← verificación de los platos: que encajen en su toma y las raciones sean de verdad
 │   ├── payload_registro.py ← datos del Registro: descansos, ejercicios de peso corporal, volumen y km del plan
@@ -1324,6 +1389,7 @@ python3 actualizar.py
     ├── index.html       ← el mismo archivo
     ├── catalogo.json    ← los alimentos de las tres tiendas (se actualiza solo cada lunes)
     ├── manifest.webmanifest, sw.js, icon-192.png, icon-512.png
+    ├── vendor/quagga.min.js ← lector de códigos para iPhone y PC (Quagga2, MIT; licencia al lado)
 └── obsoleto/            ← lo que la app ya no usa, guardado por versión (mira su LEEME.md)</code></pre>
 <p><b>Regla de oro:</b> los cambios de entreno se hacen en <code>menu/entreno.py</code>; los de dieta, en los dos CSV de <code>datos/</code>. Solo hace falta tocar Python para cambiar las calorías de un bloque o las horas de las tomas (<code>menu/modelo.py</code>).</p>
 <hr>
@@ -1434,17 +1500,22 @@ python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"</code></pr
 <h4>Precios</h4>
 <p><code>datos/alimentos.csv</code>, columna <code>precio_eur</code>. La lista de la compra y el total semanal se recalculan solos.</p>
 <hr>
-<h3>5. La pestaña Menús (v2.0)</h3>
+<h3>5. La pestaña Menús (v2.1)</h3>
 <p>Una pantalla por día con todas las comidas en orden. Arriba, lo que llevas comido frente al objetivo del día; debajo, cada toma con su hora, su plato y sus kcal.</p>
 <h4>Qué día y qué bloque</h4>
 <ul><li>Se abre en <b>hoy</b>. Con las flechas pasas de día.</li><li>El <b>bloque</b> sale solo de la fecha de inicio que pones en el Registro. Si no la has puesto, lo eliges en el desplegable.</li><li>El <b>tipo de día</b> sale del día de la semana (lunes A, martes B...). Si un día cambia tu plan, por ejemplo porque no entrenas, cámbialo en el desplegable y los objetivos se ajustan.</li></ul>
 <h4>La calculadora</h4>
 <p>Toca una comida y se abre. Tocas el nombre del plato y sale la lista de platos con un buscador arriba: encuentra por nombre o por ingrediente («salmón», «garbanzos»). Al elegir uno, la app propone los gramos para clavar las kcal y la proteína de esa toma.</p>
-<ul><li><b>Todos los platos valen para la comida y para la cena.</b> En la cena se aplica la cena ligera: se mantiene la proteína y se recorta primero el pan y el aceite.</li><li><b>Si tienes otra cantidad</b> (descongelaste 137 g de pollo y tocaban 120), escríbela. Ese alimento queda fijado (candado rojo) y el resto se reajusta. Toca el candado para soltarlo.</li><li><b>La verdura no se toca nunca.</b> La X quita un alimento del plato.</li><li><b>Añadir alimento</b> busca primero entre tus alimentos y después en el catálogo de Mercadona, Lidl y Carrefour (solo en la app instalada). Lo que añades entra fijado con una ración normal.</li><li>Si un plato se queda corto (una cena usada como comida, por ejemplo), la app propone el acompañante que mejor lo completa con un toque.</li></ul>
+<ul><li><b>Todos los platos valen para la comida y para la cena.</b> En la cena se aplica la cena ligera: se mantiene la proteína y se recorta primero el pan y el aceite.</li><li><b>Si tienes otra cantidad</b> (descongelaste 137 g de pollo y tocaban 120), escríbela. Ese alimento queda fijado (candado rojo) y el resto se reajusta. Toca el candado para soltarlo.</li><li><b>La verdura no se toca nunca.</b> La X quita un alimento del plato.</li><li><b>Añadir alimento</b> busca primero en Mis productos, después en los alimentos del plan y al final en el catálogo de Mercadona, Lidl y Carrefour (solo en la app instalada). Lo que añades entra fijado con una ración normal. El botón <b>Escanear</b> de al lado lee el código de barras de un producto (mira Mis productos, abajo).</li><li>Si un plato se queda corto (una cena usada como comida, por ejemplo), la app propone el acompañante que mejor lo completa con un toque.</li></ul>
+<h4>Mis productos (escanear un código de barras)</h4>
+<p>Para tener a mano lo que compras de verdad. Se escanea desde dos sitios: el botón <b>Escanear</b> dentro de Añadir alimento (lo guarda y lo mete en esa comida) y la tarjeta <b>Mis productos</b> (solo lo guarda).</p>
+<ol><li>Apunta la cámara al código. Si no hay cámara o no das permiso, toca <b>Escribir el código</b> y pon los números de debajo de las barras.</li><li>La app lo busca, por este orden: en tus productos (si ya lo tienes, abre su ficha), en el catálogo de las tiendas y en <b>Open Food Facts</b>, una base abierta con millones de productos (necesita internet). Si no está en ningún sitio, copias los datos de la etiqueta.</li><li>En la ficha sale un <b>nombre sugerido</b>: cámbialo si quieres. Eliges la <b>etiqueta</b> (Tuyo, Mercadona, Lidl, Carrefour) o creas otra con <b>+ Nueva</b> (Dia, Alcampo...), que queda guardada para la próxima vez. Revisa kcal, proteína, grasa e hidratos <b>por 100 g</b>: si las kcal no cuadran con los macros, te avisa. Si dejas las kcal vacías, las calcula.</li><li><b>Guardar</b> o <b>Guardar y añadir a</b> la comida que tenías abierta.</li></ol>
+<p>En la tarjeta, <b>Ver la lista</b> enseña tus productos; tocas uno para corregirlo o borrarlo (hay que tocar Borrar dos veces). En los platos entra como «Nombre (Tienda)»; los de la etiqueta Tuyo, sin apellido.</p>
+<ul><li><b>Dónde se guarda:</b> en el móvil, en <code>mis_productos_v1</code>, muy corto: código, nombre, etiqueta, los cuatro números y la fecha. Mil productos ocupan menos de 100 KB. Entran en <b>Guardar copia</b> y <b>Recuperar copia</b>.</li><li><b>Qué lee:</b> EAN-13, EAN-8 y UPC, los de cualquier producto de supermercado. Comprueba el dígito de control, así que una lectura mal hecha no se cuela.</li><li><b>En cada aparato:</b> en Android con Chrome usa el lector del propio móvil. En iPhone, en PC y en el resto usa <code>docs/vendor/quagga.min.js</code> (Quagga2, licencia MIT), que se guarda con la app y funciona sin conexión. La cámara solo abre en la app instalada (https); abriendo el archivo suelto se escribe el código a mano.</li><li>Lo que llega de Open Food Facts lo escribe gente voluntaria: revisa que cuadre con la etiqueta antes de guardar.</li></ul>
 <h4>El margen y el arrastre</h4>
 <p>Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las tomas pequeñas). Si te pasas o te quedas corto y la comes así, no pasa nada: al pulsar <b>Hecho, lo he comido</b> la diferencia se reparte entre las tomas que quedan del día, en proporción a su tamaño. Lo que decide es el total del día y la media de la semana.</p>
 <h4>El diario y el peso</h4>
-<ul><li>Lo que confirmas se guarda en el móvil. Se guardan <b>14 días con detalle</b>; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.</li><li><b>Peso de hoy</b> se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.</li><li><b>Guardar copia</b> descarga el diario en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; <b>Recuperar copia</b> lo restaura en cualquier móvil.</li></ul>
+<ul><li>Lo que confirmas se guarda en el móvil. Se guardan <b>14 días con detalle</b>; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.</li><li><b>Peso de hoy</b> se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.</li><li><b>Guardar copia</b> descarga el diario (y Mis productos) en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; <b>Recuperar copia</b> lo restaura en cualquier móvil.</li></ul>
 <h4>Cómo funciona la cuenta</h4>
 <p><code>menu/calculadora.js</code> busca, por mínimos cuadrados con límites, los gramos que más se acercan al objetivo sin deformar el plato. Importan, por este orden, las kcal, la proteína (como mínimo, no como techo) y después la grasa y el hidrato. Cada alimento se queda dentro de su ración razonable (<code>RACION</code> en <code>menu/generar.py</code>). Es aritmética exacta: siempre da lo mismo.</p>
 <p><code>menu/calculadora.py</code> es la misma cuenta en Python. La usa la verificación para probar todos los platos en todas las tomas, bloques y tipos de día, y comprueba que las dos dan exactamente lo mismo.</p>
@@ -1519,13 +1590,13 @@ python3 catalogo/actualizar_catalogo.py --solo M   # solo Mercadona (unos 2 minu
 <ul><li><b>Nunca se vacía.</b> Si una fuente falla o trae menos de la mitad de productos que la vez anterior, se conservan sus datos anteriores y queda anotado en <code>fuentes</code> dentro del propio archivo.</li><li><b>Datos dudosos.</b> Si las kcal de un producto no cuadran con sus macros (4/4/9, ±15 %), se marca como dudoso en vez de esconderlo: la app lo enseña con un aviso.</li><li><b>Open Food Facts lo rellenan usuarios.</b> Están los productos más escaneados de cada tienda, no todos. Lo que falte se podrá añadir desde la app con el escáner.</li><li>Las piezas están separadas para cambiar una fuente sin tocar las demás: <code>catalogo/fuente_mercadona.py</code>, <code>catalogo/fuente_openFood.py</code>, <code>catalogo/comun.py</code> (descarga, formato y control de calidad) y <code>catalogo/actualizar_catalogo.py</code> (el que lo une todo).</li></ul>
 <hr>
 <h3>11. Versiones</h3>
-<div class="tscroll"><table><thead><tr><th>Versión</th><th>Qué trae</th></tr></thead><tbody><tr><td>v1.0</td><td>Siete pestañas, menús por tipo de día, Registro y app instalable</td></tr><tr><td>v1.1</td><td>Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin</td></tr><tr><td>v2.0</td><td>Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia</td></tr></tbody></table></div>
-<p><i>Versión del sistema: v2.0, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.</i></p></div></section>
+<div class="tscroll"><table><thead><tr><th>Versión</th><th>Qué trae</th></tr></thead><tbody><tr><td>v1.0</td><td>Siete pestañas, menús por tipo de día, Registro y app instalable</td></tr><tr><td>v1.1</td><td>Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin</td></tr><tr><td>v2.0</td><td>Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia</td></tr><tr><td>v2.1</td><td>Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil</td></tr></tbody></table></div>
+<p><i>Versión del sistema: v2.1, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.</i></p></div></section>
 </div>
 </div>
 </main>
 <div class="sello">
-  versión 08fcd0db, 7 de octubre de 2026
+  versión f12e3266, 14 de octubre de 2026
 </div>
 <script>
 
@@ -1691,15 +1762,176 @@ const CALC = (function(){
 })();
 if (typeof module !== "undefined") module.exports = CALC;
 
-// Menús v2.0: lista del día, calculadora de raciones y diario.
+// Escáner de códigos de barras (v2.1). Solo la cámara y la lectura; qué se hace con
+// el código lo decide quien lo llama (menu/a2.js).
+//
+// Cómo lee:
+//   1. Si el navegador trae lector propio (BarcodeDetector: Chrome en Android y en
+//      algunos ordenadores), usa ese. No carga nada extra.
+//   2. Si no (iPhone, Firefox, la mayoría de PC), carga docs/vendor/quagga.min.js
+//      (Quagga2, licencia MIT, unos 150 KB) la primera vez que escaneas. Queda
+//      guardado para usarlo sin conexión.
+//   3. Si no hay cámara, no das permiso o abres el archivo suelto (sin https), se
+//      puede escribir el código a mano.
+// Solo acepta códigos de producto (EAN-13, EAN-8, UPC) y comprueba su dígito de
+// control, así que no se cuela una lectura mal hecha.
+
+const ESCANER = (function(){
+  const FORMATOS = ["ean_13", "ean_8", "upc_a", "upc_e"];
+  let quaggaCargada = null;
+  // Según cómo se empaquete, Quagga2 queda en window.Quagga o en window.Quagga.default
+  const Q = () => window.Quagga && (window.Quagga.default || window.Quagga);
+
+  // Dígito de control de EAN-8, UPC-A (12) y EAN-13
+  function valido(c){
+    if(!/^\d+$/.test(c) || [8, 12, 13].indexOf(c.length) < 0) return false;
+    const d = c.split("").map(Number), control = d.pop();
+    let s = 0;
+    d.reverse().forEach((x, i) => { s += x * (i % 2 === 0 ? 3 : 1); });
+    return (10 - s % 10) % 10 === control;
+  }
+  // Los UPC-A de 12 cifras son EAN-13 con un 0 delante: así se buscan igual
+  const normaliza = c => c.length === 12 ? "0" + c : c;
+
+  function cargaQuagga(){
+    if(Q()) return Promise.resolve();
+    if(quaggaCargada) return quaggaCargada;
+    quaggaCargada = new Promise((ok, mal) => {
+      const s = document.createElement("script");
+      s.src = "vendor/quagga.min.js";
+      s.onload = () => Q() ? ok() : mal();
+      s.onerror = () => { quaggaCargada = null; mal(); };
+      document.head.append(s);
+    });
+    return quaggaCargada;
+  }
+
+  async function nativoSirve(){
+    if(!("BarcodeDetector" in window)) return false;
+    try{
+      const f = await window.BarcodeDetector.getSupportedFormats();
+      return FORMATOS.some(x => f.indexOf(x) >= 0);
+    }catch(e){ return false; }
+  }
+
+  const nodo = (t, c, x) => { const n = document.createElement(t); if(c) n.className = c; if(x !== undefined) n.textContent = x; return n; };
+
+  // Abre la pantalla de la cámara. alLeer(código) se llama una sola vez.
+  function abrir(alLeer){
+    const capa = nodo("div", "esc-capa");
+    capa.setAttribute("role", "dialog"); capa.setAttribute("aria-label", "Escanear código de barras");
+    const vista = nodo("div", "esc-vista");
+    const marco = nodo("div", "esc-marco");
+    const texto = nodo("p", "esc-texto", "Abriendo la cámara...");
+    const manual = nodo("form", "esc-manual");
+    const inp = nodo("input"); inp.inputMode = "numeric"; inp.placeholder = "8 o 13 cifras";
+    inp.setAttribute("aria-label", "Código de barras");
+    const ir = nodo("button", "m-btn prim", "Buscar"); ir.type = "submit";
+    manual.append(inp, ir); manual.hidden = true;
+    const pie = nodo("div", "esc-pie");
+    const bManual = nodo("button", "m-btn", "Escribir el código");
+    const bCerrar = nodo("button", "m-btn", "Cancelar");
+    pie.append(bManual, bCerrar);
+    vista.append(marco);
+    capa.append(vista, texto, manual, pie);
+    document.body.append(capa);
+
+    let vivo = true, flujo = null, bucle = null, usaQuagga = false;
+    const ultimas = [];
+    function cerrar(){
+      vivo = false;
+      if(bucle) clearTimeout(bucle);
+      if(usaQuagga && Q()){ try{ Q().offDetected(); Q().stop(); }catch(e){} }
+      if(flujo) flujo.getTracks().forEach(t => t.stop());
+      capa.remove();
+    }
+    function entrega(c){
+      if(!vivo) return;
+      if(navigator.vibrate) navigator.vibrate(60);
+      cerrar(); alLeer(normaliza(c));
+    }
+    // sinCamara: la cámara no ha abierto, así que se quita el recuadro negro
+    function aMano(msg, sinCamara){
+      if(msg) texto.textContent = msg;
+      if(sinCamara) vista.hidden = true;
+      manual.hidden = false; bManual.hidden = true;
+      setTimeout(() => inp.focus(), 0);
+    }
+    bCerrar.addEventListener("click", cerrar);
+    bManual.addEventListener("click", () => aMano("Escribe los números que hay debajo de las barras."));
+    manual.addEventListener("submit", e => {
+      e.preventDefault();
+      const c = inp.value.replace(/\D/g, "");
+      if(valido(c)) entrega(c); else texto.textContent = "Ese código no es válido: revisa los números.";
+    });
+
+    (async () => {
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.isSecureContext)
+        return aMano("La cámara solo funciona en la app instalada. Escribe el código.", true);
+      try{
+        if(await nativoSirve()){
+          flujo = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}, audio: false});
+          if(!vivo){ flujo.getTracks().forEach(t => t.stop()); return; }
+          const v = nodo("video"); v.setAttribute("playsinline", ""); v.muted = true; v.srcObject = flujo;
+          vista.prepend(v); await v.play();
+          texto.textContent = "Apunta al código de barras";
+          const det = new window.BarcodeDetector({formats: FORMATOS});
+          const mira = async () => {
+            if(!vivo) return;
+            try{
+              const r = await det.detect(v);
+              const c = r.map(x => x.rawValue).find(valido);
+              if(c) return entrega(c);
+            }catch(e){}
+            bucle = setTimeout(mira, 180);
+          };
+          mira();
+        } else {
+          await cargaQuagga();
+          if(!vivo) return;
+          usaQuagga = true;
+          Q().init({
+            inputStream: {type: "LiveStream", target: vista,
+                          constraints: {facingMode: "environment", width: {ideal: 1280}, height: {ideal: 720}}},
+            decoder: {readers: ["ean_reader", "ean_8_reader", "upc_reader"]},
+            // «large» encuentra mejor el código cuando lo acercas a la cámara, que es lo normal
+            locate: true, locator: {patchSize: "large", halfSample: true},
+            frequency: 10                     // 10 intentos por segundo: suficiente y gasta menos batería
+          }, err => {
+            if(err || !vivo){ if(vivo) aMano("No se ha podido abrir la cámara. Escribe el código.", true); return; }
+            Q().start();
+            texto.textContent = "Apunta al código de barras";
+          });
+          // Quagga a veces lee mal una barra: solo vale si sale igual tres veces seguidas
+          Q().onDetected(r => {
+            const c = r && r.codeResult && r.codeResult.code;
+            if(!c || !valido(c)) return;
+            ultimas.push(c); if(ultimas.length > 3) ultimas.shift();
+            if(ultimas.length === 3 && ultimas.every(x => x === c)) entrega(c);
+          });
+        }
+      }catch(e){
+        aMano(e && e.name === "NotAllowedError"
+          ? "No has dado permiso a la cámara. Puedes escribir el código."
+          : "No se ha podido abrir la cámara. Escribe el código.", true);
+      }
+    })();
+  }
+
+  return {abrir, valido};
+})();
+if (typeof module !== "undefined") module.exports = ESCANER;
+
+// Menús v2.1: lista del día, calculadora de raciones, diario y tus productos escaneados.
 // Los datos del plan (M) los genera menu/payload3.py. La cuenta de raciones está
-// en menu/calculadora.js (CALC). Aquí solo se pinta y se guarda en el navegador.
+// en menu/calculadora.js (CALC) y la cámara en menu/escaner.js (ESCANER). Aquí solo
+// se pinta y se guarda en el navegador.
 
 const DIAS_SEM = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const CORTO = ["D","L","M","X","J","V","S"];
 const MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 const TIPO_DE = {1:"A",2:"B",3:"A",4:"B",5:"C",6:"D",0:"E"};   // getDay() -> tipo de día
-const KEY = "diario_v1", KEY_EXTRA = "menu_extra_v1", KEY_REG = "registro_v1";
+const KEY = "diario_v1", KEY_EXTRA = "menu_extra_v1", KEY_REG = "registro_v1", KEY_PROD = "mis_productos_v1";
 const DETALLE_DIAS = 14;          // días con detalle; lo anterior se resume por semanas
 const MARGEN = 0.05, MARGEN_MIN = 25;
 
@@ -1760,7 +1992,7 @@ function guardaPeso(fecha, kg){
 }
 
 // ---------------------------------------------------------------- qué toca cada día
-let fecha = hoy(), abierta = null, buscando = null, eligiendo = null;
+let fecha = hoy(), abierta = null, buscando = null, eligiendo = null, verProductos = false;
 let faseManual = leeJSON("menu_fase", null);
 
 function faseDe(f){
@@ -2061,16 +2293,21 @@ function acompanante(b, obj){
 }
 
 // ---------------------------------------------------------------- añadir alimento
-let CAT = null, catEstado = "sin";      // sin | cargando | ok | error
+let CAT = null, CAT_EAN = {}, catEstado = "sin", catPromesa = null;   // sin | cargando | ok | error
 function cargaCatalogo(){
-  if(catEstado!=="sin") return;
+  if(catPromesa) return catPromesa;
   catEstado = "cargando";
-  fetch("catalogo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
+  catPromesa = fetch("catalogo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{ const c=j.campos; const ix=k=>c.indexOf(k);
-      CAT = j.items.map(x=>({n:x[ix("nombre")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")],
+      CAT = j.items.map(x=>({n:x[ix("nombre")], m:x[ix("marca")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")],
                              dud:x[ix("dudoso")], q:sinTildes(x[ix("nombre")]+" "+(x[ix("marca")]||""))}));
+      // índice por código de barras, para el escáner (los UPC de 12 cifras, con un 0 delante)
+      CAT_EAN = {};
+      j.items.forEach((x,i)=>{ let e = x[ix("ean")]; if(!e) return; e = String(e); if(e.length===12) e = "0"+e;
+        if(!CAT_EAN[e]) CAT_EAN[e] = CAT[i]; });
       catEstado = "ok"; if(buscando) render(); })
     .catch(()=>{ catEstado = "error"; if(buscando) render(); });
+  return catPromesa;
 }
 const TIENDA = {M:"Mercadona", L:"Lidl", C:"Carrefour"};
 // Papel que se le supone a un producto del catálogo, por sus macros
@@ -2083,7 +2320,12 @@ function rolDe(k,p,g,c){
 function buscador(b){
   cargaCatalogo();
   const box = el("div","m-buscar");
+  const fila = el("div","m-buscar-fila");
   const inp = el("input"); inp.type="search"; inp.placeholder="Busca: pollo, yogur, arroz..."; inp.setAttribute("aria-label","Buscar alimento");
+  const esc = el("button","m-btn m-esc-btn"); esc.innerHTML = BARRAS; esc.append(document.createTextNode("Escanear"));
+  esc.setAttribute("aria-label","Escanear el código de barras de un producto");
+  esc.addEventListener("click", ()=>escanea(b));
+  fila.append(inp, esc);
   const lista = el("div","m-res-lista"), pie = el("p","m-nota");
   const cerrar = el("button","m-btn peq","Cerrar");
   cerrar.addEventListener("click", ()=>{ buscando=null; render(); });
@@ -2091,10 +2333,18 @@ function buscador(b){
     lista.replaceChildren();
     const q = sinTildes(inp.value.trim()), pal = q.split(/\s+/).filter(Boolean);
     const vale = t => pal.every(w=>t.indexOf(w)>=0);
-    const mios = Object.keys(M.foods).concat(Object.keys(EXTRA)).filter(n=>!pal.length || vale(sinTildes(n))).slice(0, pal.length?12:8);
-    mios.forEach(n=>{ const f=ficha(n); const it=el("button","m-res-it");
-      const a=el("span",null,n); a.append(el("span","m-tag","tuyo"));
-      it.append(a, el("small",null,nf(f[0])+" kcal")); it.addEventListener("click", ()=>anade(b, n, f)); lista.append(it); });
+    const fila = (n, f, tag, accion) => { const it=el("button","m-res-it");
+      const a=el("span",null,n); a.append(el("span","m-tag",tag));
+      it.append(a, el("small",null,nf(f[0])+" kcal")); it.addEventListener("click", accion); lista.append(it); };
+    // 1. tus productos escaneados
+    const mp = Object.keys(PROD.p).filter(e=>!pal.length || vale(sinTildes(PROD.p[e][0]))).slice(0, pal.length?12:6);
+    const deProductos = new Set(Object.keys(PROD.p).map(claveProducto));
+    mp.forEach(e=>{ const x = PROD.p[e]; fila(x[0], x.slice(2,6), nombreEtq(x[1]), ()=>anadeProducto(b, e)); });
+    // 2. los alimentos del plan y los que ya añadiste del catálogo
+    const mios = Object.keys(M.foods).concat(Object.keys(EXTRA).filter(n=>!deProductos.has(n)))
+      .filter(n=>!pal.length || vale(sinTildes(n))).slice(0, pal.length?12:6);
+    mios.forEach(n=>{ const f=ficha(n); fila(n, f, M.foods[n] ? "del plan" : "añadido", ()=>anade(b, n, f)); });
+    // 3. el catálogo de las tiendas
     if(pal.length && CAT){
       CAT.filter(x=>vale(x.q)).slice(0,25).forEach(x=>{ const it=el("button","m-res-it");
         const a=el("span",null,x.n); a.append(el("span","m-tag",x.s.split("").map(l=>TIENDA[l]).join(", ")));
@@ -2107,10 +2357,10 @@ function buscador(b){
     }
     pie.textContent = catEstado==="cargando" ? "Cargando el catálogo de Mercadona, Lidl y Carrefour..."
       : catEstado==="error" ? "El catálogo de las tiendas solo está en la app instalada. Mientras, elige entre tus alimentos."
-      : catEstado==="ok" ? "Tus alimentos primero; después, los de Mercadona, Lidl y Carrefour." : "";
+      : catEstado==="ok" ? "Primero lo tuyo; después, los de Mercadona, Lidl y Carrefour." : "";
   };
   inp.addEventListener("input", pinta);
-  box.append(inp, lista, pie, cerrar);
+  box.append(fila, lista, pie, cerrar);
   pinta();
   setTimeout(()=>inp.focus(), 0);
   return box;
@@ -2124,6 +2374,250 @@ function anade(b, n, f){
   t.it.push([n, g, true, g]);
   buscando = null; guardaEstado(fecha, b, t); aviso(n+": "+g+" g. Cambia los gramos si quieres"); render();
 }
+
+// ---------------------------------------------------------------- mis productos (v2.1)
+// Lo que escaneas se guarda en este móvil, en la clave mis_productos_v1, así de corto:
+//   {v:1, etq:[[id, nombre], ...], p:{código: [nombre, etiqueta, kcal, P, G, C, fecha]}}
+// Macros por 100 g con un decimal. Las etiquetas fijas (Tuyo, Mercadona, Lidl,
+// Carrefour) no se guardan: solo las que creas tú. Cada producto ocupa unos 80 bytes,
+// así que mil productos son menos de 100 KB.
+const ETQ_FIJAS = [["T","Tuyo"],["M","Mercadona"],["L","Lidl"],["C","Carrefour"]];
+const BARRAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>';
+// Marcas propias de cada tienda, para adivinar la etiqueta de lo que viene de Open Food Facts
+const MARCAS = {M:["hacendado","deliplus","bosque verde"], L:["milbona","pilos","alesto","crownfield","solevita","chef select","combino","baresa","freeway","vitasia"], C:["carrefour"]};
+
+function esFija(id){ return ETQ_FIJAS.some(f=>f[0]===id); }
+function normalizaProd(d){
+  d = d || {};
+  return {v:1, etq: ETQ_FIJAS.concat((d.etq||[]).filter(e=>Array.isArray(e) && !esFija(e[0]))), p: d.p || {}};
+}
+let PROD = normalizaProd(leeJSON(KEY_PROD, null));
+function prodParaGuardar(){ return {v:1, etq:PROD.etq.filter(e=>!esFija(e[0])), p:PROD.p}; }
+function guardaProductos(){
+  try{ localStorage.setItem(KEY_PROD, JSON.stringify(prodParaGuardar())); return true; }
+  catch(e){ aviso("No se ha podido guardar: el navegador tiene el almacenamiento lleno o bloqueado."); return false; }
+}
+function nombreEtq(id){ const e = PROD.etq.find(x=>x[0]===id); return e ? e[1] : "Tuyo"; }
+// Nombre con el que entra en un plato: «Yogur natural (Mercadona)»; los tuyos, sin apellido
+function claveProducto(e){
+  const x = PROD.p[e]; let k = x[1]==="T" ? x[0] : x[0]+" ("+nombreEtq(x[1])+")";
+  if(M.foods[k]) k += " (escaneado)";
+  return k;
+}
+// Al añadirlo a un plato se copia a EXTRA: así el diario sigue bien aunque luego lo
+// cambies o lo borres de Mis productos.
+function anadeProducto(b, e){
+  const x = PROD.p[e], k = claveProducto(e), [rol,lo,hi] = rolDe(x[2],x[3],x[4],x[5]);
+  EXTRA[k] = [x[2],x[3],x[4],x[5],rol,"","",lo,hi];
+  anade(b, k, EXTRA[k]);
+}
+
+function sugiereNombre(n, marca){
+  n = (n||"").replace(/\s+/g," ").trim(); marca = (marca||"").trim();
+  if(marca && sinTildes(n).indexOf(sinTildes(marca)) < 0) n = (n ? n+" " : "")+marca;
+  return (n.charAt(0).toUpperCase()+n.slice(1)).slice(0, 60);
+}
+function etqDeOFF(tiendas, marcas){
+  const slug = t => sinTildes(t).trim().replace(/\s+/g,"-");
+  const ts = tiendas.map(t=>String(t).replace(/^[a-z]{2}:/,""));
+  const porTienda = PROD.etq.find(e=>e[0]!=="T" && ts.some(t=>t===slug(e[1]) || t.indexOf(slug(e[1])+"-")===0));
+  if(porTienda) return porTienda[0];
+  const m = sinTildes(marcas);
+  for(const id in MARCAS) if(MARCAS[id].some(x=>m.indexOf(x)>=0)) return id;
+  return "T";
+}
+function buscaOFF(c){
+  const ctl = window.AbortController ? new AbortController() : null;
+  const t = setTimeout(()=>{ if(ctl) ctl.abort(); }, 8000);
+  const url = "https://world.openfoodfacts.org/api/v2/product/"+c+".json?fields=product_name_es,product_name,brands,stores_tags,nutriments";
+  return fetch(url, ctl ? {signal:ctl.signal} : {})
+    .then(r=>r.ok ? r.json() : null)
+    .then(j=>{
+      clearTimeout(t);
+      if(!j || j.status!==1 || !j.product) return null;
+      const p = j.product, n = p.nutriments || {};
+      const num = v => { const x = parseFloat(v); return isFinite(x) && x>=0 ? Math.round(x*10)/10 : null; };
+      let k = num(n["energy-kcal_100g"]);
+      if(k===null && num(n["energy_100g"])!==null) k = Math.round(num(n["energy_100g"])/4.184);   // viene en kJ
+      return {nombre: sugiereNombre(p.product_name_es || p.product_name, (p.brands||"").split(",")[0]),
+              etq: etqDeOFF(p.stores_tags||[], p.brands||""),
+              m: [k, num(n.proteins_100g), num(n.fat_100g), num(n.carbohydrates_100g)]};
+    })
+    .catch(()=>{ clearTimeout(t); return null; });
+}
+
+// Capa a pantalla completa para la ficha del producto (se cierra con Cancelar o Esc)
+function abreCapa(titulo){
+  const capa = el("div","prod-capa"), panel = el("div","prod-panel");
+  panel.setAttribute("role","dialog"); panel.setAttribute("aria-modal","true"); panel.setAttribute("aria-label", titulo);
+  capa.append(panel); document.body.append(capa);
+  const tecla = e=>{ if(e.key==="Escape") cierra(); };
+  function cierra(){ document.removeEventListener("keydown", tecla); capa.remove(); }
+  document.addEventListener("keydown", tecla);
+  return {capa, panel, cierra};
+}
+
+// Escanear: b es la toma a la que se añadirá (o null si vienes de Mis productos)
+function escanea(b){ ESCANER.abrir(c=>buscaCodigo(c, b)); }
+async function buscaCodigo(c, b){
+  if(PROD.p[c]) return fichaProducto({ean:c, b, editar:true});
+  const v = abreCapa("Buscando el producto");
+  v.panel.append(el("p","prod-buscando","Buscando el código "+c+"..."));
+  await cargaCatalogo();
+  const x = CAT_EAN[c];
+  let o;
+  if(x) o = {nombre: sugiereNombre(x.n, x.m), etq: x.s[0], m:[x.k,x.p,x.g,x.c],
+             origen: "Está en el catálogo de "+x.s.split("").map(l=>TIENDA[l]).join(", ")+". Pon el nombre que quieras."};
+  else {
+    const off = await buscaOFF(c);
+    o = off ? Object.assign(off, {origen:"Datos de Open Food Facts, una base abierta: comprueba que cuadran con la etiqueta."})
+            : {nombre:"", etq:"T", m:[null,null,null,null],
+               origen: navigator.onLine===false ? "Sin conexión no puedo buscarlo fuera. Copia los datos de la etiqueta (por 100 g)."
+                                                : "No lo encuentro en ningún sitio. Copia los datos de la etiqueta (por 100 g)."};
+  }
+  v.cierra();
+  fichaProducto(Object.assign(o, {ean:c, b}));
+}
+
+// Ficha de un producto: nombre, etiqueta y macros por 100 g
+function fichaProducto(o){
+  const viejo = o.editar ? PROD.p[o.ean] : null;
+  if(viejo) Object.assign(o, {nombre:viejo[0], etq:viejo[1], m:viejo.slice(2,6),
+    origen:"Guardado el "+deIso(viejo[6]||hoy()).toLocaleDateString("es-ES")+"."});
+  const v = abreCapa(viejo ? "Editar producto" : "Producto nuevo"), p = v.panel;
+  let etq = PROD.etq.some(e=>e[0]===o.etq) ? o.etq : "T";
+  p.append(el("h2",null, viejo ? "Editar producto" : "Producto nuevo"),
+           el("p","prod-cod","Código "+o.ean), el("p","m-nota",o.origen));
+
+  const cNom = el("label","prod-campo"), nom = el("input");
+  nom.value = o.nombre || ""; nom.maxLength = 60; nom.placeholder = "Por ejemplo: Yogur griego ligero";
+  cNom.append(el("span",null,"Nombre"), nom);
+
+  const cEtq = el("div","prod-campo"), chips = el("div","prod-etqs");
+  const nueva = el("form","prod-nueva"); nueva.hidden = true;
+  const inpN = el("input"); inpN.maxLength = 20; inpN.placeholder = "Por ejemplo: Dia"; inpN.setAttribute("aria-label","Nombre de la etiqueta nueva");
+  const okN = el("button","m-btn peq","Crear"); okN.type = "submit";
+  nueva.append(inpN, okN);
+  const pintaChips = ()=>{
+    chips.replaceChildren();
+    PROD.etq.forEach(([id, n])=>{
+      const ch = el("button","prod-chip", n); ch.type = "button";
+      ch.setAttribute("aria-pressed", id===etq ? "true" : "false");
+      ch.addEventListener("click", ()=>{ etq = id; pintaChips(); });
+      chips.append(ch);
+    });
+    const mas = el("button","prod-chip mas","+ Nueva"); mas.type = "button";
+    mas.addEventListener("click", ()=>{ nueva.hidden = false; inpN.focus(); });
+    chips.append(mas);
+  };
+  nueva.addEventListener("submit", e=>{
+    e.preventDefault();
+    const n = inpN.value.replace(/\s+/g," ").trim(); if(!n) return;
+    const ya = PROD.etq.find(x=>sinTildes(x[1])===sinTildes(n));
+    if(ya) etq = ya[0];
+    else {
+      let i = 1; while(PROD.etq.some(x=>x[0]==="X"+i)) i++;
+      PROD.etq.push(["X"+i, n.charAt(0).toUpperCase()+n.slice(1)]); etq = "X"+i;
+      guardaProductos();
+    }
+    inpN.value = ""; nueva.hidden = true; pintaChips();
+  });
+  pintaChips();
+  cEtq.append(el("span",null,"Etiqueta"), chips, nueva);
+
+  const cMac = el("div","prod-campo"), rej = el("div","prod-macros");
+  const campos = [["Kcal","kcal"],["Proteína","g"],["Grasa","g"],["Hidratos","g"]].map(([n,u],i)=>{
+    const l = el("label"), inp = el("input"); inp.inputMode = "decimal";
+    inp.value = o.m && o.m[i]!==null && o.m[i]!==undefined ? String(o.m[i]).replace(".",",") : "";
+    l.append(el("span",null,n), inp, el("small",null,u)); rej.append(l); return inp;
+  });
+  const avisoM = el("p","prod-aviso"); avisoM.hidden = true;
+  cMac.append(el("span",null,"Por cada 100 g"), rej, avisoM);
+
+  const lee = ()=>campos.map(x=>{ const t = x.value.replace(",",".").trim(); return t==="" ? null : parseFloat(t); });
+  const revisa = ()=>{
+    const [k,pp,g,c] = lee();
+    if(k>0 && pp!==null && g!==null && c!==null){
+      const cuenta = 4*pp+4*c+9*g;
+      if(Math.abs(cuenta-k) > Math.max(15, 0.2*k)){
+        avisoM.textContent = "Las kcal no cuadran con los macros (darían unas "+nf(cuenta)+"). Revisa la etiqueta."; avisoM.hidden = false; return;
+      }
+    }
+    avisoM.hidden = true;
+  };
+  campos.forEach(x=>x.addEventListener("input", revisa));
+  revisa();
+
+  const err = el("p","prod-err"); err.hidden = true;
+  const acc = el("div","prod-acc");
+  const guardar = anadir=>{
+    const n = nom.value.replace(/\s+/g," ").trim();
+    let [k,pp,g,c] = lee();
+    const fallo = t=>{ err.textContent = t; err.hidden = false; };
+    if(!n) return fallo("Ponle un nombre.");
+    if([k,pp,g,c].some(x=>x!==null && !(x>=0))) return fallo("Revisa los números: solo cifras.");
+    pp = pp||0; g = g||0; c = c||0;
+    if(k===null) k = Math.round(4*pp+4*c+9*g);
+    if(!(k>0 && k<=900)) return fallo("Faltan las kcal por 100 g (están en la etiqueta).");
+    if(pp+g+c > 100.5) return fallo("Proteína, grasa e hidratos suman más de 100 g: revisa que sean por 100 g.");
+    const r1 = x=>Math.round(x*10)/10;
+    const choca = Object.keys(PROD.p).find(e=>e!==o.ean && PROD.p[e][1]===etq && sinTildes(PROD.p[e][0])===sinTildes(n));
+    if(choca) return fallo("Ya tienes otro producto con ese nombre y esa etiqueta.");
+    PROD.p[o.ean] = [n, etq, r1(k), r1(pp), r1(g), r1(c), viejo ? viejo[6] : hoy()];
+    if(!guardaProductos()) return;
+    v.cierra();
+    if(anadir && o.b){ anadeProducto(o.b, o.ean); }
+    else { aviso(viejo ? "Producto actualizado" : "Guardado en Mis productos"); render(); }
+  };
+  if(viejo){
+    const borra = el("button","m-btn borrar","Borrar"); let seguro = false;
+    borra.addEventListener("click", ()=>{
+      if(!seguro){ seguro = true; borra.textContent = "Toca otra vez para borrar"; return; }
+      delete PROD.p[o.ean]; guardaProductos(); v.cierra(); aviso("Producto borrado"); render();
+    });
+    acc.append(borra);
+  }
+  const cancel = el("button","m-btn","Cancelar"); cancel.addEventListener("click", v.cierra);
+  const bg = el("button","m-btn"+(o.b ? "" : " prim"),"Guardar"); bg.addEventListener("click", ()=>guardar(false));
+  acc.append(cancel, bg);
+  if(o.b){ const ba = el("button","m-btn prim","Guardar y añadir a "+M.nombres[o.b].toLowerCase()); ba.addEventListener("click", ()=>guardar(true)); acc.append(ba); }
+  p.append(cNom, cEtq, cMac, err, acc);
+  // sin poner el cursor en el nombre: en el móvil sacaría el teclado y taparía la ficha
+}
+
+// Tarjeta «Mis productos» en la página
+function pintaProductos(){
+  const ks = Object.keys(PROD.p), n = ks.length;
+  $("m-prod-n").textContent = n ? n+(n===1 ? " producto guardado" : " productos guardados")+" en este móvil."
+    : "Escanea un producto para tenerlo a mano al añadir alimentos.";
+  const ver = $("m-prod-ver"), box = $("m-prod-lista");
+  ver.hidden = !n; ver.textContent = verProductos ? "Ocultar la lista" : "Ver la lista";
+  box.hidden = !(n && verProductos); box.replaceChildren();
+  if(!n || !verProductos) return;
+  let filtro = "";
+  const lista = el("div","m-res-lista");
+  const pinta = ()=>{
+    lista.replaceChildren();
+    const pal = sinTildes(filtro.trim()).split(/\s+/).filter(Boolean);
+    ks.filter(e=>{ const t = sinTildes(PROD.p[e][0]+" "+nombreEtq(PROD.p[e][1])); return pal.every(w=>t.indexOf(w)>=0); })
+      .sort((a,b)=>(PROD.p[b][6]||"").localeCompare(PROD.p[a][6]||"") || PROD.p[a][0].localeCompare(PROD.p[b][0],"es"))
+      .forEach(e=>{ const x = PROD.p[e], it = el("button","m-res-it");
+        const a = el("span",null,x[0]); a.append(el("span","m-tag",nombreEtq(x[1])));
+        it.append(a, el("small",null,nf(x[2])+" kcal"));
+        it.addEventListener("click", ()=>fichaProducto({ean:e, b:null, editar:true}));
+        lista.append(it); });
+    if(!lista.children.length) lista.append(el("p","m-nota","Ninguno con eso."));
+  };
+  if(n > 8){
+    const inp = el("input","m-prod-filtro"); inp.type = "search"; inp.placeholder = "Busca en tus productos"; inp.setAttribute("aria-label","Buscar en tus productos");
+    inp.addEventListener("input", ()=>{ filtro = inp.value; pinta(); });
+    box.append(inp);
+  }
+  box.append(lista); pinta();
+}
+$("m-prod-esc").innerHTML = BARRAS + "Escanear";
+$("m-prod-esc").addEventListener("click", ()=>escanea(null));
+$("m-prod-ver").addEventListener("click", ()=>{ verProductos = !verProductos; pintaProductos(); });
 
 // ---------------------------------------------------------------- semana
 function pintaSemana(){
@@ -2150,7 +2644,7 @@ function pintaSemana(){
 
 // ---------------------------------------------------------------- copia de seguridad
 $("m-exp").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA}, null, 1)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar()}, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "diario_"+hoy()+".json";
   document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   aviso("Copia descargada: guárdala en tu carpeta del gimnasio");
@@ -2160,7 +2654,9 @@ $("m-imp-f").addEventListener("change", function(){
   const f = this.files && this.files[0]; if(!f) return;
   f.text().then(t=>{ const j=JSON.parse(t);
     if(!j || j.tipo!=="diario" || !j.diario || !j.diario.dias) throw 0;
-    D = Object.assign(vacio(), j.diario); EXTRA = j.extra || {}; guarda(); compacta(); render(); aviso("Copia recuperada");
+    D = Object.assign(vacio(), j.diario); EXTRA = j.extra || {};
+    if(j.productos){ PROD = normalizaProd(j.productos); guardaProductos(); }
+    guarda(); compacta(); render(); aviso("Copia recuperada");
   }).catch(()=>aviso("Ese archivo no es una copia del diario"));
   this.value = "";
 });
@@ -2183,7 +2679,7 @@ $("m-peso-ok").addEventListener("click", ()=>{
 });
 window.addEventListener("gd:peso", ()=>pintaResumen());
 
-function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaSemana(); }
+function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaProductos(); pintaSemana(); }
 compacta();
 render();
 

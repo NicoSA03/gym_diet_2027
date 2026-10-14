@@ -1,6 +1,7 @@
-// Service worker de «Junio 2027», versión 08fcd0db (lo genera menu/pwa.py)
-const V = "junio2027-08fcd0db";
-const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./catalogo.json"];
+// Service worker de «Junio 2027», versión f12e3266 (lo genera menu/pwa.py)
+const V = "junio2027-f12e3266";
+const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./catalogo.json",
+              "./vendor/quagga.min.js"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(BASE)).then(() => self.skipWaiting()));
@@ -23,6 +24,8 @@ self.addEventListener("fetch", e => {
     e.respondWith(Promise.race([red, espera]).catch(() => caches.match("./index.html")));
     return;
   }
+  // Open Food Facts (buscar un código escaneado): siempre a la red, nunca a la copia
+  if (new URL(r.url).hostname.endsWith("openfoodfacts.org")) return;
   // el catálogo de alimentos cambia cada semana sin que cambie la app: se sirve
   // la copia guardada al momento y se pide la nueva por detrás para la próxima vez
   if (new URL(r.url).pathname.endsWith("/catalogo.json")) {

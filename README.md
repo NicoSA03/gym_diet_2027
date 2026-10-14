@@ -51,6 +51,7 @@ gym_diet_2027/
 │   ├── calidad.py       ← la nota de la A a la D de cada alimento, con sus reglas a la vista
 │   ├── calculadora.js   ← la cuenta de raciones de la pestaña Menús (y calculadora.py, la misma en Python)
 │   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
+│   ├── escaner.js       ← la cámara que lee códigos de barras en Menús (sección 5, Mis productos)
 │   ├── ver_alimentos.py ← verificación de la base de datos y lista de datos que faltan
 │   ├── ver_platos.py    ← verificación de los platos: que encajen en su toma y las raciones sean de verdad
 │   ├── payload_registro.py ← datos del Registro: descansos, ejercicios de peso corporal, volumen y km del plan
@@ -65,6 +66,7 @@ gym_diet_2027/
     ├── index.html       ← el mismo archivo
     ├── catalogo.json    ← los alimentos de las tres tiendas (se actualiza solo cada lunes)
     ├── manifest.webmanifest, sw.js, icon-192.png, icon-512.png
+    ├── vendor/quagga.min.js ← lector de códigos para iPhone y PC (Quagga2, MIT; licencia al lado)
 └── obsoleto/            ← lo que la app ya no usa, guardado por versión (mira su LEEME.md)
 ```
 
@@ -314,7 +316,7 @@ Las horas y los nombres de las tomas (no los platos) están en el diccionario `T
 
 ---
 
-## 5. La pestaña Menús (v2.0)
+## 5. La pestaña Menús (v2.1)
 
 Una pantalla por día con todas las comidas en orden. Arriba, lo que llevas comido frente al objetivo del día; debajo, cada toma con su hora, su plato y sus kcal.
 
@@ -331,8 +333,24 @@ Toca una comida y se abre. Tocas el nombre del plato y sale la lista de platos c
 - **Todos los platos valen para la comida y para la cena.** En la cena se aplica la cena ligera: se mantiene la proteína y se recorta primero el pan y el aceite.
 - **Si tienes otra cantidad** (descongelaste 137 g de pollo y tocaban 120), escríbela. Ese alimento queda fijado (candado rojo) y el resto se reajusta. Toca el candado para soltarlo.
 - **La verdura no se toca nunca.** La X quita un alimento del plato.
-- **Añadir alimento** busca primero entre tus alimentos y después en el catálogo de Mercadona, Lidl y Carrefour (solo en la app instalada). Lo que añades entra fijado con una ración normal.
+- **Añadir alimento** busca primero en Mis productos, después en los alimentos del plan y al final en el catálogo de Mercadona, Lidl y Carrefour (solo en la app instalada). Lo que añades entra fijado con una ración normal. El botón **Escanear** de al lado lee el código de barras de un producto (mira Mis productos, abajo).
 - Si un plato se queda corto (una cena usada como comida, por ejemplo), la app propone el acompañante que mejor lo completa con un toque.
+
+### Mis productos (escanear un código de barras)
+
+Para tener a mano lo que compras de verdad. Se escanea desde dos sitios: el botón **Escanear** dentro de Añadir alimento (lo guarda y lo mete en esa comida) y la tarjeta **Mis productos** (solo lo guarda).
+
+1. Apunta la cámara al código. Si no hay cámara o no das permiso, toca **Escribir el código** y pon los números de debajo de las barras.
+2. La app lo busca, por este orden: en tus productos (si ya lo tienes, abre su ficha), en el catálogo de las tiendas y en **Open Food Facts**, una base abierta con millones de productos (necesita internet). Si no está en ningún sitio, copias los datos de la etiqueta.
+3. En la ficha sale un **nombre sugerido**: cámbialo si quieres. Eliges la **etiqueta** (Tuyo, Mercadona, Lidl, Carrefour) o creas otra con **+ Nueva** (Dia, Alcampo...), que queda guardada para la próxima vez. Revisa kcal, proteína, grasa e hidratos **por 100 g**: si las kcal no cuadran con los macros, te avisa. Si dejas las kcal vacías, las calcula.
+4. **Guardar** o **Guardar y añadir a** la comida que tenías abierta.
+
+En la tarjeta, **Ver la lista** enseña tus productos; tocas uno para corregirlo o borrarlo (hay que tocar Borrar dos veces). En los platos entra como «Nombre (Tienda)»; los de la etiqueta Tuyo, sin apellido.
+
+- **Dónde se guarda:** en el móvil, en `mis_productos_v1`, muy corto: código, nombre, etiqueta, los cuatro números y la fecha. Mil productos ocupan menos de 100 KB. Entran en **Guardar copia** y **Recuperar copia**.
+- **Qué lee:** EAN-13, EAN-8 y UPC, los de cualquier producto de supermercado. Comprueba el dígito de control, así que una lectura mal hecha no se cuela.
+- **En cada aparato:** en Android con Chrome usa el lector del propio móvil. En iPhone, en PC y en el resto usa `docs/vendor/quagga.min.js` (Quagga2, licencia MIT), que se guarda con la app y funciona sin conexión. La cámara solo abre en la app instalada (https); abriendo el archivo suelto se escribe el código a mano.
+- Lo que llega de Open Food Facts lo escribe gente voluntaria: revisa que cuadre con la etiqueta antes de guardar.
 
 ### El margen y el arrastre
 
@@ -342,7 +360,7 @@ Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las t
 
 - Lo que confirmas se guarda en el móvil. Se guardan **14 días con detalle**; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.
 - **Peso de hoy** se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.
-- **Guardar copia** descarga el diario en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; **Recuperar copia** lo restaura en cualquier móvil.
+- **Guardar copia** descarga el diario (y Mis productos) en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; **Recuperar copia** lo restaura en cualquier móvil.
 
 ### Cómo funciona la cuenta
 
@@ -549,5 +567,6 @@ Cosas que conviene saber:
 | v1.0 | Siete pestañas, menús por tipo de día, Registro y app instalable |
 | v1.1 | Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin |
 | v2.0 | Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia |
+| v2.1 | Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil |
 
-*Versión del sistema: v2.0, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*
+*Versión del sistema: v2.1, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*
