@@ -40,7 +40,8 @@ gym_diet_2027/
 ├── README.md
 ├── datos/
 │   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
-│   └── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
+│   ├── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
+│   └── *.pdf, Workout.csv, exercises.sql ← material de contexto: no se sube (está en .gitignore)
 ├── catalogo/            ← descarga los alimentos de Mercadona, Lidl y Carrefour (sección 10)
 ├── menu/
 │   ├── entreno.py       ← TODO el entreno: peso, bloques, ejercicios, series, tabata, carrera, variantes

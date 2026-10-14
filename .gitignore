@@ -4,3 +4,8 @@ salida/
 fuente_junio2027.txt
 menu/pay_*.json
 *.tmp
+
+# Material de contexto: se queda en el PC y no se sube (el repositorio es público)
+datos/*.pdf
+datos/Workout.csv
+datos/exercises.sql
