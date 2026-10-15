@@ -53,3 +53,9 @@ C;Fajitas de pollo;Fajitas 100% integrales|Arroz redondo Hacendado|Pechuga de po
 C;Fajitas de carne picada;Fajitas 100% integrales|Arroz redondo Hacendado|Carne picada vacuno y cerdo|Pimiento y cebolla|Tomate frito Hacendado|Yogur natural;150|50|170|250|60|100;El yogur natural hace de salsa en lugar de nata agria
 N;Ensalada de garbanzos con atún;Garbanzos cocidos (bote)|Atún claro al natural|Pimiento y cebolla;295|95|100;generado
 N;Patata con pollo y verduras asadas;Patata|Pechuga de pollo|Verduras asadas (batch)|Queso rallado (ingred.);265|155|100|15;generado
+C;Judías verdes con patata y huevo;Judías verdes congeladas|Patata|Pan de semillas|Arroz redondo Hacendado|Huevos|Claras de huevo (brik)|Aceite de oliva virgen ex.;250|255|75|50|65|300|25;
+C;Tortilla de patata con jamón;Patata|Pan de semillas|Arroz redondo Hacendado|Huevos|Claras de huevo (brik)|Jamón serrano (lonchas)|Aceite de oliva virgen ex.|Tomate cherry;255|75|55|60|195|50|15|200;
+C;Tortilla francesa;Huevos|Claras de huevo (brik)|Patata|Pan de semillas|Arroz redondo Hacendado|Tomate cherry|Aceite de oliva virgen ex.;65|300|265|85|50|200|20;
+N;Judías verdes con patata y huevo;Judías verdes congeladas|Patata|Huevos|Claras de huevo (brik);195|240|70|250;
+N;Tortilla de patata con jamón;Patata|Huevos|Claras de huevo (brik)|Jamón serrano (lonchas)|Tomate cherry;275|60|225|20|80;
+N;Tortilla francesa;Huevos|Claras de huevo (brik)|Pan de semillas|Tomate cherry;60|240|85|200;
