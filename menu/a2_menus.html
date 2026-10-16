@@ -1,5 +1,5 @@
 <style>
-/* Menús v2.1: lista del día + calculadora + diario + mis productos */
+/* Menús v2.3: lista del día + calculadora + diario + mis productos + mis platos */
 .m2{--ok:#3DDC84;--ok-soft:#0C2A18;--p:var(--accent-ink);--g:var(--amber);--c:var(--clay)}
 .m2 .wrap-in{display:flex;flex-direction:column;gap:14px;padding-top:18px}
 .m2 section{padding-block:0}
@@ -196,6 +196,22 @@
 .prod-acc{display:flex;gap:8px;flex-wrap:wrap}
 .prod-acc .m-btn{flex:1 1 auto}
 .m-btn.borrar{color:var(--clay);border-color:var(--clay);background:transparent}
+
+/* mis platos (v2.3) */
+.m-pla-acc{display:flex;gap:8px;flex-wrap:wrap}
+.m-elegir>.m-btn.peq{align-self:flex-start}
+.prod-panel .m-it{background:var(--surface-2)}
+.pla-tabla{display:flex;flex-direction:column;gap:3px}
+.pla-fila{display:grid;grid-template-columns:1fr 70px 70px;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;
+  background:var(--surface-2);font-size:14px}
+.pla-fila span:not(:first-child){font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pla-fila.cab{background:none;padding-block:2px}
+.pla-fila.cab span{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.pla-fila.cambia span:last-child{color:var(--accent-ink);font-weight:700}
+.pla-fila.tot,.pla-fila.tot2{background:none;font-weight:700}
+.pla-fila.tot{border-top:1px solid var(--line);border-radius:0;margin-top:3px}
+.pla-pasos{padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--ink-2)}
+.pla-pasos code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:2px 5px;border-radius:4px;word-break:break-word}
 </style>
 
 <div class="wrap m2">
@@ -232,6 +248,18 @@
     </section>
 
     <section class="m-tomas" id="m-tomas" aria-label="Comidas del día"></section>
+
+    <section class="card m-prod" aria-label="Mis platos">
+      <div class="m-prod-cab">
+        <div><h3>Mis platos</h3><p class="m-nota" id="m-pla-n"></p></div>
+        <button class="m-btn prim" id="m-pla-nuevo">+ Nuevo plato</button>
+      </div>
+      <div class="m-pla-acc">
+        <button class="m-btn peq" id="m-pla-ver" hidden>Ver la lista</button>
+        <button class="m-btn peq" id="m-pla-exp" hidden>Exportar para el CSV</button>
+      </div>
+      <div id="m-pla-lista" hidden></div>
+    </section>
 
     <section class="card m-prod" aria-label="Mis productos">
       <div class="m-prod-cab">

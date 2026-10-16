@@ -177,7 +177,7 @@ body{padding-top:0}
 
 /* === menus === */
 
-/* Menús v2.1: lista del día + calculadora + diario + mis productos */
+/* Menús v2.3: lista del día + calculadora + diario + mis productos + mis platos */
 .m2{--ok:#3DDC84;--ok-soft:#0C2A18;--p:var(--accent-ink);--g:var(--amber);--c:var(--clay)}
 .m2 .wrap-in{display:flex;flex-direction:column;gap:14px;padding-top:18px}
 .m2 section{padding-block:0}
@@ -374,6 +374,22 @@ body{padding-top:0}
 .prod-acc{display:flex;gap:8px;flex-wrap:wrap}
 .prod-acc .m-btn{flex:1 1 auto}
 .m-btn.borrar{color:var(--clay);border-color:var(--clay);background:transparent}
+
+/* mis platos (v2.3) */
+.m-pla-acc{display:flex;gap:8px;flex-wrap:wrap}
+.m-elegir>.m-btn.peq{align-self:flex-start}
+.prod-panel .m-it{background:var(--surface-2)}
+.pla-tabla{display:flex;flex-direction:column;gap:3px}
+.pla-fila{display:grid;grid-template-columns:1fr 70px 70px;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;
+  background:var(--surface-2);font-size:14px}
+.pla-fila span:not(:first-child){font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pla-fila.cab{background:none;padding-block:2px}
+.pla-fila.cab span{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.pla-fila.cambia span:last-child{color:var(--accent-ink);font-weight:700}
+.pla-fila.tot,.pla-fila.tot2{background:none;font-weight:700}
+.pla-fila.tot{border-top:1px solid var(--line);border-radius:0;margin-top:3px}
+.pla-pasos{padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--ink-2)}
+.pla-pasos code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:2px 5px;border-radius:4px;word-break:break-word}
 
 /* === compra === */
 
@@ -888,6 +904,18 @@ body{padding-top:0}
 
     <section class="m-tomas" id="m-tomas" aria-label="Comidas del día"></section>
 
+    <section class="card m-prod" aria-label="Mis platos">
+      <div class="m-prod-cab">
+        <div><h3>Mis platos</h3><p class="m-nota" id="m-pla-n"></p></div>
+        <button class="m-btn prim" id="m-pla-nuevo">+ Nuevo plato</button>
+      </div>
+      <div class="m-pla-acc">
+        <button class="m-btn peq" id="m-pla-ver" hidden>Ver la lista</button>
+        <button class="m-btn peq" id="m-pla-exp" hidden>Exportar para el CSV</button>
+      </div>
+      <div id="m-pla-lista" hidden></div>
+    </section>
+
     <section class="card m-prod" aria-label="Mis productos">
       <div class="m-prod-cab">
         <div><h3>Mis productos</h3><p class="m-nota" id="m-prod-n"></p></div>
@@ -1364,6 +1392,7 @@ body{padding-top:0}
 python3 actualizar.py
 # 3. El resultado está en salida/planificacion_dieta_gym.html y la app instalable en docs/</code></pre>
 <p>Si has tocado <b>platos, alimentos o calorías de la dieta</b>, usa <code>python3 actualizar.py --recalcular</code> (tarda unos 20 segundos más).</p>
+<p>Si has creado <b>platos en la app</b> (Menús, Mis platos), expórtalos y usa <code>python3 actualizar.py --importar platos_app.csv</code> (sección 4).</p>
 <p>Si la verificación encuentra un problema, <b>no se genera nada</b> y te dice qué ha fallado. Así nunca acabas con un archivo roto en el móvil.</p>
 <hr>
 <h3>2. Qué hay en cada sitio</h3>
@@ -1385,6 +1414,8 @@ python3 actualizar.py
 │   ├── generar.py       ← INVENTA PLATOS: tú pides calorías, él resuelve los gramos
 │   ├── calidad.py       ← la nota de la A a la D de cada alimento, con sus reglas a la vista
 │   ├── calculadora.js   ← la cuenta de raciones de la pestaña Menús (y calculadora.py, la misma en Python)
+│   ├── mis_platos.js    ← Mis platos de la pestaña Menús: guardado, cantidades lógicas y exportación (sección 5)
+│   ├── importar_platos.py ← mete en datos/platos.csv los platos exportados desde la app (sección 4)
 │   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
 │   ├── escaner.js       ← la cámara que lee códigos de barras en Menús (sección 5, Mis productos)
 │   ├── ejercicios.py    ← carga datos/ejercicios.csv para El entreno y la verificación
@@ -1504,6 +1535,15 @@ python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"</code></pr
 <p>Cómo trabaja: coge una base, una proteína, una verdura y una grasa; descarta las combinaciones que no pegan; resuelve los gramos que clavan tus objetivos; tira las raciones absurdas; y ordena lo que queda por nota de calidad y precio. Si no le dices calorías, usa las de la toma, que es lo que necesita un plato para entrar en la app sin descuadrar nada.</p>
 <p>Las reglas están arriba del archivo, a la vista y para que las cambies: <code>NO_JUNTOS</code> son las parejas que no pegan, <code>NO_DE_PLATO</code> lo que no quieres ver en una comida por mucho que cuadren los números, y <code>RACION</code> el mínimo y el máximo razonables de cada alimento.</p>
 <p>Lo que propone son <b>ideas con los números resueltos</b>, no recetas probadas. Léelas antes de guardarlas: el programa sabe de aritmética, no de cocina.</p>
+<h4>Crear un plato desde la app (v2.3)</h4>
+<p>También puedes crear el plato en el móvil, en <b>Menús → Mis platos → + Nuevo plato</b> (sección 5), y pasarlo después a <code>datos/platos.csv</code> sin escribir nada a mano:</p>
+<ol><li>En la app, <b>Exportar para el CSV</b>. Se descarga <code>platos_app.csv</code>, con las mismas columnas que <code>datos/platos.csv</code>.</li><li>Cópialo a la carpeta del proyecto y ejecuta:</li></ol>
+<pre><code>python3 actualizar.py --importar platos_app.csv</code></pre>
+<ol><li>Sube los cambios a GitHub, como siempre.</li></ol>
+<p>La app no puede escribir en <code>datos/platos.csv</code> por su cuenta (es una página fija y solo guarda cosas en el propio móvil); por eso el paso por el archivo. Lo que hace la importación, en <code>menu/importar_platos.py</code>:</p>
+<ul><li>Revisa cada plato con las mismas reglas que <code>ver_platos.py</code>: toma válida, ingredientes de <code>datos/alimentos.csv</code> sin repetir, calorías a ±12 % (o ±25 kcal) de la media de su toma y raciones razonables.</li><li>Los que pasan se añaden <b>al final</b> del CSV, así que la semana por defecto y la lista de la compra no cambian. Los que no, salen como <code>RECHAZADO</code> con el motivo.</li><li>Los que ya están (misma toma y mismo nombre) se saltan: importar el mismo archivo dos veces no duplica nada.</li><li>Al terminar ejecuta la verificación completa de los platos. Si fallara, <code>datos/platos.csv</code> queda <b>exactamente como estaba</b>.</li><li>Después regenera todo con <code>--recalcular</code>.</li></ul>
+<p>Para ver qué pasaría sin escribir nada: <code>python3 menu/importar_platos.py platos_app.csv --probar</code>. Los <code>platos_app*.csv</code> están en <code>.gitignore</code>: una vez importados, ya viven en <code>datos/platos.csv</code>.</p>
+<p>Una vez importado, el plato sale en la app desde el CSV y tu copia del móvil se oculta sola en la lista de platos (en Mis platos aparece como «ya en el plan», y la puedes borrar).</p>
 <h4>Añadir un alimento nuevo</h4>
 <p>Todo pasa en <b><code>datos/alimentos.csv</code></b>, una fila por alimento. Se abre con Excel (o con el Bloc de notas): el separador es el punto y coma y los decimales van con punto (3.5). Si Excel lo guarda con coma decimal (3,5) también vale: el programa entiende las dos.</p>
 <div class="tscroll"><table><thead><tr><th>Columna</th><th>Qué poner</th></tr></thead><tbody><tr><td><code>nombre</code></td><td>Tal cual lo vas a escribir en los platos. Si lo cambias, cámbialo también en los platos</td></tr><tr><td><code>kcal</code>, <code>proteina</code>, <code>grasa</code>, <code>carbohidrato</code></td><td>Por 100 g. Obligatorios</td></tr><tr><td><code>azucares</code>, <code>fibra</code>, <code>sal</code>, <code>saturadas</code></td><td>Por 100 g, de la etiqueta. Déjalos vacíos si aún no los tienes: vacío significa «no lo sé», no cero</td></tr><tr><td><code>formato_g</code></td><td>Gramos del envase que compras (1000 para un kilo, 570 para un bote…)</td></tr><tr><td><code>precio_eur</code></td><td>Lo que cuesta ese envase</td></tr><tr><td><code>grupo</code></td><td><code>carb</code>, <code>grasa</code> o <code>prot</code> si debe escalar con el bloque; <code>fijo</code> si no</td></tr><tr><td><code>seccion</code></td><td>Pasillo del súper: Frutería, Carnicería, Pescadería, Huevos y lácteos, Refrigerados, Congelados, Conservas y despensa o Panadería</td></tr><tr><td><code>nova</code></td><td>Grado de procesado, de 1 a 4 (ver más abajo)</td></tr><tr><td><code>fuente</code></td><td><code>f</code> si el precio lo has visto en tienda (sale con punto verde en la compra), <code>e</code> si es estimación</td></tr><tr><td><code>rol</code></td><td>Qué papel juega en un plato: <code>base</code>, <code>proteina</code>, <code>verdura</code>, <code>grasa</code>, <code>fruta</code> o <code>lacteo</code>. Lo usa <code>generar.py</code> para no combinar cualquier cosa con cualquier cosa</td></tr><tr><td><code>notas</code></td><td>Lo que quieras recordar</td></tr></tbody></table></div>
@@ -1520,7 +1560,7 @@ python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"</code></pr
 <h4>Precios</h4>
 <p><code>datos/alimentos.csv</code>, columna <code>precio_eur</code>. La lista de la compra y el total semanal se recalculan solos.</p>
 <hr>
-<h3>5. La pestaña Menús (v2.1)</h3>
+<h3>5. La pestaña Menús (v2.3)</h3>
 <p>Una pantalla por día con todas las comidas en orden. Arriba, lo que llevas comido frente al objetivo del día; debajo, cada toma con su hora, su plato y sus kcal.</p>
 <h4>Qué día y qué bloque</h4>
 <ul><li>Se abre en <b>hoy</b>. Con las flechas pasas de día.</li><li>El <b>bloque</b> sale solo de la fecha de inicio que pones en el Registro. Si no la has puesto, lo eliges en el desplegable.</li><li>El <b>tipo de día</b> sale del día de la semana (lunes A, martes B...). Si un día cambia tu plan, por ejemplo porque no entrenas, cámbialo en el desplegable y los objetivos se ajustan.</li></ul>
@@ -1532,10 +1572,15 @@ python3 menu/generar.py comida --guardar 3 --nombre "Patata con pavo"</code></pr
 <ol><li>Apunta la cámara al código. Si no hay cámara o no das permiso, toca <b>Escribir el código</b> y pon los números de debajo de las barras.</li><li>La app lo busca, por este orden: en tus productos (si ya lo tienes, abre su ficha), en el catálogo de las tiendas y en <b>Open Food Facts</b>, una base abierta con millones de productos (necesita internet). Si no está en ningún sitio, copias los datos de la etiqueta.</li><li>En la ficha sale un <b>nombre sugerido</b>: cámbialo si quieres. Eliges la <b>etiqueta</b> (Tuyo, Mercadona, Lidl, Carrefour) o creas otra con <b>+ Nueva</b> (Dia, Alcampo...), que queda guardada para la próxima vez. Revisa kcal, proteína, grasa e hidratos <b>por 100 g</b>: si las kcal no cuadran con los macros, te avisa. Si dejas las kcal vacías, las calcula.</li><li><b>Guardar</b> o <b>Guardar y añadir a</b> la comida que tenías abierta.</li></ol>
 <p>En la tarjeta, <b>Ver la lista</b> enseña tus productos; tocas uno para corregirlo o borrarlo (hay que tocar Borrar dos veces). En los platos entra como «Nombre (Tienda)»; los de la etiqueta Tuyo, sin apellido.</p>
 <ul><li><b>Dónde se guarda:</b> en el móvil, en <code>mis_productos_v1</code>, muy corto: código, nombre, etiqueta, los cuatro números y la fecha. Mil productos ocupan menos de 100 KB. Entran en <b>Guardar copia</b> y <b>Recuperar copia</b>.</li><li><b>Qué lee:</b> EAN-13, EAN-8 y UPC, los de cualquier producto de supermercado. Comprueba el dígito de control, así que una lectura mal hecha no se cuela.</li><li><b>En cada aparato:</b> en Android con Chrome usa el lector del propio móvil. En iPhone, en PC y en el resto usa <code>docs/vendor/quagga.min.js</code> (Quagga2, licencia MIT), que se guarda con la app y funciona sin conexión. La cámara solo abre en la app instalada (https); abriendo el archivo suelto se escribe el código a mano.</li><li>Lo que llega de Open Food Facts lo escribe gente voluntaria: revisa que cuadre con la etiqueta antes de guardar.</li></ul>
+<h4>Mis platos (v2.3)</h4>
+<p>Para crear platos tuyos sin tocar el CSV. Se entra por <b>+ Nuevo plato</b> en la tarjeta Mis platos, o por <b>+ Crear un plato nuevo</b> al final de la lista de platos de cualquier toma.</p>
+<ol><li>Ponle <b>nombre</b>, elige la <b>toma</b> (cualquiera: pre-entreno, desayuno, comida, cena, frutos secos, potito, turno o antes de dormir) y busca los <b>ingredientes</b> con sus gramos. Solo salen los alimentos de tu plan (<code>datos/alimentos.csv</code>), para que el plato pueda entrar en el CSV sin tocar nada más. Si falta alguno, añádelo antes al CSV (sección 4).</li><li>Debajo ves lo que suma tu receta y lo que rondan los demás platos de esa toma.</li><li>Al tocar <b>Guardar</b> sale la revisión: tus gramos al lado de las <b>cantidades lógicas</b>, que son las que dejan el plato en la media de su toma sin cambiar su forma (la misma calculadora de raciones: la verdura no se toca y la proteína se mantiene). Te dice si tu versión encaja con el resto de platos, si alguna ración es rara y si el plato movería la media tanto que otro plato del plan se saldría del margen.</li><li>Eliges <b>Guardar las lógicas</b> o <b>Guardar las mías</b>. Las tuyas se pueden usar igual en la app, pero si no encajan no se exportan al CSV hasta que las ajustes.</li></ol>
+<p>El plato se puede elegir <b>al momento</b> en su toma, con la etiqueta «tuyo»; los de comida y cena valen para las dos, como los del plan. En la tarjeta, <b>Ver la lista</b> enseña tus platos con su toma y si encajan; tocas uno para cambiarlo o borrarlo (hay que tocar Borrar dos veces). <b>Exportar para el CSV</b> descarga los que encajan y te recuerda cómo importarlos.</p>
+<ul><li><b>Dónde se guarda:</b> en el móvil, en <code>mis_platos_v1</code>: toma, nombre, ingredientes con sus gramos, notas y fecha. Entra en <b>Guardar copia</b> y <b>Recuperar copia</b>.</li><li><b>De dónde sale la media:</b> <code>M.base</code> en <code>menu/payload3.py</code>, la media de las recetas de cada toma tal cual están en <code>datos/platos.csv</code>. Es la misma cuenta que hace <code>ver_platos.py</code>, así que lo que la app da por bueno, la importación también.</li></ul>
 <h4>El margen y el arrastre</h4>
 <p>Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las tomas pequeñas). Si te pasas o te quedas corto y la comes así, no pasa nada: al pulsar <b>Hecho, lo he comido</b> la diferencia se reparte entre las tomas que quedan del día, en proporción a su tamaño. Lo que decide es el total del día y la media de la semana.</p>
 <h4>El diario y el peso</h4>
-<ul><li>Lo que confirmas se guarda en el móvil. Se guardan <b>14 días con detalle</b>; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.</li><li><b>Peso de hoy</b> se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.</li><li><b>Guardar copia</b> descarga el diario (y Mis productos) en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; <b>Recuperar copia</b> lo restaura en cualquier móvil.</li></ul>
+<ul><li>Lo que confirmas se guarda en el móvil. Se guardan <b>14 días con detalle</b>; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.</li><li><b>Peso de hoy</b> se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.</li><li><b>Guardar copia</b> descarga el diario (y Mis productos y Mis platos) en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; <b>Recuperar copia</b> lo restaura en cualquier móvil.</li></ul>
 <h4>Cómo funciona la cuenta</h4>
 <p><code>menu/calculadora.js</code> busca, por mínimos cuadrados con límites, los gramos que más se acercan al objetivo sin deformar el plato. Importan, por este orden, las kcal, la proteína (como mínimo, no como techo) y después la grasa y el hidrato. Cada alimento se queda dentro de su ración razonable (<code>RACION</code> en <code>menu/generar.py</code>). Es aritmética exacta: siempre da lo mismo.</p>
 <p><code>menu/calculadora.py</code> es la misma cuenta en Python. La usa la verificación para probar todos los platos en todas las tomas, bloques y tipos de día, y comprueba que las dos dan exactamente lo mismo.</p>
@@ -1610,13 +1655,13 @@ python3 catalogo/actualizar_catalogo.py --solo M   # solo Mercadona (unos 2 minu
 <ul><li><b>Nunca se vacía.</b> Si una fuente falla o trae menos de la mitad de productos que la vez anterior, se conservan sus datos anteriores y queda anotado en <code>fuentes</code> dentro del propio archivo.</li><li><b>Datos dudosos.</b> Si las kcal de un producto no cuadran con sus macros (4/4/9, ±15 %), se marca como dudoso en vez de esconderlo: la app lo enseña con un aviso.</li><li><b>Open Food Facts lo rellenan usuarios.</b> Están los productos más escaneados de cada tienda, no todos. Lo que falte se podrá añadir desde la app con el escáner.</li><li>Las piezas están separadas para cambiar una fuente sin tocar las demás: <code>catalogo/fuente_mercadona.py</code>, <code>catalogo/fuente_openFood.py</code>, <code>catalogo/comun.py</code> (descarga, formato y control de calidad) y <code>catalogo/actualizar_catalogo.py</code> (el que lo une todo).</li></ul>
 <hr>
 <h3>11. Versiones</h3>
-<div class="tscroll"><table><thead><tr><th>Versión</th><th>Qué trae</th></tr></thead><tbody><tr><td>v1.0</td><td>Siete pestañas, menús por tipo de día, Registro y app instalable</td></tr><tr><td>v1.1</td><td>Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin</td></tr><tr><td>v2.0</td><td>Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia</td></tr><tr><td>v2.1</td><td>Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil</td></tr><tr><td>v2.2</td><td>Base de ejercicios propia (<code>datos/ejercicios.csv</code>) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno</td></tr></tbody></table></div>
-<p><i>Versión del sistema: v2.2, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.</i></p></div></section>
+<div class="tscroll"><table><thead><tr><th>Versión</th><th>Qué trae</th></tr></thead><tbody><tr><td>v1.0</td><td>Siete pestañas, menús por tipo de día, Registro y app instalable</td></tr><tr><td>v1.1</td><td>Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin</td></tr><tr><td>v2.0</td><td>Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia</td></tr><tr><td>v2.1</td><td>Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil</td></tr><tr><td>v2.2</td><td>Base de ejercicios propia (<code>datos/ejercicios.csv</code>) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno</td></tr><tr><td>v2.3</td><td>Mis platos: crear platos en la app con sus cantidades lógicas, y <code>actualizar.py --importar</code> para pasarlos a <code>datos/platos.csv</code></td></tr></tbody></table></div>
+<p><i>Versión del sistema: v2.3, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.</i></p></div></section>
 </div>
 </div>
 </main>
 <div class="sello">
-  versión 1c88673f, 15 de octubre de 2026
+  versión 3a10f259, 16 de octubre de 2026
 </div>
 <script>
 
@@ -1664,7 +1709,7 @@ if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
 (function(){
 var ROOT=document.getElementById('s-menus');
 var $=function(id){return ROOT.querySelector('#'+id);};
-const M = {"foods":{"Aceite de oliva virgen ex.":[900.0,0.0,100.0,0.0,"grasa","B","−5 procesado: NOVA 2, ingrediente culinario. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0 g/100 g. −15 grasa saturada alto: 14 g/100 g",5,28],"Aguacate":[160.0,2.0,15.0,2.0,"grasa","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.7 g/100 g. ±0 sal bajo: 0.01 g/100 g. −6 grasa saturada medio: 2.1 g/100 g. +8 fibra: 6.7 g/100 g",50,150],"Almendras":[600.0,21.0,53.0,5.0,"grasa","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 4.4 g/100 g. ±0 sal bajo: 0 g/100 g. −6 grasa saturada medio: 4 g/100 g. +8 fibra: 12.5 g/100 g",15,50],"Alubias cocidas (bote)":[100.0,7.0,0.6,15.0,"base","","Faltan datos de la etiqueta",200,395],"Arroz redondo Hacendado":[344.0,8.2,1.0,75.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0.2 g/100 g",50,220],"Atún claro al natural":[110.0,25.0,1.0,0.0,"proteina","","Faltan datos de la etiqueta",80,135],"Batata doce congelada":[163.0,1.6,5.0,26.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 9.5 g/100 g. ±0 sal bajo: 0.3 g/100 g. ±0 grasa saturada bajo: 0.5 g/100 g. +4 fibra: 3.2 g/100 g",80,345],"Batido proteínas (botella)":[60.0,6.0,1.5,5.5,"proteina","","Faltan datos de la etiqueta",330,330],"Bolsita de fruta":[65.0,0.4,0.2,15.0,"fruta","","Faltan datos de la etiqueta",100,200],"Carne picada vacuno y cerdo":[230.0,18.0,17.0,0.5,"proteina","C","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.3 g/100 g. −8 sal medio: 1.2 g/100 g. −15 grasa saturada alto: 7 g/100 g",100,250],"Champiñón laminado":[22.0,3.0,0.3,1.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.05 g/100 g",100,250],"Claras de huevo (brik)":[48.0,11.0,0.2,0.7,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.7 g/100 g. −8 sal medio: 0.4 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",100,300],"Copos de avena Hacendado":[375.0,13.5,7.0,59.9,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 1 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 1.3 g/100 g. +8 fibra: 10 g/100 g",30,60],"Creatina monohidrato":[0.0,0.0,0.0,0.0,"lacteo","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",3,10],"Crema de cacahuete":[600.0,25.0,50.0,12.0,"grasa","","Faltan datos de la etiqueta",8,35],"Fajitas 100% integrales":[271.0,9.3,5.8,41.0,"base","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 2.1 g/100 g. −8 sal medio: 1.5 g/100 g. −6 grasa saturada medio: 1.9 g/100 g. +8 fibra: 8.5 g/100 g",100,500],"Filete de pavo":[105.0,22.0,1.5,0.0,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0.15 g/100 g. ±0 grasa saturada bajo: 0.4 g/100 g",110,215],"Fuet":[440.0,25.0,37.0,2.0,"grasa","D","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 1 g/100 g. −20 sal alto: 4 g/100 g. −15 grasa saturada alto: 14 g/100 g",15,40],"Garbanzos cocidos (bote)":[120.0,7.0,2.5,16.0,"base","","Faltan datos de la etiqueta",200,560],"Gazpacho (brik)":[40.0,0.8,2.5,3.5,"verdura","","Faltan datos de la etiqueta",150,300],"Guisantes congelados":[80.0,5.5,0.4,11.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3.5 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 0.1 g/100 g. +4 fibra: 5 g/100 g",100,220],"Huevos":[150.0,12.5,11.1,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. −8 sal medio: 0.4 g/100 g. −6 grasa saturada medio: 3.1 g/100 g",60,200],"Jamón serrano (lonchas)":[245.0,31.0,13.0,0.5,"proteina","C","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.5 g/100 g. −20 sal alto: 4.5 g/100 g. −6 grasa saturada medio: 4.5 g/100 g",20,80],"Judías verdes congeladas":[31.0,1.9,0.2,4.2,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",100,250],"Kéfir natural":[74.0,3.9,4.2,5.1,"lacteo","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.3 g/100 g. ±0 sal bajo: 0.1 g/100 g. −6 grasa saturada medio: 2.9 g/100 g",125,375],"Leche semidesnatada":[46.0,3.2,1.6,4.8,"lacteo","","Faltan datos de la etiqueta",150,450],"Lentejas cocidas (bote)":[95.0,7.0,0.5,14.0,"base","","Faltan datos de la etiqueta",200,560],"Manzana":[52.0,0.3,0.2,12.0,"fruta","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 10.4 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0.03 g/100 g",100,250],"Merluza congelada":[82.0,18.0,1.2,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.2 g/100 g. ±0 grasa saturada bajo: 0.3 g/100 g",120,215],"Nueces":[654.0,15.0,65.0,7.0,"grasa","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.6 g/100 g. ±0 sal bajo: 0 g/100 g. −15 grasa saturada alto: 6.1 g/100 g. +8 fibra: 6.7 g/100 g",15,50],"Pan de semillas":[271.0,11.0,5.1,43.0,"base","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 2.6 g/100 g. −8 sal medio: 1 g/100 g. ±0 grasa saturada bajo: 0.7 g/100 g. +8 fibra: 6.2 g/100 g",30,110],"Pasta integral":[350.0,13.0,2.5,63.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 0.5 g/100 g. +8 fibra: 8 g/100 g",50,220],"Patata":[80.0,2.0,0.1,17.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.8 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.02 g/100 g",150,700],"Pavo en lonchas":[124.0,20.0,5.0,1.0,"proteina","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 0 g/100 g. −8 sal medio: 0.4 g/100 g. −6 grasa saturada medio: 1.7 g/100 g",60,130],"Pechuga de pollo":[108.0,22.0,1.8,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0.2 g/100 g. ±0 grasa saturada bajo: 0.6 g/100 g",110,215],"Pimiento y cebolla":[30.0,1.0,0.2,5.5,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 4 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.03 g/100 g",100,250],"Plátano":[89.0,1.1,0.3,20.0,"fruta","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 12.2 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0.1 g/100 g",80,110],"Proteína en polvo":[366.0,78.0,3.3,6.3,"proteina","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 5 g/100 g. −8 sal medio: 0.79 g/100 g. −6 grasa saturada medio: 2.4 g/100 g",10,35],"Queso rallado (ingred.)":[380.0,26.0,29.0,2.0,"grasa","","Faltan datos de la etiqueta",8,35],"Salmón congelado hacendado":[223.0,20.0,16.0,0.0,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0.1 g/100 g. −6 grasa saturada medio: 2.3 g/100 g",110,200],"Ternera magra (babilla)":[130.0,21.0,5.0,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.2 g/100 g. −6 grasa saturada medio: 2.3 g/100 g",100,190],"Tomate cherry":[20.0,1.0,0.2,3.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.8 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.03 g/100 g",80,200],"Tomate frito Hacendado":[74.0,1.4,3.2,9.2,"verdura","D","−35 procesado: NOVA 4, ultraprocesado. −10 azúcares medio: 7.1 g/100 g. −8 sal medio: 1.1 g/100 g. ±0 grasa saturada bajo: 0.4 g/100 g",100,250],"Tortitas de arroz integral":[380.0,8.0,2.8,80.0,"base","B","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 0.6 g/100 g. +4 fibra: 3.5 g/100 g",15,60],"Verdura congelada":[40.0,2.5,0.4,5.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.5 g/100 g. ±0 sal bajo: 0.05 g/100 g. ±0 grasa saturada bajo: 0.1 g/100 g. +4 fibra: 3 g/100 g",100,250],"Verduras asadas (batch)":[45.0,1.5,2.0,5.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3.5 g/100 g. ±0 sal bajo: 0.1 g/100 g. ±0 grasa saturada bajo: 0.3 g/100 g",100,250],"Yogur natural":[60.0,4.0,3.0,4.5,"lacteo","","Faltan datos de la etiqueta",125,375],"Zumo de naranja exprimido":[45.0,0.7,0.2,10.4,"fruta","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 8.4 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",150,250],"Ñoquis de patata":[174.0,4.5,0.4,37.6,"base","B","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.2 g/100 g. −8 sal medio: 0.9 g/100 g. ±0 grasa saturada bajo: 0.2 g/100 g",150,500]},"bloques":{"P":{"n":"Pre-entreno","hora":"06:30","nota":"En casa, 15 min antes de salir","ops":[{"n":"Plátano y batido","it":[["Plátano",100],["Proteína en polvo",13],["Tortitas de arroz integral",30]]},{"n":"Avena líquida","it":[["Leche semidesnatada",250],["Copos de avena Hacendado",22],["Tortitas de arroz integral",20]]},{"n":"De bolsillo","it":[["Pan de semillas",50],["Crema de cacahuete",9],["Proteína en polvo",10]]}]},"D":{"n":"Desayuno post-entreno","hora":"08:45","nota":"En casa, al volver del entreno","ops":[{"n":"Tortitas de avena","it":[["Copos de avena Hacendado",55],["Claras de huevo (brik)",150],["Huevos",65],["Leche semidesnatada",150],["Plátano",100],["Pan de semillas",100],["Jamón serrano (lonchas)",50],["Aceite de oliva virgen ex.",10],["Crema de cacahuete",20],["Creatina monohidrato",5],["Zumo de naranja exprimido",200]]},{"n":"Salado","it":[["Huevos",180],["Jamón serrano (lonchas)",60],["Fuet",20],["Pan de semillas",100],["Aceite de oliva virgen ex.",15],["Yogur natural",250],["Plátano",100],["Creatina monohidrato",5],["Zumo de naranja exprimido",200]]},{"n":"Batido con prisa","it":[["Leche semidesnatada",150],["Kéfir natural",200],["Copos de avena Hacendado",55],["Plátano",100],["Crema de cacahuete",20],["Proteína en polvo",30],["Creatina monohidrato",5],["Huevos",120],["Pan de semillas",100],["Zumo de naranja exprimido",200]]},{"n":"Avena con kéfir","it":[["Copos de avena Hacendado",55],["Leche semidesnatada",150],["Kéfir natural",210],["Proteína en polvo",20],["Creatina monohidrato",5],["Huevos",120],["Pan de semillas",100],["Aceite de oliva virgen ex.",10],["Jamón serrano (lonchas)",30],["Plátano",100],["Zumo de naranja exprimido",200]]}]},"S1":{"n":"Frutos secos","hora":"17:00","nota":"1 bolsita, en la mochila","ops":[{"n":"Nueces","it":[["Nueces",40]]},{"n":"Almendras","it":[["Almendras",40]]},{"n":"Mezcla","it":[["Nueces",20],["Almendras",20]]}]},"S2":{"n":"Potito de fruta","hora":"19:30","nota":"1 potito, en la mochila","ops":[{"n":"Bolsita de fruta","it":[["Bolsita de fruta",100]]},{"n":"Bolsita grande","it":[["Bolsita de fruta",120]]},{"n":"Plátano","it":[["Plátano",95]]}]},"T2":{"n":"Segunda parada del turno","hora":"21:00","nota":"Solo el sábado, turno de 9 h","ops":[{"n":"Frutos secos y bocadillo","it":[["Nueces",30],["Bolsita de fruta",100],["Tortitas de arroz integral",30],["Pan de semillas",80],["Pavo en lonchas",50]]},{"n":"Botella y bocadillo","it":[["Batido proteínas (botella)",330],["Almendras",20],["Tortitas de arroz integral",30],["Pan de semillas",80],["Pavo en lonchas",50]]},{"n":"Fruta, almendras y bocadillo","it":[["Almendras",30],["Manzana",200],["Tortitas de arroz integral",30],["Pan de semillas",80],["Pavo en lonchas",50]]}]},"T":{"n":"Kit de turno de bar","hora":"01:00","nota":"En la mochila del trabajo","ops":[{"n":"Frutos secos, batido y bocadillo","it":[["Nueces",32],["Plátano",100],["Proteína en polvo",20],["Tortitas de arroz integral",30],["Pan de semillas",80],["Jamón serrano (lonchas)",40]]},{"n":"Botella, almendras y bocadillo","it":[["Batido proteínas (botella)",330],["Almendras",28],["Bolsita de fruta",100],["Tortitas de arroz integral",30],["Pan de semillas",80],["Jamón serrano (lonchas)",40]]},{"n":"Mezcla y bocadillo","it":[["Almendras",25],["Nueces",15],["Manzana",200],["Proteína en polvo",16],["Tortitas de arroz integral",30],["Pan de semillas",80],["Jamón serrano (lonchas)",40]]}]},"Z":{"n":"Antes de dormir","hora":"04:15","nota":"Al llegar del turno","ops":[{"n":"Kéfir con nueces","it":[["Kéfir natural",150],["Proteína en polvo",8],["Nueces",14]]},{"n":"Leche","it":[["Leche semidesnatada",300],["Proteína en polvo",19]]},{"n":"Yogur","it":[["Yogur natural",250],["Proteína en polvo",18]]}]}},"principales":[{"n":"Ñoquis con pollo","de":"C","it":[["Ñoquis de patata",260],["Pan de semillas",80],["Pechuga de pollo",185],["Verdura congelada",200],["Queso rallado (ingred.)",15],["Aceite de oliva virgen ex.",18]]},{"n":"Lentejas con huevo","de":"C","it":[["Lentejas cocidas (bote)",250],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Huevos",180],["Verdura congelada",150],["Aceite de oliva virgen ex.",24]]},{"n":"Pasta con ternera","de":"C","it":[["Pasta integral",110],["Tomate frito Hacendado",100],["Pan de semillas",80],["Ternera magra (babilla)",170],["Champiñón laminado",150],["Queso rallado (ingred.)",15],["Aceite de oliva virgen ex.",10]]},{"n":"Batata con pollo","de":"C","it":[["Batata doce congelada",260],["Pan de semillas",80],["Pechuga de pollo",210],["Guisantes congelados",120],["Aceite de oliva virgen ex.",15]]},{"n":"Arroz con salmón","de":"C","it":[["Arroz redondo Hacendado",110],["Pan de semillas",80],["Salmón congelado hacendado",200],["Verdura congelada",200],["Aceite de oliva virgen ex.",5]]},{"n":"Pollo con patata y arroz","de":"C","it":[["Patata",260],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Pechuga de pollo",210],["Verduras asadas (batch)",200],["Aceite de oliva virgen ex.",20]]},{"n":"Garbanzos con atún","de":"C","it":[["Garbanzos cocidos (bote)",260],["Patata",200],["Pan de semillas",80],["Atún claro al natural",110],["Verduras asadas (batch)",200],["Aceite de oliva virgen ex.",24]]},{"n":"Pasta con pollo","de":"C","it":[["Pasta integral",110],["Tomate frito Hacendado",100],["Pan de semillas",80],["Pechuga de pollo",170],["Champiñón laminado",200],["Aceite de oliva virgen ex.",15]]},{"n":"Arroz con pavo","de":"C","it":[["Arroz redondo Hacendado",110],["Pan de semillas",80],["Filete de pavo",215],["Verdura congelada",250],["Aceite de oliva virgen ex.",20]]},{"n":"Merluza con patata y arroz","de":"C","it":[["Patata",260],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Merluza congelada",195],["Guisantes congelados",220],["Aceite de oliva virgen ex.",25]]},{"n":"Garbanzos con pollo","de":"C","it":[["Garbanzos cocidos (bote)",260],["Patata",200],["Pan de semillas",80],["Pechuga de pollo",170],["Tomate cherry",200],["Aceite de oliva virgen ex.",15]]},{"n":"Batata con ternera","de":"C","it":[["Batata doce congelada",260],["Pan de semillas",80],["Ternera magra (babilla)",175],["Champiñón laminado",250],["Aceite de oliva virgen ex.",20]]},{"n":"Lentejas con pavo","de":"C","it":[["Lentejas cocidas (bote)",250],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Filete de pavo",130],["Verdura congelada",155],["Aceite de oliva virgen ex.",25]]},{"n":"Pasta con atún","de":"C","it":[["Pasta integral",110],["Tomate frito Hacendado",100],["Pan de semillas",80],["Atún claro al natural",135],["Tomate cherry",150],["Aceite de oliva virgen ex.",20]]},{"n":"Fajitas de pollo","de":"C","it":[["Fajitas 100% integrales",150],["Arroz redondo Hacendado",60],["Pechuga de pollo",200],["Pimiento y cebolla",250],["Tomate frito Hacendado",60],["Aceite de oliva virgen ex.",10]]},{"n":"Fajitas de carne picada","de":"C","it":[["Fajitas 100% integrales",150],["Arroz redondo Hacendado",50],["Carne picada vacuno y cerdo",170],["Pimiento y cebolla",250],["Tomate frito Hacendado",60],["Yogur natural",100]]},{"n":"Judías verdes con patata y huevo","de":"C","it":[["Judías verdes congeladas",250],["Patata",255],["Pan de semillas",75],["Arroz redondo Hacendado",50],["Huevos",65],["Claras de huevo (brik)",300],["Aceite de oliva virgen ex.",25]]},{"n":"Tortilla de patata con jamón","de":"C","it":[["Patata",255],["Pan de semillas",75],["Arroz redondo Hacendado",55],["Huevos",60],["Claras de huevo (brik)",195],["Jamón serrano (lonchas)",50],["Aceite de oliva virgen ex.",15],["Tomate cherry",200]]},{"n":"Tortilla francesa","de":"C","it":[["Huevos",65],["Claras de huevo (brik)",300],["Patata",265],["Pan de semillas",85],["Arroz redondo Hacendado",50],["Tomate cherry",200],["Aceite de oliva virgen ex.",20]]},{"n":"Gazpacho y pollo","de":"N","it":[["Gazpacho (brik)",250],["Pechuga de pollo",150],["Pan de semillas",85]]},{"n":"Arroz con pollo","de":"N","it":[["Arroz redondo Hacendado",70],["Pechuga de pollo",150],["Verdura congelada",150]]},{"n":"Atún y gazpacho","de":"N","it":[["Gazpacho (brik)",250],["Atún claro al natural",145],["Pan de semillas",85]]},{"n":"Alubias con huevo","de":"N","it":[["Alubias cocidas (bote)",240],["Huevos",130],["Verdura congelada",120]]},{"n":"Ñoquis con pollo","de":"N","it":[["Ñoquis de patata",170],["Pechuga de pollo",150],["Champiñón laminado",150]]},{"n":"Patata y huevos","de":"N","it":[["Patata",230],["Huevos",120],["Filete de pavo",100]]},{"n":"Merluza con batata","de":"N","it":[["Batata doce congelada",125],["Merluza congelada",210],["Guisantes congelados",150]]},{"n":"Pasta con pavo","de":"N","it":[["Pasta integral",60],["Tomate frito Hacendado",80],["Filete de pavo",130],["Guisantes congelados",110],["Aceite de oliva virgen ex.",5]]},{"n":"Arroz con merluza","de":"N","it":[["Arroz redondo Hacendado",55],["Merluza congelada",215],["Verdura congelada",180],["Aceite de oliva virgen ex.",5]]},{"n":"Patata con atún","de":"N","it":[["Patata",275],["Atún claro al natural",105],["Huevos",70],["Tomate cherry",180]]},{"n":"Garbanzos con pavo","de":"N","it":[["Garbanzos cocidos (bote)",270],["Filete de pavo",110],["Verdura congelada",100]]},{"n":"Lentejas con pollo","de":"N","it":[["Lentejas cocidas (bote)",300],["Pechuga de pollo",125],["Champiñón laminado",100]]},{"n":"Alubias con pavo","de":"N","it":[["Alubias cocidas (bote)",330],["Filete de pavo",110],["Champiñón laminado",100]]},{"n":"Ñoquis con ternera","de":"N","it":[["Ñoquis de patata",150],["Ternera magra (babilla)",130],["Champiñón laminado",250]]},{"n":"Ensalada de garbanzos con atún","de":"N","it":[["Garbanzos cocidos (bote)",295],["Atún claro al natural",95],["Pimiento y cebolla",100]]},{"n":"Patata con pollo y verduras asadas","de":"N","it":[["Patata",265],["Pechuga de pollo",155],["Verduras asadas (batch)",100],["Queso rallado (ingred.)",15]]},{"n":"Judías verdes con patata y huevo","de":"N","it":[["Judías verdes congeladas",195],["Patata",240],["Huevos",70],["Claras de huevo (brik)",250]]},{"n":"Tortilla de patata con jamón","de":"N","it":[["Patata",275],["Huevos",60],["Claras de huevo (brik)",225],["Jamón serrano (lonchas)",20],["Tomate cherry",80]]},{"n":"Tortilla francesa","de":"N","it":[["Huevos",60],["Claras de huevo (brik)",240],["Pan de semillas",85],["Tomate cherry",200]]}],"nombres":{"P":"Pre-entreno","D":"Desayuno post-entreno","C":"Comida","S1":"Frutos secos","S2":"Potito de fruta","N":"Cena","T2":"Segunda parada del turno","T":"Kit de turno de bar","Z":"Antes de dormir"},"horas":{"P":"06:30","D":"08:45","C":"14:00","S1":"17:00","S2":"19:30","N":"22:00","T2":"21:00","T":"01:00","Z":"04:15"},"orden":["P","D","C","S1","S2","N","T2","T","Z"],"fases":{"B0":{"n":"Rearranque","f":"Sem 1-4","obj":[3050,170,80,413],"s0":1,"s1":4},"B1":{"n":"Construcción I","f":"Sem 5-12","obj":[3300,175,85,459],"s0":5,"s1":12},"B2":{"n":"Fuerza","f":"Sem 13-17","obj":[3300,178,90,445],"s0":13,"s1":17},"B3":{"n":"Construcción II","f":"Sem 18-23","obj":[3500,185,92,483],"s0":18,"s1":23},"B4":{"n":"Definición","f":"Sem 24-35","obj":[2950,200,72,375],"s0":24,"s1":35},"B5":{"n":"Pico","f":"Sem 36-39","obj":[3050,190,76,401],"s0":36,"s1":39}},"tipos":{"A":{"n":"Fuerza + universidad por la tarde","d":"Lunes y miércoles","mult":0.91,"tomas":["P","D","C","S1","S2","N"]},"B":{"n":"Carrera + universidad desde 12:30","d":"Martes y jueves","mult":1.0,"tomas":["P","D","C","S1","S2","N"]},"C":{"n":"Entreno + universidad + turno","d":"Viernes","mult":1.07,"tomas":["P","D","C","S1","S2","N","T"]},"D":{"n":"Tirada larga + turno de 9 h","d":"Sábado","mult":1.21,"tomas":["P","D","C","S1","S2","T2","T","Z"]},"E":{"n":"Descanso total","d":"Domingo","mult":0.88,"tomas":["D","C","S1","S2","N"]}},"obj":{"B0|A":{"P":[230.0,12.6,4.2,34.4],"D":[1095.2,61.1,38.8,122.2],"C":[908.7,51.3,21.2,120.3],"S1":[83.6,2.4,7.9,0.8],"S2":[75.1,0.6,0.2,17.1],"N":[420.0,34.5,8.2,48.3]},"B0|B":{"P":[249.0,13.0,4.4,38.4],"D":[1134.9,63.2,39.7,128.1],"C":[1042.9,56.3,22.9,143.9],"S1":[93.6,2.7,8.8,0.9],"S2":[75.1,0.6,0.2,17.1],"N":[488.4,38.0,8.9,59.7]},"B0|C":{"P":[227.7,12.5,4.2,34.0],"D":[1085.1,61.0,38.7,119.8],"C":[846.3,49.5,19.6,110.4],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[398.2,33.8,8.0,44.2],"T":[582.5,31.5,14.7,78.4]},"B0|D":{"P":[234.0,12.6,4.2,35.4],"D":[1113.2,63.8,39.5,122.4],"C":[935.3,55.7,21.1,122.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[534.7,25.6,13.1,76.7],"T":[621.5,35.1,15.6,82.6],"Z":[187.2,17.8,7.8,11.9]},"B0|E":{"D":[1113.2,61.3,38.8,126.5],"C":[980.1,53.7,20.9,135.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[462.4,36.1,8.7,55.9]},"B1|A":{"P":[249.0,13.0,4.4,38.4],"D":[1120.5,61.5,38.9,128.1],"C":[1016.1,54.9,21.3,142.3],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[478.4,36.7,8.8,58.9]},"B1|B":{"P":[264.6,13.5,4.5,41.4],"D":[1165.8,64.1,40.8,132.5],"C":[1150.0,59.7,25.4,160.8],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[535.0,40.2,9.4,67.5]},"B1|C":{"P":[242.6,12.9,4.3,37.0],"D":[1111.5,61.3,38.8,126.1],"C":[976.8,53.6,20.9,135.0],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[459.3,36.0,8.6,55.4],"T":[626.0,32.2,15.7,86.3]},"B1|D":{"P":[259.1,13.4,4.5,40.1],"D":[1143.6,64.2,39.5,129.9],"C":[1085.7,60.0,22.3,151.9],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[578.3,26.0,12.5,88.4],"T":[672.2,34.9,16.0,94.6],"Z":[181.1,16.5,7.7,11.8]},"B1|E":{"D":[1139.6,61.8,39.0,132.6],"C":[1107.1,57.6,22.1,159.7],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[523.5,38.5,9.3,66.8]},"B2|A":{"P":[249.0,13.0,4.4,38.4],"D":[1131.6,62.2,40.5,126.4],"C":[1016.5,54.1,24.0,137.4],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[467.1,36.4,8.8,56.6]},"B2|B":{"P":[264.6,13.5,4.5,41.4],"D":[1173.2,64.9,41.2,132.6],"C":[1148.1,60.5,25.8,158.8],"S1":[125.4,3.6,11.8,1.2],"S2":[75.1,0.6,0.2,17.1],"N":[531.9,40.9,9.5,66.1]},"B2|C":{"P":[242.6,12.9,4.3,37.0],"D":[1112.3,61.7,39.8,123.6],"C":[957.6,52.4,22.9,127.2],"S1":[83.6,2.4,7.9,0.8],"S2":[75.1,0.6,0.2,17.1],"N":[440.5,35.2,8.4,52.0],"T":[624.5,32.5,16.6,83.5]},"B2|D":{"P":[245.2,12.8,4.3,37.7],"D":[1145.2,66.3,39.9,127.0],"C":[1037.9,60.9,22.1,139.9],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[564.2,26.8,12.7,83.8],"T":[666.3,37.3,16.4,89.7],"Z":[193.3,19.1,7.8,12.0]},"B2|E":{"D":[1145.9,62.3,40.0,131.2],"C":[1097.6,56.9,23.8,154.5],"S1":[93.6,2.7,8.8,0.9],"S2":[75.1,0.6,0.2,17.1],"N":[510.3,38.0,9.1,64.4]},"B3|A":{"P":[263.9,13.4,4.5,41.3],"D":[1152.5,62.5,40.6,131.2],"C":[1110.6,57.0,24.8,155.2],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[513.0,38.1,9.1,65.0]},"B3|B":{"P":[260.9,13.3,4.5,40.8],"D":[1202.4,67.4,42.9,133.6],"C":[1185.0,63.6,27.4,161.0],"S1":[125.4,3.6,11.8,1.2],"S2":[75.1,0.6,0.2,17.1],"N":[549.6,43.3,9.7,67.4]},"B3|C":{"P":[249.0,13.0,4.4,38.4],"D":[1134.0,62.1,39.9,128.4],"C":[1044.4,54.9,23.9,143.3],"S1":[104.5,3.0,9.9,1.0],"S2":[75.1,0.6,0.2,17.1],"N":[482.3,36.9,8.8,59.5],"T":[661.5,33.3,16.9,91.2]},"B3|D":{"P":[260.9,13.3,4.5,40.8],"D":[1170.3,66.5,39.9,133.3],"C":[1156.7,63.8,24.1,161.2],"S1":[83.6,2.4,7.9,0.8],"S2":[75.1,0.6,0.2,17.1],"T2":[609.4,27.9,13.8,91.3],"T":[714.9,37.9,18.1,97.1],"Z":[193.3,19.1,7.8,12.0]},"B3|E":{"D":[1166.3,64.1,40.8,132.6],"C":[1147.6,59.0,25.2,161.2],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[533.5,39.8,9.4,67.7]},"B4|A":{"P":[226.1,12.3,4.1,34.0],"D":[1105.1,66.1,39.9,117.1],"C":[839.3,56.0,20.5,100.7],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[404.6,39.1,8.3,40.0]},"B4|B":{"P":[233.0,13.8,4.3,33.9],"D":[1151.7,70.9,40.8,122.0],"C":[968.0,64.5,22.2,119.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[470.3,45.1,9.1,48.3]},"B4|C":{"P":[209.0,12.0,4.0,30.4],"D":[1093.9,65.8,39.9,114.6],"C":[783.5,53.6,20.0,90.8],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[374.6,37.6,8.0,35.0],"T":[593.2,37.0,16.7,71.2]},"B4|D":{"P":[223.7,13.5,4.1,32.2],"D":[1120.0,69.1,40.2,117.1],"C":[853.8,58.9,21.1,100.0],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[510.3,27.6,13.5,67.8],"T":[633.0,39.7,17.6,76.2],"Z":[192.3,19.1,7.8,11.9]},"B4|E":{"D":[1124.8,66.4,39.9,121.6],"C":[940.8,59.2,21.4,119.9],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[449.6,40.7,8.7,48.4]},"B5|A":{"P":[227.7,12.5,4.2,34.0],"D":[1113.3,64.8,39.5,121.4],"C":[916.5,55.9,20.9,118.4],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[435.2,38.2,8.5,47.8]},"B5|B":{"P":[245.2,12.8,4.3,37.7],"D":[1145.4,67.1,40.1,125.9],"C":[1030.4,62.5,22.3,136.1],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[495.9,43.1,9.2,55.9]},"B5|C":{"P":[223.9,12.4,4.1,33.4],"D":[1099.2,63.7,39.4,119.1],"C":[860.0,53.5,20.2,108.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[407.7,36.6,8.2,43.3],"T":[602.3,34.8,15.5,78.3]},"B5|D":{"P":[232.2,13.6,4.1,34.1],"D":[1110.5,66.5,39.9,117.8],"C":[862.3,57.4,20.8,104.3],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[519.2,26.8,13.3,71.1],"T":[623.7,38.7,16.5,77.3],"Z":[193.3,19.1,7.8,12.0]},"B5|E":{"D":[1128.5,65.1,39.5,124.9],"C":[985.9,58.0,21.5,131.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[468.4,39.4,8.8,53.9]}}};
+const M = {"foods":{"Aceite de oliva virgen ex.":[900.0,0.0,100.0,0.0,"grasa","B","−5 procesado: NOVA 2, ingrediente culinario. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0 g/100 g. −15 grasa saturada alto: 14 g/100 g",5,28],"Aguacate":[160.0,2.0,15.0,2.0,"grasa","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.7 g/100 g. ±0 sal bajo: 0.01 g/100 g. −6 grasa saturada medio: 2.1 g/100 g. +8 fibra: 6.7 g/100 g",50,150],"Almendras":[600.0,21.0,53.0,5.0,"grasa","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 4.4 g/100 g. ±0 sal bajo: 0 g/100 g. −6 grasa saturada medio: 4 g/100 g. +8 fibra: 12.5 g/100 g",15,50],"Alubias cocidas (bote)":[100.0,7.0,0.6,15.0,"base","","Faltan datos de la etiqueta",200,395],"Arroz redondo Hacendado":[344.0,8.2,1.0,75.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0.2 g/100 g",50,220],"Atún claro al natural":[110.0,25.0,1.0,0.0,"proteina","","Faltan datos de la etiqueta",80,135],"Batata doce congelada":[163.0,1.6,5.0,26.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 9.5 g/100 g. ±0 sal bajo: 0.3 g/100 g. ±0 grasa saturada bajo: 0.5 g/100 g. +4 fibra: 3.2 g/100 g",80,345],"Batido proteínas (botella)":[60.0,6.0,1.5,5.5,"proteina","","Faltan datos de la etiqueta",330,330],"Bolsita de fruta":[65.0,0.4,0.2,15.0,"fruta","","Faltan datos de la etiqueta",100,200],"Carne picada vacuno y cerdo":[230.0,18.0,17.0,0.5,"proteina","C","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.3 g/100 g. −8 sal medio: 1.2 g/100 g. −15 grasa saturada alto: 7 g/100 g",100,250],"Champiñón laminado":[22.0,3.0,0.3,1.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.05 g/100 g",100,250],"Claras de huevo (brik)":[48.0,11.0,0.2,0.7,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.7 g/100 g. −8 sal medio: 0.4 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",100,300],"Copos de avena Hacendado":[375.0,13.5,7.0,59.9,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 1 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 1.3 g/100 g. +8 fibra: 10 g/100 g",30,60],"Creatina monohidrato":[0.0,0.0,0.0,0.0,"lacteo","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",3,10],"Crema de cacahuete":[600.0,25.0,50.0,12.0,"grasa","","Faltan datos de la etiqueta",8,35],"Fajitas 100% integrales":[271.0,9.3,5.8,41.0,"base","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 2.1 g/100 g. −8 sal medio: 1.5 g/100 g. −6 grasa saturada medio: 1.9 g/100 g. +8 fibra: 8.5 g/100 g",100,500],"Filete de pavo":[105.0,22.0,1.5,0.0,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0.15 g/100 g. ±0 grasa saturada bajo: 0.4 g/100 g",110,215],"Fuet":[440.0,25.0,37.0,2.0,"grasa","D","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 1 g/100 g. −20 sal alto: 4 g/100 g. −15 grasa saturada alto: 14 g/100 g",15,40],"Garbanzos cocidos (bote)":[120.0,7.0,2.5,16.0,"base","","Faltan datos de la etiqueta",200,560],"Gazpacho (brik)":[40.0,0.8,2.5,3.5,"verdura","","Faltan datos de la etiqueta",150,300],"Guisantes congelados":[80.0,5.5,0.4,11.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3.5 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 0.1 g/100 g. +4 fibra: 5 g/100 g",100,220],"Huevos":[150.0,12.5,11.1,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. −8 sal medio: 0.4 g/100 g. −6 grasa saturada medio: 3.1 g/100 g",60,200],"Jamón serrano (lonchas)":[245.0,31.0,13.0,0.5,"proteina","C","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.5 g/100 g. −20 sal alto: 4.5 g/100 g. −6 grasa saturada medio: 4.5 g/100 g",20,80],"Judías verdes congeladas":[31.0,1.9,0.2,4.2,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",100,250],"Kéfir natural":[74.0,3.9,4.2,5.1,"lacteo","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.3 g/100 g. ±0 sal bajo: 0.1 g/100 g. −6 grasa saturada medio: 2.9 g/100 g",125,375],"Leche semidesnatada":[46.0,3.2,1.6,4.8,"lacteo","","Faltan datos de la etiqueta",150,450],"Lentejas cocidas (bote)":[95.0,7.0,0.5,14.0,"base","","Faltan datos de la etiqueta",200,560],"Manzana":[52.0,0.3,0.2,12.0,"fruta","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 10.4 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0.03 g/100 g",100,250],"Merluza congelada":[82.0,18.0,1.2,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.2 g/100 g. ±0 grasa saturada bajo: 0.3 g/100 g",120,215],"Nueces":[654.0,15.0,65.0,7.0,"grasa","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.6 g/100 g. ±0 sal bajo: 0 g/100 g. −15 grasa saturada alto: 6.1 g/100 g. +8 fibra: 6.7 g/100 g",15,50],"Pan de semillas":[271.0,11.0,5.1,43.0,"base","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 2.6 g/100 g. −8 sal medio: 1 g/100 g. ±0 grasa saturada bajo: 0.7 g/100 g. +8 fibra: 6.2 g/100 g",30,110],"Pasta integral":[350.0,13.0,2.5,63.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 0.5 g/100 g. +8 fibra: 8 g/100 g",50,220],"Patata":[80.0,2.0,0.1,17.0,"base","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.8 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.02 g/100 g",150,700],"Pavo en lonchas":[124.0,20.0,5.0,1.0,"proteina","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 0 g/100 g. −8 sal medio: 0.4 g/100 g. −6 grasa saturada medio: 1.7 g/100 g",60,130],"Pechuga de pollo":[108.0,22.0,1.8,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0.2 g/100 g. ±0 grasa saturada bajo: 0.6 g/100 g",110,215],"Pimiento y cebolla":[30.0,1.0,0.2,5.5,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 4 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.03 g/100 g",100,250],"Plátano":[89.0,1.1,0.3,20.0,"fruta","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 12.2 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0.1 g/100 g",80,110],"Proteína en polvo":[366.0,78.0,3.3,6.3,"proteina","C","−35 procesado: NOVA 4, ultraprocesado. ±0 azúcares bajo: 5 g/100 g. −8 sal medio: 0.79 g/100 g. −6 grasa saturada medio: 2.4 g/100 g",10,35],"Queso rallado (ingred.)":[380.0,26.0,29.0,2.0,"grasa","","Faltan datos de la etiqueta",8,35],"Salmón congelado hacendado":[223.0,20.0,16.0,0.0,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0 g/100 g. ±0 sal bajo: 0.1 g/100 g. −6 grasa saturada medio: 2.3 g/100 g",110,200],"Ternera magra (babilla)":[130.0,21.0,5.0,0.5,"proteina","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.2 g/100 g. −6 grasa saturada medio: 2.3 g/100 g",100,190],"Tomate cherry":[20.0,1.0,0.2,3.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.8 g/100 g. ±0 sal bajo: 0.01 g/100 g. ±0 grasa saturada bajo: 0.03 g/100 g",80,200],"Tomate frito Hacendado":[74.0,1.4,3.2,9.2,"verdura","D","−35 procesado: NOVA 4, ultraprocesado. −10 azúcares medio: 7.1 g/100 g. −8 sal medio: 1.1 g/100 g. ±0 grasa saturada bajo: 0.4 g/100 g",100,250],"Tortitas de arroz integral":[380.0,8.0,2.8,80.0,"base","B","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.5 g/100 g. ±0 sal bajo: 0.02 g/100 g. ±0 grasa saturada bajo: 0.6 g/100 g. +4 fibra: 3.5 g/100 g",15,60],"Verdura congelada":[40.0,2.5,0.4,5.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 2.5 g/100 g. ±0 sal bajo: 0.05 g/100 g. ±0 grasa saturada bajo: 0.1 g/100 g. +4 fibra: 3 g/100 g",100,250],"Verduras asadas (batch)":[45.0,1.5,2.0,5.0,"verdura","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. ±0 azúcares bajo: 3.5 g/100 g. ±0 sal bajo: 0.1 g/100 g. ±0 grasa saturada bajo: 0.3 g/100 g",100,250],"Yogur natural":[60.0,4.0,3.0,4.5,"lacteo","","Faltan datos de la etiqueta",125,375],"Zumo de naranja exprimido":[45.0,0.7,0.2,10.4,"fruta","A","±0 procesado: NOVA 1, sin procesar o mínimamente procesado. −10 azúcares medio: 8.4 g/100 g. ±0 sal bajo: 0 g/100 g. ±0 grasa saturada bajo: 0 g/100 g",150,250],"Ñoquis de patata":[174.0,4.5,0.4,37.6,"base","B","−20 procesado: NOVA 3, procesado. ±0 azúcares bajo: 0.2 g/100 g. −8 sal medio: 0.9 g/100 g. ±0 grasa saturada bajo: 0.2 g/100 g",150,500]},"bloques":{"P":{"n":"Pre-entreno","hora":"06:30","nota":"En casa, 15 min antes de salir","ops":[{"n":"Plátano y batido","it":[["Plátano",100],["Proteína en polvo",13],["Tortitas de arroz integral",30]]},{"n":"Avena líquida","it":[["Leche semidesnatada",250],["Copos de avena Hacendado",22],["Tortitas de arroz integral",20]]},{"n":"De bolsillo","it":[["Pan de semillas",50],["Crema de cacahuete",9],["Proteína en polvo",10]]}]},"D":{"n":"Desayuno post-entreno","hora":"08:45","nota":"En casa, al volver del entreno","ops":[{"n":"Tortitas de avena","it":[["Copos de avena Hacendado",55],["Claras de huevo (brik)",150],["Huevos",65],["Leche semidesnatada",150],["Plátano",100],["Pan de semillas",100],["Jamón serrano (lonchas)",50],["Aceite de oliva virgen ex.",10],["Crema de cacahuete",20],["Creatina monohidrato",5],["Zumo de naranja exprimido",200]]},{"n":"Salado","it":[["Huevos",180],["Jamón serrano (lonchas)",60],["Fuet",20],["Pan de semillas",100],["Aceite de oliva virgen ex.",15],["Yogur natural",250],["Plátano",100],["Creatina monohidrato",5],["Zumo de naranja exprimido",200]]},{"n":"Batido con prisa","it":[["Leche semidesnatada",150],["Kéfir natural",200],["Copos de avena Hacendado",55],["Plátano",100],["Crema de cacahuete",20],["Proteína en polvo",30],["Creatina monohidrato",5],["Huevos",120],["Pan de semillas",100],["Zumo de naranja exprimido",200]]},{"n":"Avena con kéfir","it":[["Copos de avena Hacendado",55],["Leche semidesnatada",150],["Kéfir natural",210],["Proteína en polvo",20],["Creatina monohidrato",5],["Huevos",120],["Pan de semillas",100],["Aceite de oliva virgen ex.",10],["Jamón serrano (lonchas)",30],["Plátano",100],["Zumo de naranja exprimido",200]]}]},"S1":{"n":"Frutos secos","hora":"17:00","nota":"1 bolsita, en la mochila","ops":[{"n":"Nueces","it":[["Nueces",40]]},{"n":"Almendras","it":[["Almendras",40]]},{"n":"Mezcla","it":[["Nueces",20],["Almendras",20]]}]},"S2":{"n":"Potito de fruta","hora":"19:30","nota":"1 potito, en la mochila","ops":[{"n":"Bolsita de fruta","it":[["Bolsita de fruta",100]]},{"n":"Bolsita grande","it":[["Bolsita de fruta",120]]},{"n":"Plátano","it":[["Plátano",95]]}]},"T2":{"n":"Segunda parada del turno","hora":"21:00","nota":"Solo el sábado, turno de 9 h","ops":[{"n":"Frutos secos y bocadillo","it":[["Nueces",30],["Bolsita de fruta",100],["Tortitas de arroz integral",30],["Pan de semillas",80],["Pavo en lonchas",50]]},{"n":"Botella y bocadillo","it":[["Batido proteínas (botella)",330],["Almendras",20],["Tortitas de arroz integral",30],["Pan de semillas",80],["Pavo en lonchas",50]]},{"n":"Fruta, almendras y bocadillo","it":[["Almendras",30],["Manzana",200],["Tortitas de arroz integral",30],["Pan de semillas",80],["Pavo en lonchas",50]]}]},"T":{"n":"Kit de turno de bar","hora":"01:00","nota":"En la mochila del trabajo","ops":[{"n":"Frutos secos, batido y bocadillo","it":[["Nueces",32],["Plátano",100],["Proteína en polvo",20],["Tortitas de arroz integral",30],["Pan de semillas",80],["Jamón serrano (lonchas)",40]]},{"n":"Botella, almendras y bocadillo","it":[["Batido proteínas (botella)",330],["Almendras",28],["Bolsita de fruta",100],["Tortitas de arroz integral",30],["Pan de semillas",80],["Jamón serrano (lonchas)",40]]},{"n":"Mezcla y bocadillo","it":[["Almendras",25],["Nueces",15],["Manzana",200],["Proteína en polvo",16],["Tortitas de arroz integral",30],["Pan de semillas",80],["Jamón serrano (lonchas)",40]]}]},"Z":{"n":"Antes de dormir","hora":"04:15","nota":"Al llegar del turno","ops":[{"n":"Kéfir con nueces","it":[["Kéfir natural",150],["Proteína en polvo",8],["Nueces",14]]},{"n":"Leche","it":[["Leche semidesnatada",300],["Proteína en polvo",19]]},{"n":"Yogur","it":[["Yogur natural",250],["Proteína en polvo",18]]}]}},"principales":[{"n":"Ñoquis con pollo","de":"C","it":[["Ñoquis de patata",260],["Pan de semillas",80],["Pechuga de pollo",185],["Verdura congelada",200],["Queso rallado (ingred.)",15],["Aceite de oliva virgen ex.",18]]},{"n":"Lentejas con huevo","de":"C","it":[["Lentejas cocidas (bote)",250],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Huevos",180],["Verdura congelada",150],["Aceite de oliva virgen ex.",24]]},{"n":"Pasta con ternera","de":"C","it":[["Pasta integral",110],["Tomate frito Hacendado",100],["Pan de semillas",80],["Ternera magra (babilla)",170],["Champiñón laminado",150],["Queso rallado (ingred.)",15],["Aceite de oliva virgen ex.",10]]},{"n":"Batata con pollo","de":"C","it":[["Batata doce congelada",260],["Pan de semillas",80],["Pechuga de pollo",210],["Guisantes congelados",120],["Aceite de oliva virgen ex.",15]]},{"n":"Arroz con salmón","de":"C","it":[["Arroz redondo Hacendado",110],["Pan de semillas",80],["Salmón congelado hacendado",200],["Verdura congelada",200],["Aceite de oliva virgen ex.",5]]},{"n":"Pollo con patata y arroz","de":"C","it":[["Patata",260],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Pechuga de pollo",210],["Verduras asadas (batch)",200],["Aceite de oliva virgen ex.",20]]},{"n":"Garbanzos con atún","de":"C","it":[["Garbanzos cocidos (bote)",260],["Patata",200],["Pan de semillas",80],["Atún claro al natural",110],["Verduras asadas (batch)",200],["Aceite de oliva virgen ex.",24]]},{"n":"Pasta con pollo","de":"C","it":[["Pasta integral",110],["Tomate frito Hacendado",100],["Pan de semillas",80],["Pechuga de pollo",170],["Champiñón laminado",200],["Aceite de oliva virgen ex.",15]]},{"n":"Arroz con pavo","de":"C","it":[["Arroz redondo Hacendado",110],["Pan de semillas",80],["Filete de pavo",215],["Verdura congelada",250],["Aceite de oliva virgen ex.",20]]},{"n":"Merluza con patata y arroz","de":"C","it":[["Patata",260],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Merluza congelada",195],["Guisantes congelados",220],["Aceite de oliva virgen ex.",25]]},{"n":"Garbanzos con pollo","de":"C","it":[["Garbanzos cocidos (bote)",260],["Patata",200],["Pan de semillas",80],["Pechuga de pollo",170],["Tomate cherry",200],["Aceite de oliva virgen ex.",15]]},{"n":"Batata con ternera","de":"C","it":[["Batata doce congelada",260],["Pan de semillas",80],["Ternera magra (babilla)",175],["Champiñón laminado",250],["Aceite de oliva virgen ex.",20]]},{"n":"Lentejas con pavo","de":"C","it":[["Lentejas cocidas (bote)",250],["Arroz redondo Hacendado",60],["Pan de semillas",80],["Filete de pavo",130],["Verdura congelada",155],["Aceite de oliva virgen ex.",25]]},{"n":"Pasta con atún","de":"C","it":[["Pasta integral",110],["Tomate frito Hacendado",100],["Pan de semillas",80],["Atún claro al natural",135],["Tomate cherry",150],["Aceite de oliva virgen ex.",20]]},{"n":"Fajitas de pollo","de":"C","it":[["Fajitas 100% integrales",150],["Arroz redondo Hacendado",60],["Pechuga de pollo",200],["Pimiento y cebolla",250],["Tomate frito Hacendado",60],["Aceite de oliva virgen ex.",10]]},{"n":"Fajitas de carne picada","de":"C","it":[["Fajitas 100% integrales",150],["Arroz redondo Hacendado",50],["Carne picada vacuno y cerdo",170],["Pimiento y cebolla",250],["Tomate frito Hacendado",60],["Yogur natural",100]]},{"n":"Judías verdes con patata y huevo","de":"C","it":[["Judías verdes congeladas",250],["Patata",255],["Pan de semillas",75],["Arroz redondo Hacendado",50],["Huevos",65],["Claras de huevo (brik)",300],["Aceite de oliva virgen ex.",25]]},{"n":"Tortilla de patata con jamón","de":"C","it":[["Patata",255],["Pan de semillas",75],["Arroz redondo Hacendado",55],["Huevos",60],["Claras de huevo (brik)",195],["Jamón serrano (lonchas)",50],["Aceite de oliva virgen ex.",15],["Tomate cherry",200]]},{"n":"Tortilla francesa","de":"C","it":[["Huevos",65],["Claras de huevo (brik)",300],["Patata",265],["Pan de semillas",85],["Arroz redondo Hacendado",50],["Tomate cherry",200],["Aceite de oliva virgen ex.",20]]},{"n":"Gazpacho y pollo","de":"N","it":[["Gazpacho (brik)",250],["Pechuga de pollo",150],["Pan de semillas",85]]},{"n":"Arroz con pollo","de":"N","it":[["Arroz redondo Hacendado",70],["Pechuga de pollo",150],["Verdura congelada",150]]},{"n":"Atún y gazpacho","de":"N","it":[["Gazpacho (brik)",250],["Atún claro al natural",145],["Pan de semillas",85]]},{"n":"Alubias con huevo","de":"N","it":[["Alubias cocidas (bote)",240],["Huevos",130],["Verdura congelada",120]]},{"n":"Ñoquis con pollo","de":"N","it":[["Ñoquis de patata",170],["Pechuga de pollo",150],["Champiñón laminado",150]]},{"n":"Patata y huevos","de":"N","it":[["Patata",230],["Huevos",120],["Filete de pavo",100]]},{"n":"Merluza con batata","de":"N","it":[["Batata doce congelada",125],["Merluza congelada",210],["Guisantes congelados",150]]},{"n":"Pasta con pavo","de":"N","it":[["Pasta integral",60],["Tomate frito Hacendado",80],["Filete de pavo",130],["Guisantes congelados",110],["Aceite de oliva virgen ex.",5]]},{"n":"Arroz con merluza","de":"N","it":[["Arroz redondo Hacendado",55],["Merluza congelada",215],["Verdura congelada",180],["Aceite de oliva virgen ex.",5]]},{"n":"Patata con atún","de":"N","it":[["Patata",275],["Atún claro al natural",105],["Huevos",70],["Tomate cherry",180]]},{"n":"Garbanzos con pavo","de":"N","it":[["Garbanzos cocidos (bote)",270],["Filete de pavo",110],["Verdura congelada",100]]},{"n":"Lentejas con pollo","de":"N","it":[["Lentejas cocidas (bote)",300],["Pechuga de pollo",125],["Champiñón laminado",100]]},{"n":"Alubias con pavo","de":"N","it":[["Alubias cocidas (bote)",330],["Filete de pavo",110],["Champiñón laminado",100]]},{"n":"Ñoquis con ternera","de":"N","it":[["Ñoquis de patata",150],["Ternera magra (babilla)",130],["Champiñón laminado",250]]},{"n":"Ensalada de garbanzos con atún","de":"N","it":[["Garbanzos cocidos (bote)",295],["Atún claro al natural",95],["Pimiento y cebolla",100]]},{"n":"Patata con pollo y verduras asadas","de":"N","it":[["Patata",265],["Pechuga de pollo",155],["Verduras asadas (batch)",100],["Queso rallado (ingred.)",15]]},{"n":"Judías verdes con patata y huevo","de":"N","it":[["Judías verdes congeladas",195],["Patata",240],["Huevos",70],["Claras de huevo (brik)",250]]},{"n":"Tortilla de patata con jamón","de":"N","it":[["Patata",275],["Huevos",60],["Claras de huevo (brik)",225],["Jamón serrano (lonchas)",20],["Tomate cherry",80]]},{"n":"Tortilla francesa","de":"N","it":[["Huevos",60],["Claras de huevo (brik)",240],["Pan de semillas",85],["Tomate cherry",200]]}],"nombres":{"P":"Pre-entreno","D":"Desayuno post-entreno","C":"Comida","S1":"Frutos secos","S2":"Potito de fruta","N":"Cena","T2":"Segunda parada del turno","T":"Kit de turno de bar","Z":"Antes de dormir"},"horas":{"P":"06:30","D":"08:45","C":"14:00","S1":"17:00","S2":"19:30","N":"22:00","T2":"21:00","T":"01:00","Z":"04:15"},"orden":["P","D","C","S1","S2","N","T2","T","Z"],"fases":{"B0":{"n":"Rearranque","f":"Sem 1-4","obj":[3050,170,80,413],"s0":1,"s1":4},"B1":{"n":"Construcción I","f":"Sem 5-12","obj":[3300,175,85,459],"s0":5,"s1":12},"B2":{"n":"Fuerza","f":"Sem 13-17","obj":[3300,178,90,445],"s0":13,"s1":17},"B3":{"n":"Construcción II","f":"Sem 18-23","obj":[3500,185,92,483],"s0":18,"s1":23},"B4":{"n":"Definición","f":"Sem 24-35","obj":[2950,200,72,375],"s0":24,"s1":35},"B5":{"n":"Pico","f":"Sem 36-39","obj":[3050,190,76,401],"s0":36,"s1":39}},"tipos":{"A":{"n":"Fuerza + universidad por la tarde","d":"Lunes y miércoles","mult":0.91,"tomas":["P","D","C","S1","S2","N"]},"B":{"n":"Carrera + universidad desde 12:30","d":"Martes y jueves","mult":1.0,"tomas":["P","D","C","S1","S2","N"]},"C":{"n":"Entreno + universidad + turno","d":"Viernes","mult":1.07,"tomas":["P","D","C","S1","S2","N","T"]},"D":{"n":"Tirada larga + turno de 9 h","d":"Sábado","mult":1.21,"tomas":["P","D","C","S1","S2","T2","T","Z"]},"E":{"n":"Descanso total","d":"Domingo","mult":0.88,"tomas":["D","C","S1","S2","N"]}},"obj":{"B0|A":{"P":[230.0,12.6,4.2,34.4],"D":[1095.2,61.1,38.8,122.2],"C":[908.7,51.3,21.2,120.3],"S1":[83.6,2.4,7.9,0.8],"S2":[75.1,0.6,0.2,17.1],"N":[420.0,34.5,8.2,48.3]},"B0|B":{"P":[249.0,13.0,4.4,38.4],"D":[1134.9,63.2,39.7,128.1],"C":[1042.9,56.3,22.9,143.9],"S1":[93.6,2.7,8.8,0.9],"S2":[75.1,0.6,0.2,17.1],"N":[488.4,38.0,8.9,59.7]},"B0|C":{"P":[227.7,12.5,4.2,34.0],"D":[1085.1,61.0,38.7,119.8],"C":[846.3,49.5,19.6,110.4],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[398.2,33.8,8.0,44.2],"T":[582.5,31.5,14.7,78.4]},"B0|D":{"P":[234.0,12.6,4.2,35.4],"D":[1113.2,63.8,39.5,122.4],"C":[935.3,55.7,21.1,122.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[534.7,25.6,13.1,76.7],"T":[621.5,35.1,15.6,82.6],"Z":[187.2,17.8,7.8,11.9]},"B0|E":{"D":[1113.2,61.3,38.8,126.5],"C":[980.1,53.7,20.9,135.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[462.4,36.1,8.7,55.9]},"B1|A":{"P":[249.0,13.0,4.4,38.4],"D":[1120.5,61.5,38.9,128.1],"C":[1016.1,54.9,21.3,142.3],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[478.4,36.7,8.8,58.9]},"B1|B":{"P":[264.6,13.5,4.5,41.4],"D":[1165.8,64.1,40.8,132.5],"C":[1150.0,59.7,25.4,160.8],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[535.0,40.2,9.4,67.5]},"B1|C":{"P":[242.6,12.9,4.3,37.0],"D":[1111.5,61.3,38.8,126.1],"C":[976.8,53.6,20.9,135.0],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[459.3,36.0,8.6,55.4],"T":[626.0,32.2,15.7,86.3]},"B1|D":{"P":[259.1,13.4,4.5,40.1],"D":[1143.6,64.2,39.5,129.9],"C":[1085.7,60.0,22.3,151.9],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[578.3,26.0,12.5,88.4],"T":[672.2,34.9,16.0,94.6],"Z":[181.1,16.5,7.7,11.8]},"B1|E":{"D":[1139.6,61.8,39.0,132.6],"C":[1107.1,57.6,22.1,159.7],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[523.5,38.5,9.3,66.8]},"B2|A":{"P":[249.0,13.0,4.4,38.4],"D":[1131.6,62.2,40.5,126.4],"C":[1016.5,54.1,24.0,137.4],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[467.1,36.4,8.8,56.6]},"B2|B":{"P":[264.6,13.5,4.5,41.4],"D":[1173.2,64.9,41.2,132.6],"C":[1148.1,60.5,25.8,158.8],"S1":[125.4,3.6,11.8,1.2],"S2":[75.1,0.6,0.2,17.1],"N":[531.9,40.9,9.5,66.1]},"B2|C":{"P":[242.6,12.9,4.3,37.0],"D":[1112.3,61.7,39.8,123.6],"C":[957.6,52.4,22.9,127.2],"S1":[83.6,2.4,7.9,0.8],"S2":[75.1,0.6,0.2,17.1],"N":[440.5,35.2,8.4,52.0],"T":[624.5,32.5,16.6,83.5]},"B2|D":{"P":[245.2,12.8,4.3,37.7],"D":[1145.2,66.3,39.9,127.0],"C":[1037.9,60.9,22.1,139.9],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[564.2,26.8,12.7,83.8],"T":[666.3,37.3,16.4,89.7],"Z":[193.3,19.1,7.8,12.0]},"B2|E":{"D":[1145.9,62.3,40.0,131.2],"C":[1097.6,56.9,23.8,154.5],"S1":[93.6,2.7,8.8,0.9],"S2":[75.1,0.6,0.2,17.1],"N":[510.3,38.0,9.1,64.4]},"B3|A":{"P":[263.9,13.4,4.5,41.3],"D":[1152.5,62.5,40.6,131.2],"C":[1110.6,57.0,24.8,155.2],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[513.0,38.1,9.1,65.0]},"B3|B":{"P":[260.9,13.3,4.5,40.8],"D":[1202.4,67.4,42.9,133.6],"C":[1185.0,63.6,27.4,161.0],"S1":[125.4,3.6,11.8,1.2],"S2":[75.1,0.6,0.2,17.1],"N":[549.6,43.3,9.7,67.4]},"B3|C":{"P":[249.0,13.0,4.4,38.4],"D":[1134.0,62.1,39.9,128.4],"C":[1044.4,54.9,23.9,143.3],"S1":[104.5,3.0,9.9,1.0],"S2":[75.1,0.6,0.2,17.1],"N":[482.3,36.9,8.8,59.5],"T":[661.5,33.3,16.9,91.2]},"B3|D":{"P":[260.9,13.3,4.5,40.8],"D":[1170.3,66.5,39.9,133.3],"C":[1156.7,63.8,24.1,161.2],"S1":[83.6,2.4,7.9,0.8],"S2":[75.1,0.6,0.2,17.1],"T2":[609.4,27.9,13.8,91.3],"T":[714.9,37.9,18.1,97.1],"Z":[193.3,19.1,7.8,12.0]},"B3|E":{"D":[1166.3,64.1,40.8,132.6],"C":[1147.6,59.0,25.2,161.2],"S1":[114.5,3.3,10.7,1.1],"S2":[75.1,0.6,0.2,17.1],"N":[533.5,39.8,9.4,67.7]},"B4|A":{"P":[226.1,12.3,4.1,34.0],"D":[1105.1,66.1,39.9,117.1],"C":[839.3,56.0,20.5,100.7],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[404.6,39.1,8.3,40.0]},"B4|B":{"P":[233.0,13.8,4.3,33.9],"D":[1151.7,70.9,40.8,122.0],"C":[968.0,64.5,22.2,119.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[470.3,45.1,9.1,48.3]},"B4|C":{"P":[209.0,12.0,4.0,30.4],"D":[1093.9,65.8,39.9,114.6],"C":[783.5,53.6,20.0,90.8],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[374.6,37.6,8.0,35.0],"T":[593.2,37.0,16.7,71.2]},"B4|D":{"P":[223.7,13.5,4.1,32.2],"D":[1120.0,69.1,40.2,117.1],"C":[853.8,58.9,21.1,100.0],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[510.3,27.6,13.5,67.8],"T":[633.0,39.7,17.6,76.2],"Z":[192.3,19.1,7.8,11.9]},"B4|E":{"D":[1124.8,66.4,39.9,121.6],"C":[940.8,59.2,21.4,119.9],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[449.6,40.7,8.7,48.4]},"B5|A":{"P":[227.7,12.5,4.2,34.0],"D":[1113.3,64.8,39.5,121.4],"C":[916.5,55.9,20.9,118.4],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[435.2,38.2,8.5,47.8]},"B5|B":{"P":[245.2,12.8,4.3,37.7],"D":[1145.4,67.1,40.1,125.9],"C":[1030.4,62.5,22.3,136.1],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[495.9,43.1,9.2,55.9]},"B5|C":{"P":[223.9,12.4,4.1,33.4],"D":[1099.2,63.7,39.4,119.1],"C":[860.0,53.5,20.2,108.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[407.7,36.6,8.2,43.3],"T":[602.3,34.8,15.5,78.3]},"B5|D":{"P":[232.2,13.6,4.1,34.1],"D":[1110.5,66.5,39.9,117.8],"C":[862.3,57.4,20.8,104.3],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"T2":[519.2,26.8,13.3,71.1],"T":[623.7,38.7,16.5,77.3],"Z":[193.3,19.1,7.8,12.0]},"B5|E":{"D":[1128.5,65.1,39.5,124.9],"C":[985.9,58.0,21.5,131.6],"S1":[62.7,1.8,5.9,0.6],"S2":[75.1,0.6,0.2,17.1],"N":[468.4,39.4,8.8,53.9]}},"base":{"P":{"m":[250.1,13.9,5.0,36.4],"tope":30.0},"D":{"m":[1261.9,72.8,50.8,125.1],"tope":151.4},"C":{"m":[1106.5,64.3,35.4,124.4],"tope":132.8},"S1":{"m":[250.8,7.2,23.6,2.4],"tope":30.1},"S2":{"m":[75.8,0.6,0.2,17.3],"tope":25},"N":{"m":[482.2,44.9,9.3,50.7],"tope":57.9},"T2":{"m":[680.5,33.1,24.6,79.5],"tope":81.7},"T":{"m":[833.2,46.3,32.0,87.0],"tope":100.0},"Z":{"m":[218.4,20.9,9.7,12.4],"tope":26.2}}};
 // Calculadora de raciones (v2.0). Sin pantalla: solo la cuenta.
 // La misma lógica está en menu/calculadora.py, que es la que usa la verificación.
 // Si cambias una, cambia la otra.
@@ -1942,10 +1987,127 @@ const ESCANER = (function(){
 })();
 if (typeof module !== "undefined") module.exports = ESCANER;
 
-// Menús v2.1: lista del día, calculadora de raciones, diario y tus productos escaneados.
-// Los datos del plan (M) los genera menu/payload3.py. La cuenta de raciones está
-// en menu/calculadora.js (CALC) y la cámara en menu/escaner.js (ESCANER). Aquí solo
-// se pinta y se guarda en el navegador.
+// Mis platos (v2.3): los platos que creas en la app. Sin pantalla: guardado,
+// revisión de cantidades y exportación a CSV. La pantalla está en menu/a2.js.
+//
+// Se guardan en este móvil, en la clave mis_platos_v1:
+//   {v:1, sig:8, p:[{id, t:toma, n:nombre, it:[[alimento, gramos]], no:notas, f:fecha}]}
+// Solo admiten alimentos de datos/alimentos.csv. Así, al exportarlos y ejecutar
+// «python3 actualizar.py --importar platos_app.csv», entran en datos/platos.csv
+// sin tener que tocar nada más.
+//
+// Las cantidades lógicas: los gramos que dejan la receta con las calorías base de su
+// toma (M.base: la media de sus compañeros en datos/platos.csv), calculados con la
+// misma calculadora de raciones (CALC). Es lo que exige menu/ver_platos.py para que
+// un plato entre en el CSV: ±12 % (o ±25 kcal) de la media y raciones razonables.
+
+const MIS_PLATOS = (function(){
+  const KEY = "mis_platos_v1";
+  const sinT = t => String(t).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
+  const z2 = n => String(n).padStart(2,"0");
+  const hoyIso = () => { const d=new Date(); return d.getFullYear()+"-"+z2(d.getMonth()+1)+"-"+z2(d.getDate()); };
+
+  function normaliza(d){
+    d = d || {};
+    const p = (Array.isArray(d.p) ? d.p : []).filter(x=>x && x.id>0 && x.t && x.n && Array.isArray(x.it));
+    const sig = Math.max(d.sig||1, 1, ...p.map(x=>x.id+1));
+    return {v:1, sig, p};
+  }
+  function carga(){
+    try{ const t = localStorage.getItem(KEY); if(t) return normaliza(JSON.parse(t)); }catch(e){}
+    return normaliza(null);
+  }
+  let D = carga();
+  function guarda(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); return true; }catch(e){ return false; } }
+
+  // ¿Ya hay un plato con ese nombre en esa toma del plan (datos/platos.csv)?
+  // Pasa después de importarlo: desde entonces manda el del CSV y el tuyo se oculta.
+  function enPlan(t, n){
+    const ops = (t==="C"||t==="N") ? M.principales.filter(p=>p.de===t) : ((M.bloques[t]||{}).ops||[]);
+    return ops.some(o=>sinT(o.n)===sinT(n));
+  }
+  // ¿El nombre choca con otro plato de la misma toma (del plan o tuyo)?
+  function nombreOcupado(t, n, id){
+    return enPlan(t, n) || D.p.some(x=>x.id!==id && x.t===t && sinT(x.n)===sinT(n));
+  }
+  function lista(){ return D.p.slice(); }
+  function uno(id){ return D.p.find(x=>x.id===id) || null; }
+  // Los tuyos que se pueden elegir en una toma (los que ya están en el plan, no)
+  function deTomas(ts){ return D.p.filter(x=>ts.indexOf(x.t)>=0 && !enPlan(x.t, x.n)); }
+
+  // Guarda un plato: nuevo si no trae id. Devuelve el plato o null si no se pudo.
+  function pon(pl){
+    const it = pl.it.map(([n,g])=>[n, Math.round(g)]).filter(x=>x[1]>0);
+    const limpio = {t:pl.t, n:pl.n.replace(/\s+/g," ").trim(), it, no:(pl.no||"").replace(/\s+/g," ").trim()};
+    let x = pl.id ? uno(pl.id) : null;
+    if(x) Object.assign(x, limpio);
+    else { x = Object.assign({id:D.sig++, f:hoyIso()}, limpio); D.p.push(x); }
+    return guarda() ? x : null;
+  }
+  function quita(id){ D.p = D.p.filter(x=>x.id!==id); return guarda(); }
+  function paraCopia(){ return D; }
+  function recupera(d){ D = normaliza(d); return guarda(); }
+
+  function totales(it){
+    const t=[0,0,0,0];
+    it.forEach(([n,g])=>{ const f=M.foods[n]; if(!f) return; for(let m=0;m<4;m++) t[m]+=f[m]*g/100; });
+    return t;
+  }
+  // ¿Encaja un plato de k kcal en la toma t? Igual que ver_platos.py: con él dentro,
+  // TODOS los platos de la toma (también los que ya estaban) tienen que quedar a ±12 %
+  // (o ±25 kcal) de la nueva media. «afecta»: los del plan que se saldrían por su culpa.
+  function encajaEn(t, k){
+    const ops = (t==="C"||t==="N") ? M.principales.filter(p=>p.de===t) : M.bloques[t].ops;
+    const ks = ops.map(o=>totales(o.it)[0]).concat([k]);
+    const m = ks.reduce((a,b)=>a+b, 0)/ks.length, tope = Math.max(0.12*m, 25);
+    return {ok: ks.every(x=>Math.abs(x-m) <= tope),
+            afecta: ops.filter((o,i)=>Math.abs(ks[i]-m) > tope).map(o=>o.n)};
+  }
+  // Ración fuera de lo razonable: la misma regla que ver_platos.py
+  function racionMala(n, g){ const f=M.foods[n]; return !!f && g>0 && (g > f[8]*1.25 || g < f[7]*0.5); }
+
+  // Revisión de una receta para la toma t.
+  //   encaja: entra tal cual en datos/platos.csv
+  //   logicas: [[alimento, gramos]] con las cantidades lógicas (0 = mejor quitarlo)
+  //   logicasOk: si con las lógicas sí encaja
+  function revisa(t, it){
+    const base = M.base[t];
+    const faltan = it.filter(([n])=>!M.foods[n]).map(([n])=>n);
+    const buenos = it.filter(([n])=>M.foods[n]);
+    const tot = totales(buenos);
+    const raciones = buenos.filter(([n,g])=>racionMala(n,g)).map(([n,g])=>({n, g, lo:M.foods[n][7], hi:M.foods[n][8]}));
+    const enc = encajaEn(t, tot[0]);
+    const its = buenos.map(([n,g])=>CALC.item(n, g, M.foods[n], t, false));
+    const gl = its.length ? CALC.resolver(its, base.m) : [];
+    const logicas = its.map((x,i)=>[x.n, gl[i]]);
+    const totL = CALC.suma(its, gl);
+    const quedan = logicas.filter(x=>x[1]>0);
+    const logicasOk = quedan.length>0 && encajaEn(t, totL[0]).ok && !quedan.some(([n,g])=>racionMala(n,g));
+    return {base, tot, totL, faltan, raciones, logicas, logicasOk, afecta: enc.afecta,
+            encaja: buenos.length>0 && !faltan.length && enc.ok && !raciones.length};
+  }
+
+  // Archivo para «python3 actualizar.py --importar»: mismas columnas que datos/platos.csv.
+  // Solo van los que encajan y aún no están en el plan; los demás se devuelven en «fuera».
+  function csv(){
+    const q = s => /[;"\r\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+    const filas = ["toma;plato;alimentos;gramos;notas"], fuera = [];
+    D.p.forEach(x=>{
+      if(enPlan(x.t, x.n)) return;
+      if(!revisa(x.t, x.it).encaja){ fuera.push(x); return; }
+      filas.push([x.t, x.n, x.it.map(i=>i[0]).join("|"), x.it.map(i=>String(Math.round(i[1]))).join("|"), x.no||""].map(q).join(";"));
+    });
+    return {texto: "﻿"+filas.join("\r\n")+"\r\n", n: filas.length-1, fuera};
+  }
+
+  return {lista, uno, deTomas, enPlan, nombreOcupado, pon, quita, paraCopia, recupera, totales, revisa, csv};
+})();
+
+// Menús v2.3: lista del día, calculadora de raciones, diario, tus productos escaneados
+// y tus platos. Los datos del plan (M) los genera menu/payload3.py. La cuenta de
+// raciones está en menu/calculadora.js (CALC), la cámara en menu/escaner.js (ESCANER)
+// y el guardado y la revisión de tus platos en menu/mis_platos.js (MIS_PLATOS). Aquí
+// solo se pinta y se guarda en el navegador.
 
 const DIAS_SEM = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const CORTO = ["D","L","M","X","J","V","S"];
@@ -2039,9 +2201,13 @@ function asegura(f){
 // ---------------------------------------------------------------- platos y alimentos
 function ficha(n){ return M.foods[n] || EXTRA[n]; }
 function principalesDe(b){ return M.principales.map((p,i)=>({p, i})).filter(x=>x.p.de===b); }
+// Tus platos (v2.3) se añaden al final con la clave «U» + su número. Los de comida
+// y cena se comparten entre las dos, igual que los del plan.
 function opciones(b){
-  return (b==="C"||b==="N") ? M.principales.map((p,i)=>({clave:"P"+i, n:p.n, de:p.de, it:p.it}))
-                            : M.bloques[b].ops.map((o,i)=>({clave:"O"+i, n:o.n, it:o.it}));
+  const cn = b==="C"||b==="N";
+  const mios = MIS_PLATOS.deTomas(cn ? ["C","N"] : [b]).map(x=>({clave:"U"+x.id, n:x.n, de:x.t, it:x.it, mio:true}));
+  return (cn ? M.principales.map((p,i)=>({clave:"P"+i, n:p.n, de:p.de, it:p.it}))
+             : M.bloques[b].ops.map((o,i)=>({clave:"O"+i, n:o.n, it:o.it}))).concat(mios);
 }
 // Plato por defecto: en comida y cena, el de ese día de la semana (como la lista de la compra)
 function claveDefecto(f, b){
@@ -2279,7 +2445,8 @@ function selectorPlato(b, actual){
     const res = todos.filter(vale);
     res.forEach(o=>{
       const it = el("button","m-res-it"+(o.n===actual.n ? " sel" : ""));
-      it.append(el("span",null,o.n));
+      const nm = el("span",null,o.n); if(o.mio) nm.append(el("span","m-tag","tuyo"));
+      it.append(nm);
       if(o.n===actual.n) it.append(el("small",null,"elegido"));
       it.addEventListener("click", ()=>{
         guardaEstado(fecha, b, {p:o.clave, it:o.it.map(([n,g])=>[n,g,false,null]), ok:false});
@@ -2290,7 +2457,9 @@ function selectorPlato(b, actual){
     if(!res.length) lista.append(el("p","m-nota","Ningún plato con eso. Prueba con otra palabra."));
   };
   inp.addEventListener("input", pinta);
-  box.append(inp, lista);
+  const crear = el("button","m-btn peq","+ Crear un plato nuevo");
+  crear.addEventListener("click", ()=>fichaPlato(0, b));
+  box.append(inp, lista, crear);
   pinta();
   setTimeout(()=>inp.focus(), 0);
   return box;
@@ -2639,6 +2808,221 @@ $("m-prod-esc").innerHTML = BARRAS + "Escanear";
 $("m-prod-esc").addEventListener("click", ()=>escanea(null));
 $("m-prod-ver").addEventListener("click", ()=>{ verProductos = !verProductos; pintaProductos(); });
 
+// ---------------------------------------------------------------- mis platos (v2.3)
+// Crear un plato: nombre, toma e ingredientes con sus gramos, solo con alimentos de
+// datos/alimentos.csv. Al guardar sale la revisión con las cantidades lógicas, las que
+// hacen que el plato encaje con el resto de su toma (MIS_PLATOS.revisa, en mis_platos.js).
+// El plato se puede elegir en la app al momento; para pasarlo a datos/platos.csv se
+// exporta y se importa con «python3 actualizar.py --importar platos_app.csv».
+let verPlatos = false;
+const nomToma = t => M.nombres[t] || t;
+const racionTipica = n => { const f = M.foods[n]; return Math.max(5, Math.round((f[7]+f[8])/2/5)*5); };
+
+function fichaPlato(id, toma){
+  const viejo = id ? MIS_PLATOS.uno(id) : null;
+  const st = viejo ? {n:viejo.n, t:viejo.t, it:viejo.it.map(x=>x.slice()), no:viejo.no||""}
+                   : {n:"", t:(toma && M.base[toma]) ? toma : "C", it:[], no:""};
+  const v = abreCapa(viejo ? "Editar plato" : "Plato nuevo");
+  edita();
+
+  function edita(){
+    const p = v.panel; p.replaceChildren();
+    p.append(el("h2",null, viejo ? "Editar plato" : "Plato nuevo"),
+      el("p","m-nota","Con los alimentos de tu plan. Al guardar te digo qué cantidades encajan con el resto de platos de esa toma."));
+
+    const cNom = el("label","prod-campo"), nom = el("input");
+    nom.value = st.n; nom.maxLength = 60; nom.placeholder = "Por ejemplo: Arroz con pavo y calabacín";
+    nom.addEventListener("input", ()=>{ st.n = nom.value; });
+    cNom.append(el("span",null,"Nombre"), nom);
+
+    const cT = el("div","prod-campo"), chips = el("div","prod-etqs");
+    const pintaChips = ()=>{
+      chips.replaceChildren();
+      M.orden.forEach(t=>{
+        const ch = el("button","prod-chip", nomToma(t)); ch.type = "button";
+        ch.setAttribute("aria-pressed", t===st.t ? "true" : "false");
+        ch.addEventListener("click", ()=>{ st.t = t; pintaChips(); pintaRes(); });
+        chips.append(ch);
+      });
+    };
+    cT.append(el("span",null,"Toma"), chips);
+
+    const cIng = el("div","prod-campo"), filas = el("div","m-items");
+    const pintaIng = ()=>{
+      filas.replaceChildren();
+      if(!st.it.length) filas.append(el("p","m-nota","Aún no hay ingredientes. Búscalos aquí debajo."));
+      st.it.forEach((x, i)=>{
+        const n = x[0], f = M.foods[n];
+        const fila = el("div","m-it"), nm = el("div","nom"), kc = el("small");
+        const pintaKc = ()=>{ kc.textContent = f ? nf(f[0]*st.it[i][1]/100)+" kcal" : "ya no está en tu plan: quítalo"; };
+        nm.append(document.createTextNode(n), kc); pintaKc();
+        const gr = el("label","gr"), inp = el("input"); inp.type = "text"; inp.inputMode = "numeric";
+        inp.value = String(x[1]); inp.setAttribute("aria-label","Gramos de "+n);
+        inp.addEventListener("focus", ()=>inp.select());
+        inp.addEventListener("input", ()=>{
+          const g = parseFloat(inp.value.replace(",","."));
+          if(g>0 && g<5000){ st.it[i][1] = Math.round(g); pintaKc(); pintaRes(); }
+        });
+        gr.append(inp, el("span",null,"g"));
+        const bt = el("button","m-ic"); bt.type = "button"; bt.innerHTML = QUITAR; bt.setAttribute("aria-label","Quitar "+n);
+        bt.addEventListener("click", ()=>{ st.it.splice(i,1); pintaIng(); pintaRes(); });
+        fila.append(nm, gr, bt); filas.append(fila);
+      });
+    };
+    const bus = el("input"); bus.type = "search"; bus.placeholder = "Añade un ingrediente: arroz, pollo..."; bus.setAttribute("aria-label","Buscar ingrediente");
+    const res = el("div","m-res-lista");
+    const pintaBus = ()=>{
+      res.replaceChildren();
+      const pal = sinTildes(bus.value.trim()).split(/\s+/).filter(Boolean);
+      if(!pal.length) return;
+      const ya = new Set(st.it.map(x=>x[0]));
+      const hits = Object.keys(M.foods).filter(n=>!ya.has(n) && pal.every(w=>sinTildes(n).indexOf(w)>=0)).slice(0, 8);
+      hits.forEach(n=>{
+        const it = el("button","m-res-it"); it.type = "button";
+        it.append(el("span",null,n), el("small",null,nf(M.foods[n][0])+" kcal/100 g"));
+        it.addEventListener("click", ()=>{ st.it.push([n, racionTipica(n)]); bus.value = ""; pintaBus(); pintaIng(); pintaRes(); });
+        res.append(it);
+      });
+      if(!hits.length) res.append(el("p","m-nota","No está en tu plan. Para usarlo, añádelo antes a datos/alimentos.csv."));
+    };
+    bus.addEventListener("input", pintaBus);
+    cIng.append(el("span",null,"Ingredientes, en gramos de la receta"), filas, bus, res);
+
+    const resu = el("p","m-nota");
+    const pintaRes = ()=>{
+      const b = M.base[st.t], t = MIS_PLATOS.totales(st.it);
+      resu.textContent = (st.it.length ? "Tu receta: "+nf(t[0])+" kcal y "+nf(t[1])+" g de proteína. " : "")+
+        "Los platos de "+nomToma(st.t).toLowerCase()+" rondan "+nf(b.m[0])+" kcal y "+nf(b.m[1])+" g de proteína.";
+    };
+
+    const cNo = el("label","prod-campo"), no = el("input");
+    no.value = st.no; no.maxLength = 120; no.placeholder = "Opcional: cómo se prepara";
+    no.addEventListener("input", ()=>{ st.no = no.value; });
+    cNo.append(el("span",null,"Notas"), no);
+
+    const err = el("p","prod-err"); err.hidden = true;
+    const acc = el("div","prod-acc");
+    if(viejo){
+      const borra = el("button","m-btn borrar","Borrar"); let seguro = false;
+      borra.addEventListener("click", ()=>{
+        if(!seguro){ seguro = true; borra.textContent = "Toca otra vez para borrar"; return; }
+        MIS_PLATOS.quita(viejo.id); v.cierra(); aviso("Plato borrado"); render();
+      });
+      acc.append(borra);
+    }
+    const cancel = el("button","m-btn","Cancelar"); cancel.addEventListener("click", v.cierra);
+    const sig = el("button","m-btn prim","Guardar");
+    sig.addEventListener("click", ()=>{
+      const n = st.n.replace(/\s+/g," ").trim();
+      const fallo = t=>{ err.textContent = t; err.hidden = false; };
+      if(!n) return fallo("Ponle un nombre.");
+      if(/[|;]/.test(n)) return fallo("El nombre no puede llevar «|» ni «;».");
+      if(MIS_PLATOS.nombreOcupado(st.t, n, viejo ? viejo.id : 0)) return fallo("Ya hay un plato con ese nombre en "+nomToma(st.t).toLowerCase()+".");
+      if(!st.it.length) return fallo("Añade al menos un ingrediente.");
+      if(st.it.some(x=>!M.foods[x[0]])) return fallo("Quita los ingredientes que ya no están en tu plan.");
+      st.n = n; revision();
+    });
+    acc.append(cancel, sig);
+    p.append(cNom, cT, cIng, resu, cNo, err, acc);
+    pintaChips(); pintaIng(); pintaRes();
+    // sin poner el cursor en el nombre: en el móvil sacaría el teclado y taparía la ficha
+  }
+
+  // La revisión: tus cantidades al lado de las lógicas, y tú eliges con cuáles se guarda
+  function revision(){
+    const p = v.panel; p.replaceChildren();
+    const r = MIS_PLATOS.revisa(st.t, st.it), b = r.base, tn = nomToma(st.t).toLowerCase();
+    const lo = b.m[0]-b.tope, hi = b.m[0]+b.tope;
+    p.append(el("h2",null,"Revisa las cantidades"));
+    p.append(el("p","m-estado "+(r.encaja ? "ok" : "aviso"), r.encaja
+      ? "Tus cantidades encajan con el resto de platos de "+tn+": "+nf(r.tot[0])+" kcal, y lo normal es de "+nf(lo)+" a "+nf(hi)+"."
+      : "Así no encaja con el resto de platos de "+tn+": tu receta tiene "+nf(r.tot[0])+" kcal y lo normal es de "+nf(lo)+" a "+nf(hi)+"."));
+    r.raciones.forEach(x=>p.append(el("p","prod-aviso", x.n+": "+x.g+" g es una ración rara (lo normal, de "+nf(x.lo)+" a "+nf(x.hi)+" g).")));
+    if(r.afecta.length) p.append(el("p","prod-aviso","Con este plato la media de "+tn+" se mueve y se saldrían del margen: "+r.afecta.join(", ")+"."));
+    p.append(el("p","m-nota","Las cantidades lógicas son las que dejan el plato en la media de "+tn+" ("+nf(b.m[0])+" kcal) sin cambiar su forma: la verdura no se toca y la proteína se mantiene."));
+
+    const tabla = el("div","pla-tabla");
+    const fila = (cls, a, b2, c)=>{ const f = el("div","pla-fila"+(cls ? " "+cls : "")); f.append(el("span",null,a), el("span",null,b2), el("span",null,c)); tabla.append(f); };
+    fila("cab", "Ingrediente", "Tuyas", "Lógicas");
+    r.logicas.forEach(([n, gl])=>{
+      const g = st.it.find(x=>x[0]===n)[1];
+      fila(Math.abs(gl-g) >= Math.max(5, 0.1*g) ? "cambia" : "", n, g+" g", gl>0 ? gl+" g" : "quitar");
+    });
+    fila("tot", "Kcal", nf(r.tot[0]), nf(r.totL[0]));
+    fila("tot2", "Proteína", nf(r.tot[1])+" g", nf(r.totL[1])+" g");
+    p.append(tabla);
+
+    if(!r.logicasOk) p.append(el("p","prod-aviso","Ni con estas cantidades llega a encajar: cambia o añade algún ingrediente (una base como arroz o patata, o una proteína)."));
+    p.append(el("p","m-nota","Son los gramos de la receta base. Cada día la calculadora los ajusta a lo que te toca, guardes las que guardes."));
+    if(!r.encaja) p.append(el("p","m-nota","Si guardas las tuyas, el plato se puede usar en la app, pero no se exporta al CSV hasta que encaje."));
+
+    const acc = el("div","prod-acc");
+    const vol = el("button","m-btn","Volver"); vol.addEventListener("click", edita);
+    const mias = el("button","m-btn"+(r.encaja ? " prim" : ""),"Guardar las mías");
+    mias.addEventListener("click", ()=>guardaPlato(st.it));
+    acc.append(vol, mias);
+    if(r.logicasOk){
+      const lg = el("button","m-btn"+(r.encaja ? "" : " prim"),"Guardar las lógicas");
+      lg.addEventListener("click", ()=>guardaPlato(r.logicas.filter(x=>x[1]>0)));
+      acc.append(lg);
+    }
+    p.append(acc);
+  }
+
+  function guardaPlato(it){
+    const x = MIS_PLATOS.pon({id: viejo ? viejo.id : 0, t:st.t, n:st.n, it, no:st.no});
+    if(!x){ aviso("No se ha podido guardar: el navegador tiene el almacenamiento lleno o bloqueado."); return; }
+    v.cierra(); aviso(viejo ? "Plato actualizado" : "Guardado: ya lo puedes elegir en "+nomToma(x.t).toLowerCase()); render();
+  }
+}
+
+// Descarga platos_app.csv y explica cómo meterlo en datos/platos.csv
+function exportaPlatos(){
+  const r = MIS_PLATOS.csv();
+  const v = abreCapa("Exportar platos"), p = v.panel;
+  p.append(el("h2",null,"Exportar para el CSV"));
+  if(r.n){
+    const blob = new Blob([r.texto], {type:"text/csv;charset=utf-8"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "platos_app.csv";
+    document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    p.append(el("p",null, r.n+(r.n===1 ? " plato descargado" : " platos descargados")+" en platos_app.csv. Para "+(r.n===1 ? "meterlo" : "meterlos")+" en datos/platos.csv:"));
+    const ol = el("ol","pla-pasos");
+    const li1 = el("li",null,"Copia platos_app.csv a la carpeta gym_diet_2027.");
+    const li2 = el("li",null,"Ejecuta "); li2.append(el("code",null,"python3 actualizar.py --importar platos_app.csv"));
+    const li3 = el("li",null,"Sube los cambios a GitHub, como siempre.");
+    ol.append(li1, li2, li3); p.append(ol);
+    p.append(el("p","m-nota","Puedes importar el mismo archivo dos veces: lo que ya está en el CSV no se duplica."));
+  } else p.append(el("p",null,"No hay ningún plato listo para exportar."));
+  if(r.fuera.length) p.append(el("p","prod-aviso","No van porque no encajan con su toma: "+r.fuera.map(x=>x.n).join(", ")+". Ábrelos y guárdalos con las cantidades lógicas."));
+  const acc = el("div","prod-acc"), ok = el("button","m-btn prim","Entendido");
+  ok.addEventListener("click", v.cierra); acc.append(ok); p.append(acc);
+}
+
+// Tarjeta «Mis platos» en la página
+function pintaMisPlatos(){
+  const ps = MIS_PLATOS.lista(), n = ps.length;
+  $("m-pla-n").textContent = n ? n+(n===1 ? " plato tuyo" : " platos tuyos")+" en este móvil."
+    : "Crea tus platos y elígelos en la toma que quieras.";
+  const ver = $("m-pla-ver"), exp = $("m-pla-exp"), box = $("m-pla-lista");
+  ver.hidden = !n; exp.hidden = !n; ver.textContent = verPlatos ? "Ocultar la lista" : "Ver la lista";
+  box.hidden = !(n && verPlatos); box.replaceChildren();
+  if(!n || !verPlatos) return;
+  const lista = el("div","m-res-lista");
+  ps.sort((a,b)=>M.orden.indexOf(a.t)-M.orden.indexOf(b.t) || a.n.localeCompare(b.n,"es")).forEach(x=>{
+    const it = el("button","m-res-it"), a = el("span",null,x.n);
+    a.append(el("span","m-tag",nomToma(x.t)));
+    if(MIS_PLATOS.enPlan(x.t, x.n)) a.append(el("span","m-tag","ya en el plan"));
+    else if(!MIS_PLATOS.revisa(x.t, x.it).encaja) a.append(el("span","m-tag dud","no encaja"));
+    it.append(a, el("small",null,nf(MIS_PLATOS.totales(x.it)[0])+" kcal"));
+    it.addEventListener("click", ()=>fichaPlato(x.id));
+    lista.append(it);
+  });
+  box.append(lista);
+}
+$("m-pla-nuevo").addEventListener("click", ()=>fichaPlato(0, abierta));
+$("m-pla-ver").addEventListener("click", ()=>{ verPlatos = !verPlatos; pintaMisPlatos(); });
+$("m-pla-exp").addEventListener("click", exportaPlatos);
+
 // ---------------------------------------------------------------- semana
 function pintaSemana(){
   const box = $("m-barras"); box.replaceChildren();
@@ -2664,7 +3048,7 @@ function pintaSemana(){
 
 // ---------------------------------------------------------------- copia de seguridad
 $("m-exp").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar()}, null, 1)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar(), platos:MIS_PLATOS.paraCopia()}, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "diario_"+hoy()+".json";
   document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   aviso("Copia descargada: guárdala en tu carpeta del gimnasio");
@@ -2676,6 +3060,7 @@ $("m-imp-f").addEventListener("change", function(){
     if(!j || j.tipo!=="diario" || !j.diario || !j.diario.dias) throw 0;
     D = Object.assign(vacio(), j.diario); EXTRA = j.extra || {};
     if(j.productos){ PROD = normalizaProd(j.productos); guardaProductos(); }
+    if(j.platos) MIS_PLATOS.recupera(j.platos);
     guarda(); compacta(); render(); aviso("Copia recuperada");
   }).catch(()=>aviso("Ese archivo no es una copia del diario"));
   this.value = "";
@@ -2699,7 +3084,7 @@ $("m-peso-ok").addEventListener("click", ()=>{
 });
 window.addEventListener("gd:peso", ()=>pintaResumen());
 
-function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaProductos(); pintaSemana(); }
+function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaMisPlatos(); pintaProductos(); pintaSemana(); }
 compacta();
 render();
 

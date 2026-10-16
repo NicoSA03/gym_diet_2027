@@ -35,6 +35,16 @@ for fcod in FASES:
 PRINCIPALES=[{"n":on,"de":b,"it":[[f,g] for f,g in items]}
              for b in ("C","N") for on,items in BLOQUES[b][3]]
 
+# Calorías base de cada toma (v2.3): la media de las recetas tal cual están en
+# datos/platos.csv, sin escalar. Es la misma cuenta que hace ver_platos.py, así que
+# un plato creado en la app (Menús, Mis platos) tiene que caer dentro de ese margen
+# para poder entrar en el CSV. «tope» es el margen: ±12 % o ±25 kcal, lo que sea mayor.
+BASE={}
+for b in ORDEN_TOMAS:
+    ms=[macros(it) for _,it in BLOQUES[b][3]]
+    m=[round(sum(x[j] for x in ms)/len(ms),1) for j in range(4)]
+    BASE[b]={"m":m,"tope":round(max(0.12*m[0],25),1)}
+
 # Semanas de cada bloque de dieta, para saber cuál toca a partir de la fecha de
 # inicio que guardas en el Registro.
 from entreno import calendario
@@ -53,6 +63,7 @@ PAY={
            "s0":SEM[k][0],"s1":SEM[k][1]} for k,v in FASES.items()},
  "tipos":{k:{"n":v[0],"d":v[1],"mult":v[2],"tomas":v[3]} for k,v in TIPOS.items()},
  "obj":OBJ,
+ "base":BASE,
 }
 json.dump(PAY, open('menu/pay_menus.json','w'), ensure_ascii=False, separators=(',',':'))
 print("menús:", len(open('menu/pay_menus.json',encoding='utf8').read())//1024, "KB")

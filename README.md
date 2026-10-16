@@ -27,6 +27,8 @@ python3 actualizar.py
 
 Si has tocado **platos, alimentos o calorías de la dieta**, usa `python3 actualizar.py --recalcular` (tarda unos 20 segundos más).
 
+Si has creado **platos en la app** (Menús, Mis platos), expórtalos y usa `python3 actualizar.py --importar platos_app.csv` (sección 4).
+
 Si la verificación encuentra un problema, **no se genera nada** y te dice qué ha fallado. Así nunca acabas con un archivo roto en el móvil.
 
 ---
@@ -52,6 +54,8 @@ gym_diet_2027/
 │   ├── generar.py       ← INVENTA PLATOS: tú pides calorías, él resuelve los gramos
 │   ├── calidad.py       ← la nota de la A a la D de cada alimento, con sus reglas a la vista
 │   ├── calculadora.js   ← la cuenta de raciones de la pestaña Menús (y calculadora.py, la misma en Python)
+│   ├── mis_platos.js    ← Mis platos de la pestaña Menús: guardado, cantidades lógicas y exportación (sección 5)
+│   ├── importar_platos.py ← mete en datos/platos.csv los platos exportados desde la app (sección 4)
 │   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
 │   ├── escaner.js       ← la cámara que lee códigos de barras en Menús (sección 5, Mis productos)
 │   ├── ejercicios.py    ← carga datos/ejercicios.csv para El entreno y la verificación
@@ -289,6 +293,31 @@ Las reglas están arriba del archivo, a la vista y para que las cambies: `NO_JUN
 
 Lo que propone son **ideas con los números resueltos**, no recetas probadas. Léelas antes de guardarlas: el programa sabe de aritmética, no de cocina.
 
+### Crear un plato desde la app (v2.3)
+
+También puedes crear el plato en el móvil, en **Menús → Mis platos → + Nuevo plato** (sección 5), y pasarlo después a `datos/platos.csv` sin escribir nada a mano:
+
+1. En la app, **Exportar para el CSV**. Se descarga `platos_app.csv`, con las mismas columnas que `datos/platos.csv`.
+2. Cópialo a la carpeta del proyecto y ejecuta:
+
+```bash
+python3 actualizar.py --importar platos_app.csv
+```
+
+3. Sube los cambios a GitHub, como siempre.
+
+La app no puede escribir en `datos/platos.csv` por su cuenta (es una página fija y solo guarda cosas en el propio móvil); por eso el paso por el archivo. Lo que hace la importación, en `menu/importar_platos.py`:
+
+- Revisa cada plato con las mismas reglas que `ver_platos.py`: toma válida, ingredientes de `datos/alimentos.csv` sin repetir, calorías a ±12 % (o ±25 kcal) de la media de su toma y raciones razonables.
+- Los que pasan se añaden **al final** del CSV, así que la semana por defecto y la lista de la compra no cambian. Los que no, salen como `RECHAZADO` con el motivo.
+- Los que ya están (misma toma y mismo nombre) se saltan: importar el mismo archivo dos veces no duplica nada.
+- Al terminar ejecuta la verificación completa de los platos. Si fallara, `datos/platos.csv` queda **exactamente como estaba**.
+- Después regenera todo con `--recalcular`.
+
+Para ver qué pasaría sin escribir nada: `python3 menu/importar_platos.py platos_app.csv --probar`. Los `platos_app*.csv` están en `.gitignore`: una vez importados, ya viven en `datos/platos.csv`.
+
+Una vez importado, el plato sale en la app desde el CSV y tu copia del móvil se oculta sola en la lista de platos (en Mis platos aparece como «ya en el plan», y la puedes borrar).
+
 ### Añadir un alimento nuevo
 
 Todo pasa en **`datos/alimentos.csv`**, una fila por alimento. Se abre con Excel (o con el Bloc de notas): el separador es el punto y coma y los decimales van con punto (3.5). Si Excel lo guarda con coma decimal (3,5) también vale: el programa entiende las dos.
@@ -337,7 +366,7 @@ Las horas y los nombres de las tomas (no los platos) están en el diccionario `T
 
 ---
 
-## 5. La pestaña Menús (v2.1)
+## 5. La pestaña Menús (v2.3)
 
 Una pantalla por día con todas las comidas en orden. Arriba, lo que llevas comido frente al objetivo del día; debajo, cada toma con su hora, su plato y sus kcal.
 
@@ -373,6 +402,20 @@ En la tarjeta, **Ver la lista** enseña tus productos; tocas uno para corregirlo
 - **En cada aparato:** en Android con Chrome usa el lector del propio móvil. En iPhone, en PC y en el resto usa `docs/vendor/quagga.min.js` (Quagga2, licencia MIT), que se guarda con la app y funciona sin conexión. La cámara solo abre en la app instalada (https); abriendo el archivo suelto se escribe el código a mano.
 - Lo que llega de Open Food Facts lo escribe gente voluntaria: revisa que cuadre con la etiqueta antes de guardar.
 
+### Mis platos (v2.3)
+
+Para crear platos tuyos sin tocar el CSV. Se entra por **+ Nuevo plato** en la tarjeta Mis platos, o por **+ Crear un plato nuevo** al final de la lista de platos de cualquier toma.
+
+1. Ponle **nombre**, elige la **toma** (cualquiera: pre-entreno, desayuno, comida, cena, frutos secos, potito, turno o antes de dormir) y busca los **ingredientes** con sus gramos. Solo salen los alimentos de tu plan (`datos/alimentos.csv`), para que el plato pueda entrar en el CSV sin tocar nada más. Si falta alguno, añádelo antes al CSV (sección 4).
+2. Debajo ves lo que suma tu receta y lo que rondan los demás platos de esa toma.
+3. Al tocar **Guardar** sale la revisión: tus gramos al lado de las **cantidades lógicas**, que son las que dejan el plato en la media de su toma sin cambiar su forma (la misma calculadora de raciones: la verdura no se toca y la proteína se mantiene). Te dice si tu versión encaja con el resto de platos, si alguna ración es rara y si el plato movería la media tanto que otro plato del plan se saldría del margen.
+4. Eliges **Guardar las lógicas** o **Guardar las mías**. Las tuyas se pueden usar igual en la app, pero si no encajan no se exportan al CSV hasta que las ajustes.
+
+El plato se puede elegir **al momento** en su toma, con la etiqueta «tuyo»; los de comida y cena valen para las dos, como los del plan. En la tarjeta, **Ver la lista** enseña tus platos con su toma y si encajan; tocas uno para cambiarlo o borrarlo (hay que tocar Borrar dos veces). **Exportar para el CSV** descarga los que encajan y te recuerda cómo importarlos.
+
+- **Dónde se guarda:** en el móvil, en `mis_platos_v1`: toma, nombre, ingredientes con sus gramos, notas y fecha. Entra en **Guardar copia** y **Recuperar copia**.
+- **De dónde sale la media:** `M.base` en `menu/payload3.py`, la media de las recetas de cada toma tal cual están en `datos/platos.csv`. Es la misma cuenta que hace `ver_platos.py`, así que lo que la app da por bueno, la importación también.
+
 ### El margen y el arrastre
 
 Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las tomas pequeñas). Si te pasas o te quedas corto y la comes así, no pasa nada: al pulsar **Hecho, lo he comido** la diferencia se reparte entre las tomas que quedan del día, en proporción a su tamaño. Lo que decide es el total del día y la media de la semana.
@@ -381,7 +424,7 @@ Una comida está bien si se queda a ±5 % de su objetivo (o a ±25 kcal en las t
 
 - Lo que confirmas se guarda en el móvil. Se guardan **14 días con detalle**; lo anterior se resume en una línea por semana (kcal y macros medios). Un año entero ocupa menos de medio mega.
 - **Peso de hoy** se guarda en el mismo sitio que el peso del Registro: lo apuntas en cualquiera de las dos pestañas y lo ves en las dos.
-- **Guardar copia** descarga el diario (y Mis productos) en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; **Recuperar copia** lo restaura en cualquier móvil.
+- **Guardar copia** descarga el diario (y Mis productos y Mis platos) en un archivo. Guárdalo en tu carpeta del gimnasio de vez en cuando; **Recuperar copia** lo restaura en cualquier móvil.
 
 ### Cómo funciona la cuenta
 
@@ -590,5 +633,6 @@ Cosas que conviene saber:
 | v2.0 | Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia |
 | v2.1 | Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil |
 | v2.2 | Base de ejercicios propia (`datos/ejercicios.csv`) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno |
+| v2.3 | Mis platos: crear platos en la app con sus cantidades lógicas, y `actualizar.py --importar` para pasarlos a `datos/platos.csv` |
 
-*Versión del sistema: v2.2, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*
+*Versión del sistema: v2.3, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*

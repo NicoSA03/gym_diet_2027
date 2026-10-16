@@ -9,3 +9,6 @@ menu/pay_*.json
 datos/*.pdf
 datos/Workout.csv
 datos/exercises.sql
+
+# Platos exportados desde la app (v2.3): una vez importados ya viven en datos/platos.csv
+platos_app*.csv
