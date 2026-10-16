@@ -6,6 +6,9 @@ Uso:
     python3 actualizar.py                 cambios normales (peso, test de 5 km, ejercicios, series...)
     python3 actualizar.py --recalcular    si has tocado datos/platos.csv, datos/alimentos.csv
                                           o las kcal de una fase
+    python3 actualizar.py --importar platos_app.csv
+                                          mete en datos/platos.csv los platos creados en la app
+                                          (Menús, Mis platos) y regenera con --recalcular
     python3 actualizar.py --paginas       genera también las páginas sueltas para claude.ai
     python3 actualizar.py --empaquetar    genera fuente_junio2027.txt para subirlo al proyecto
     python3 actualizar.py --probar        sirve docs/ en http://localhost:8000 para probar la app
@@ -16,6 +19,7 @@ Solo usa la biblioteca estándar de Python 3.8 o superior.
 import argparse, os, subprocess, sys, time
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
+ORIGEN = os.getcwd()          # para entender las rutas relativas de --importar
 os.chdir(RAIZ)
 
 # En Windows Python escribe por defecto en cp1252, que no tiene ▶, ✓ ni −.
@@ -33,7 +37,7 @@ FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "paylo
           "a4_entreno.html", "a4.js", "a5_teoria.html", "a5.js",
           "payload_registro.py", "a6_registro.html", "a6.js", "pwa.py",
           "calculadora.js", "calculadora.py", "ver_calculadora.py", "escaner.js", "ejercicios.py",
-          "factores.json", "normas.json", "md.py"]
+          "factores.json", "normas.json", "md.py", "mis_platos.js", "importar_platos.py"]
 RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore",
                "datos/alimentos.csv", "datos/platos.csv", "datos/ejercicios.csv"]
 
@@ -78,12 +82,18 @@ def main():
                     help="genera también las cinco páginas sueltas de claude.ai")
     ap.add_argument("--empaquetar", action="store_true",
                     help="genera fuente_junio2027.txt para subirlo al proyecto")
+    ap.add_argument("--importar", metavar="ARCHIVO",
+                    help="importa a datos/platos.csv los platos exportados desde la app (implica --recalcular)")
     ap.add_argument("--forzar", action="store_true",
                     help="construye aunque la verificación falle")
     ap.add_argument("--probar", action="store_true",
                     help="al terminar, sirve docs/ en http://localhost:8000 (Ctrl+C para parar)")
     a = ap.parse_args()
 
+    if a.importar:
+        ruta = a.importar if os.path.isabs(a.importar) else os.path.join(ORIGEN, a.importar)
+        paso("Importando los platos de la app", "importar_platos.py", ruta)
+        a.recalcular = True
     if a.recalcular:
         paso("Recalculando factores de la dieta (≈20 s)", "modelo.py", silencioso=True)
 

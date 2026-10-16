@@ -1,7 +1,8 @@
-// Menús v2.1: lista del día, calculadora de raciones, diario y tus productos escaneados.
-// Los datos del plan (M) los genera menu/payload3.py. La cuenta de raciones está
-// en menu/calculadora.js (CALC) y la cámara en menu/escaner.js (ESCANER). Aquí solo
-// se pinta y se guarda en el navegador.
+// Menús v2.3: lista del día, calculadora de raciones, diario, tus productos escaneados
+// y tus platos. Los datos del plan (M) los genera menu/payload3.py. La cuenta de
+// raciones está en menu/calculadora.js (CALC), la cámara en menu/escaner.js (ESCANER)
+// y el guardado y la revisión de tus platos en menu/mis_platos.js (MIS_PLATOS). Aquí
+// solo se pinta y se guarda en el navegador.
 
 const DIAS_SEM = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const CORTO = ["D","L","M","X","J","V","S"];
@@ -95,9 +96,13 @@ function asegura(f){
 // ---------------------------------------------------------------- platos y alimentos
 function ficha(n){ return M.foods[n] || EXTRA[n]; }
 function principalesDe(b){ return M.principales.map((p,i)=>({p, i})).filter(x=>x.p.de===b); }
+// Tus platos (v2.3) se añaden al final con la clave «U» + su número. Los de comida
+// y cena se comparten entre las dos, igual que los del plan.
 function opciones(b){
-  return (b==="C"||b==="N") ? M.principales.map((p,i)=>({clave:"P"+i, n:p.n, de:p.de, it:p.it}))
-                            : M.bloques[b].ops.map((o,i)=>({clave:"O"+i, n:o.n, it:o.it}));
+  const cn = b==="C"||b==="N";
+  const mios = MIS_PLATOS.deTomas(cn ? ["C","N"] : [b]).map(x=>({clave:"U"+x.id, n:x.n, de:x.t, it:x.it, mio:true}));
+  return (cn ? M.principales.map((p,i)=>({clave:"P"+i, n:p.n, de:p.de, it:p.it}))
+             : M.bloques[b].ops.map((o,i)=>({clave:"O"+i, n:o.n, it:o.it}))).concat(mios);
 }
 // Plato por defecto: en comida y cena, el de ese día de la semana (como la lista de la compra)
 function claveDefecto(f, b){
@@ -335,7 +340,8 @@ function selectorPlato(b, actual){
     const res = todos.filter(vale);
     res.forEach(o=>{
       const it = el("button","m-res-it"+(o.n===actual.n ? " sel" : ""));
-      it.append(el("span",null,o.n));
+      const nm = el("span",null,o.n); if(o.mio) nm.append(el("span","m-tag","tuyo"));
+      it.append(nm);
       if(o.n===actual.n) it.append(el("small",null,"elegido"));
       it.addEventListener("click", ()=>{
         guardaEstado(fecha, b, {p:o.clave, it:o.it.map(([n,g])=>[n,g,false,null]), ok:false});
@@ -346,7 +352,9 @@ function selectorPlato(b, actual){
     if(!res.length) lista.append(el("p","m-nota","Ningún plato con eso. Prueba con otra palabra."));
   };
   inp.addEventListener("input", pinta);
-  box.append(inp, lista);
+  const crear = el("button","m-btn peq","+ Crear un plato nuevo");
+  crear.addEventListener("click", ()=>fichaPlato(0, b));
+  box.append(inp, lista, crear);
   pinta();
   setTimeout(()=>inp.focus(), 0);
   return box;
@@ -695,6 +703,221 @@ document.getElementById("m-prod-esc").innerHTML = BARRAS + "Escanear";
 document.getElementById("m-prod-esc").addEventListener("click", ()=>escanea(null));
 document.getElementById("m-prod-ver").addEventListener("click", ()=>{ verProductos = !verProductos; pintaProductos(); });
 
+// ---------------------------------------------------------------- mis platos (v2.3)
+// Crear un plato: nombre, toma e ingredientes con sus gramos, solo con alimentos de
+// datos/alimentos.csv. Al guardar sale la revisión con las cantidades lógicas, las que
+// hacen que el plato encaje con el resto de su toma (MIS_PLATOS.revisa, en mis_platos.js).
+// El plato se puede elegir en la app al momento; para pasarlo a datos/platos.csv se
+// exporta y se importa con «python3 actualizar.py --importar platos_app.csv».
+let verPlatos = false;
+const nomToma = t => M.nombres[t] || t;
+const racionTipica = n => { const f = M.foods[n]; return Math.max(5, Math.round((f[7]+f[8])/2/5)*5); };
+
+function fichaPlato(id, toma){
+  const viejo = id ? MIS_PLATOS.uno(id) : null;
+  const st = viejo ? {n:viejo.n, t:viejo.t, it:viejo.it.map(x=>x.slice()), no:viejo.no||""}
+                   : {n:"", t:(toma && M.base[toma]) ? toma : "C", it:[], no:""};
+  const v = abreCapa(viejo ? "Editar plato" : "Plato nuevo");
+  edita();
+
+  function edita(){
+    const p = v.panel; p.replaceChildren();
+    p.append(el("h2",null, viejo ? "Editar plato" : "Plato nuevo"),
+      el("p","m-nota","Con los alimentos de tu plan. Al guardar te digo qué cantidades encajan con el resto de platos de esa toma."));
+
+    const cNom = el("label","prod-campo"), nom = el("input");
+    nom.value = st.n; nom.maxLength = 60; nom.placeholder = "Por ejemplo: Arroz con pavo y calabacín";
+    nom.addEventListener("input", ()=>{ st.n = nom.value; });
+    cNom.append(el("span",null,"Nombre"), nom);
+
+    const cT = el("div","prod-campo"), chips = el("div","prod-etqs");
+    const pintaChips = ()=>{
+      chips.replaceChildren();
+      M.orden.forEach(t=>{
+        const ch = el("button","prod-chip", nomToma(t)); ch.type = "button";
+        ch.setAttribute("aria-pressed", t===st.t ? "true" : "false");
+        ch.addEventListener("click", ()=>{ st.t = t; pintaChips(); pintaRes(); });
+        chips.append(ch);
+      });
+    };
+    cT.append(el("span",null,"Toma"), chips);
+
+    const cIng = el("div","prod-campo"), filas = el("div","m-items");
+    const pintaIng = ()=>{
+      filas.replaceChildren();
+      if(!st.it.length) filas.append(el("p","m-nota","Aún no hay ingredientes. Búscalos aquí debajo."));
+      st.it.forEach((x, i)=>{
+        const n = x[0], f = M.foods[n];
+        const fila = el("div","m-it"), nm = el("div","nom"), kc = el("small");
+        const pintaKc = ()=>{ kc.textContent = f ? nf(f[0]*st.it[i][1]/100)+" kcal" : "ya no está en tu plan: quítalo"; };
+        nm.append(document.createTextNode(n), kc); pintaKc();
+        const gr = el("label","gr"), inp = el("input"); inp.type = "text"; inp.inputMode = "numeric";
+        inp.value = String(x[1]); inp.setAttribute("aria-label","Gramos de "+n);
+        inp.addEventListener("focus", ()=>inp.select());
+        inp.addEventListener("input", ()=>{
+          const g = parseFloat(inp.value.replace(",","."));
+          if(g>0 && g<5000){ st.it[i][1] = Math.round(g); pintaKc(); pintaRes(); }
+        });
+        gr.append(inp, el("span",null,"g"));
+        const bt = el("button","m-ic"); bt.type = "button"; bt.innerHTML = QUITAR; bt.setAttribute("aria-label","Quitar "+n);
+        bt.addEventListener("click", ()=>{ st.it.splice(i,1); pintaIng(); pintaRes(); });
+        fila.append(nm, gr, bt); filas.append(fila);
+      });
+    };
+    const bus = el("input"); bus.type = "search"; bus.placeholder = "Añade un ingrediente: arroz, pollo..."; bus.setAttribute("aria-label","Buscar ingrediente");
+    const res = el("div","m-res-lista");
+    const pintaBus = ()=>{
+      res.replaceChildren();
+      const pal = sinTildes(bus.value.trim()).split(/\s+/).filter(Boolean);
+      if(!pal.length) return;
+      const ya = new Set(st.it.map(x=>x[0]));
+      const hits = Object.keys(M.foods).filter(n=>!ya.has(n) && pal.every(w=>sinTildes(n).indexOf(w)>=0)).slice(0, 8);
+      hits.forEach(n=>{
+        const it = el("button","m-res-it"); it.type = "button";
+        it.append(el("span",null,n), el("small",null,nf(M.foods[n][0])+" kcal/100 g"));
+        it.addEventListener("click", ()=>{ st.it.push([n, racionTipica(n)]); bus.value = ""; pintaBus(); pintaIng(); pintaRes(); });
+        res.append(it);
+      });
+      if(!hits.length) res.append(el("p","m-nota","No está en tu plan. Para usarlo, añádelo antes a datos/alimentos.csv."));
+    };
+    bus.addEventListener("input", pintaBus);
+    cIng.append(el("span",null,"Ingredientes, en gramos de la receta"), filas, bus, res);
+
+    const resu = el("p","m-nota");
+    const pintaRes = ()=>{
+      const b = M.base[st.t], t = MIS_PLATOS.totales(st.it);
+      resu.textContent = (st.it.length ? "Tu receta: "+nf(t[0])+" kcal y "+nf(t[1])+" g de proteína. " : "")+
+        "Los platos de "+nomToma(st.t).toLowerCase()+" rondan "+nf(b.m[0])+" kcal y "+nf(b.m[1])+" g de proteína.";
+    };
+
+    const cNo = el("label","prod-campo"), no = el("input");
+    no.value = st.no; no.maxLength = 120; no.placeholder = "Opcional: cómo se prepara";
+    no.addEventListener("input", ()=>{ st.no = no.value; });
+    cNo.append(el("span",null,"Notas"), no);
+
+    const err = el("p","prod-err"); err.hidden = true;
+    const acc = el("div","prod-acc");
+    if(viejo){
+      const borra = el("button","m-btn borrar","Borrar"); let seguro = false;
+      borra.addEventListener("click", ()=>{
+        if(!seguro){ seguro = true; borra.textContent = "Toca otra vez para borrar"; return; }
+        MIS_PLATOS.quita(viejo.id); v.cierra(); aviso("Plato borrado"); render();
+      });
+      acc.append(borra);
+    }
+    const cancel = el("button","m-btn","Cancelar"); cancel.addEventListener("click", v.cierra);
+    const sig = el("button","m-btn prim","Guardar");
+    sig.addEventListener("click", ()=>{
+      const n = st.n.replace(/\s+/g," ").trim();
+      const fallo = t=>{ err.textContent = t; err.hidden = false; };
+      if(!n) return fallo("Ponle un nombre.");
+      if(/[|;]/.test(n)) return fallo("El nombre no puede llevar «|» ni «;».");
+      if(MIS_PLATOS.nombreOcupado(st.t, n, viejo ? viejo.id : 0)) return fallo("Ya hay un plato con ese nombre en "+nomToma(st.t).toLowerCase()+".");
+      if(!st.it.length) return fallo("Añade al menos un ingrediente.");
+      if(st.it.some(x=>!M.foods[x[0]])) return fallo("Quita los ingredientes que ya no están en tu plan.");
+      st.n = n; revision();
+    });
+    acc.append(cancel, sig);
+    p.append(cNom, cT, cIng, resu, cNo, err, acc);
+    pintaChips(); pintaIng(); pintaRes();
+    // sin poner el cursor en el nombre: en el móvil sacaría el teclado y taparía la ficha
+  }
+
+  // La revisión: tus cantidades al lado de las lógicas, y tú eliges con cuáles se guarda
+  function revision(){
+    const p = v.panel; p.replaceChildren();
+    const r = MIS_PLATOS.revisa(st.t, st.it), b = r.base, tn = nomToma(st.t).toLowerCase();
+    const lo = b.m[0]-b.tope, hi = b.m[0]+b.tope;
+    p.append(el("h2",null,"Revisa las cantidades"));
+    p.append(el("p","m-estado "+(r.encaja ? "ok" : "aviso"), r.encaja
+      ? "Tus cantidades encajan con el resto de platos de "+tn+": "+nf(r.tot[0])+" kcal, y lo normal es de "+nf(lo)+" a "+nf(hi)+"."
+      : "Así no encaja con el resto de platos de "+tn+": tu receta tiene "+nf(r.tot[0])+" kcal y lo normal es de "+nf(lo)+" a "+nf(hi)+"."));
+    r.raciones.forEach(x=>p.append(el("p","prod-aviso", x.n+": "+x.g+" g es una ración rara (lo normal, de "+nf(x.lo)+" a "+nf(x.hi)+" g).")));
+    if(r.afecta.length) p.append(el("p","prod-aviso","Con este plato la media de "+tn+" se mueve y se saldrían del margen: "+r.afecta.join(", ")+"."));
+    p.append(el("p","m-nota","Las cantidades lógicas son las que dejan el plato en la media de "+tn+" ("+nf(b.m[0])+" kcal) sin cambiar su forma: la verdura no se toca y la proteína se mantiene."));
+
+    const tabla = el("div","pla-tabla");
+    const fila = (cls, a, b2, c)=>{ const f = el("div","pla-fila"+(cls ? " "+cls : "")); f.append(el("span",null,a), el("span",null,b2), el("span",null,c)); tabla.append(f); };
+    fila("cab", "Ingrediente", "Tuyas", "Lógicas");
+    r.logicas.forEach(([n, gl])=>{
+      const g = st.it.find(x=>x[0]===n)[1];
+      fila(Math.abs(gl-g) >= Math.max(5, 0.1*g) ? "cambia" : "", n, g+" g", gl>0 ? gl+" g" : "quitar");
+    });
+    fila("tot", "Kcal", nf(r.tot[0]), nf(r.totL[0]));
+    fila("tot2", "Proteína", nf(r.tot[1])+" g", nf(r.totL[1])+" g");
+    p.append(tabla);
+
+    if(!r.logicasOk) p.append(el("p","prod-aviso","Ni con estas cantidades llega a encajar: cambia o añade algún ingrediente (una base como arroz o patata, o una proteína)."));
+    p.append(el("p","m-nota","Son los gramos de la receta base. Cada día la calculadora los ajusta a lo que te toca, guardes las que guardes."));
+    if(!r.encaja) p.append(el("p","m-nota","Si guardas las tuyas, el plato se puede usar en la app, pero no se exporta al CSV hasta que encaje."));
+
+    const acc = el("div","prod-acc");
+    const vol = el("button","m-btn","Volver"); vol.addEventListener("click", edita);
+    const mias = el("button","m-btn"+(r.encaja ? " prim" : ""),"Guardar las mías");
+    mias.addEventListener("click", ()=>guardaPlato(st.it));
+    acc.append(vol, mias);
+    if(r.logicasOk){
+      const lg = el("button","m-btn"+(r.encaja ? "" : " prim"),"Guardar las lógicas");
+      lg.addEventListener("click", ()=>guardaPlato(r.logicas.filter(x=>x[1]>0)));
+      acc.append(lg);
+    }
+    p.append(acc);
+  }
+
+  function guardaPlato(it){
+    const x = MIS_PLATOS.pon({id: viejo ? viejo.id : 0, t:st.t, n:st.n, it, no:st.no});
+    if(!x){ aviso("No se ha podido guardar: el navegador tiene el almacenamiento lleno o bloqueado."); return; }
+    v.cierra(); aviso(viejo ? "Plato actualizado" : "Guardado: ya lo puedes elegir en "+nomToma(x.t).toLowerCase()); render();
+  }
+}
+
+// Descarga platos_app.csv y explica cómo meterlo en datos/platos.csv
+function exportaPlatos(){
+  const r = MIS_PLATOS.csv();
+  const v = abreCapa("Exportar platos"), p = v.panel;
+  p.append(el("h2",null,"Exportar para el CSV"));
+  if(r.n){
+    const blob = new Blob([r.texto], {type:"text/csv;charset=utf-8"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "platos_app.csv";
+    document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    p.append(el("p",null, r.n+(r.n===1 ? " plato descargado" : " platos descargados")+" en platos_app.csv. Para "+(r.n===1 ? "meterlo" : "meterlos")+" en datos/platos.csv:"));
+    const ol = el("ol","pla-pasos");
+    const li1 = el("li",null,"Copia platos_app.csv a la carpeta gym_diet_2027.");
+    const li2 = el("li",null,"Ejecuta "); li2.append(el("code",null,"python3 actualizar.py --importar platos_app.csv"));
+    const li3 = el("li",null,"Sube los cambios a GitHub, como siempre.");
+    ol.append(li1, li2, li3); p.append(ol);
+    p.append(el("p","m-nota","Puedes importar el mismo archivo dos veces: lo que ya está en el CSV no se duplica."));
+  } else p.append(el("p",null,"No hay ningún plato listo para exportar."));
+  if(r.fuera.length) p.append(el("p","prod-aviso","No van porque no encajan con su toma: "+r.fuera.map(x=>x.n).join(", ")+". Ábrelos y guárdalos con las cantidades lógicas."));
+  const acc = el("div","prod-acc"), ok = el("button","m-btn prim","Entendido");
+  ok.addEventListener("click", v.cierra); acc.append(ok); p.append(acc);
+}
+
+// Tarjeta «Mis platos» en la página
+function pintaMisPlatos(){
+  const ps = MIS_PLATOS.lista(), n = ps.length;
+  document.getElementById("m-pla-n").textContent = n ? n+(n===1 ? " plato tuyo" : " platos tuyos")+" en este móvil."
+    : "Crea tus platos y elígelos en la toma que quieras.";
+  const ver = document.getElementById("m-pla-ver"), exp = document.getElementById("m-pla-exp"), box = document.getElementById("m-pla-lista");
+  ver.hidden = !n; exp.hidden = !n; ver.textContent = verPlatos ? "Ocultar la lista" : "Ver la lista";
+  box.hidden = !(n && verPlatos); box.replaceChildren();
+  if(!n || !verPlatos) return;
+  const lista = el("div","m-res-lista");
+  ps.sort((a,b)=>M.orden.indexOf(a.t)-M.orden.indexOf(b.t) || a.n.localeCompare(b.n,"es")).forEach(x=>{
+    const it = el("button","m-res-it"), a = el("span",null,x.n);
+    a.append(el("span","m-tag",nomToma(x.t)));
+    if(MIS_PLATOS.enPlan(x.t, x.n)) a.append(el("span","m-tag","ya en el plan"));
+    else if(!MIS_PLATOS.revisa(x.t, x.it).encaja) a.append(el("span","m-tag dud","no encaja"));
+    it.append(a, el("small",null,nf(MIS_PLATOS.totales(x.it)[0])+" kcal"));
+    it.addEventListener("click", ()=>fichaPlato(x.id));
+    lista.append(it);
+  });
+  box.append(lista);
+}
+document.getElementById("m-pla-nuevo").addEventListener("click", ()=>fichaPlato(0, abierta));
+document.getElementById("m-pla-ver").addEventListener("click", ()=>{ verPlatos = !verPlatos; pintaMisPlatos(); });
+document.getElementById("m-pla-exp").addEventListener("click", exportaPlatos);
+
 // ---------------------------------------------------------------- semana
 function pintaSemana(){
   const box = document.getElementById("m-barras"); box.replaceChildren();
@@ -720,7 +943,7 @@ function pintaSemana(){
 
 // ---------------------------------------------------------------- copia de seguridad
 document.getElementById("m-exp").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar()}, null, 1)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar(), platos:MIS_PLATOS.paraCopia()}, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "diario_"+hoy()+".json";
   document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   aviso("Copia descargada: guárdala en tu carpeta del gimnasio");
@@ -732,6 +955,7 @@ document.getElementById("m-imp-f").addEventListener("change", function(){
     if(!j || j.tipo!=="diario" || !j.diario || !j.diario.dias) throw 0;
     D = Object.assign(vacio(), j.diario); EXTRA = j.extra || {};
     if(j.productos){ PROD = normalizaProd(j.productos); guardaProductos(); }
+    if(j.platos) MIS_PLATOS.recupera(j.platos);
     guarda(); compacta(); render(); aviso("Copia recuperada");
   }).catch(()=>aviso("Ese archivo no es una copia del diario"));
   this.value = "";
@@ -755,6 +979,6 @@ document.getElementById("m-peso-ok").addEventListener("click", ()=>{
 });
 window.addEventListener("gd:peso", ()=>pintaResumen());
 
-function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaProductos(); pintaSemana(); }
+function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaMisPlatos(); pintaProductos(); pintaSemana(); }
 compacta();
 render();
