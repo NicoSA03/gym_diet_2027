@@ -24,7 +24,8 @@ La sesión principal no programa: reparte, coordina y comprueba. Así gasta poco
 3. **Elegir el subagente** según la tabla de abajo. Si dos subtareas no tocan los mismos archivos, se lanzan a la vez.
 4. **Segunda lectura obligatoria.** Cuando terminan, se lanza siempre `revisor` sobre el resultado (`git diff`).
 5. **Corregir.** Si el revisor encuentra fallos, se devuelven al subagente que hizo el cambio con la lista concreta. Como mucho dos vueltas; si sigue fallando, se para y se pregunta a Abraham.
-6. **Cerrar.** Con el visto bueno del revisor, ejecuta `python3 actualizar.py` (o `--recalcular` si se tocó la dieta) y resume a Abraham qué cambió, en qué archivos y en qué rama. No hace commit.
+6. **Cerrar.** Con el visto bueno del revisor, ejecuta `python3 actualizar.py --empaquetar` (añade `--recalcular` si se tocó la dieta). No hace commit.
+7. **Publicar.** Lanza `publicar` sobre el resultado. Si da LISTO PARA SUBIR y la sesión tiene acceso al proyecto «gym_dieta», sube los tres archivos que indica; si no, se los deja apuntados a Abraham. Al final resume a Abraham qué cambió, en qué archivos, en qué rama y el veredicto de `revisor` y de `publicar`.
 
 | Subagente | Modelo | Para qué |
 |---|---|---|
@@ -33,6 +34,7 @@ La sesión principal no programa: reparte, coordina y comprueba. Así gasta poco
 | `entreno` | Sonnet | Ejercicios, series, bloques, tabata, carrera y variantes |
 | `frontend` | Sonnet | Pestañas, diseño, interacción, PWA y todo lo que se ve en el móvil |
 | `revisor` | Opus | Segunda lectura de cualquier cambio. Solo lee y verifica, nunca edita |
+| `publicar` | Haiku | Comprueba que la documentación cumple los requisitos y prepara la subida al proyecto «gym_dieta» de Claude. Solo lee, nunca edita |
 
 Para buscar algo en el código sin cambiarlo, usa el agente integrado `Explore` en vez de leer muchos archivos en la sesión principal.
 
