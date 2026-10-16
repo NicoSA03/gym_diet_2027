@@ -40,6 +40,8 @@ gym_diet_2027/
 ├── actualizar.py        ← la única orden que necesitas
 ├── restaurar.py         ← reconstruye menu/ desde el paquete del proyecto de Claude
 ├── README.md
+├── CLAUDE.md            ← instrucciones para Claude: el supervisor y cómo reparte el trabajo (v2.4)
+├── .claude/agents/      ← los agentes de Claude: ajustes, dieta, entreno, frontend, revisor y publicar
 ├── datos/
 │   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
 │   ├── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
@@ -634,5 +636,6 @@ Cosas que conviene saber:
 | v2.1 | Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil |
 | v2.2 | Base de ejercicios propia (`datos/ejercicios.csv`) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno |
 | v2.3 | Mis platos: crear platos en la app con sus cantidades lógicas, y `actualizar.py --importar` para pasarlos a `datos/platos.csv` |
+| v2.4 | Agentes de Claude: un supervisor (`CLAUDE.md`) que reparte el trabajo entre `ajustes` (Haiku), `dieta`, `entreno` y `frontend` (Sonnet), un `revisor` (Opus) que hace la segunda lectura de cada cambio, y `publicar` (Haiku), que comprueba los requisitos y prepara la subida al proyecto |
 
-*Versión del sistema: v2.3, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*
+*Versión del sistema: v2.4, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*

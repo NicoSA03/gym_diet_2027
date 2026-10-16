@@ -1400,6 +1400,8 @@ python3 actualizar.py
 ├── actualizar.py        ← la única orden que necesitas
 ├── restaurar.py         ← reconstruye menu/ desde el paquete del proyecto de Claude
 ├── README.md
+├── CLAUDE.md            ← instrucciones para Claude: el supervisor y cómo reparte el trabajo (v2.4)
+├── .claude/agents/      ← los agentes de Claude: ajustes, dieta, entreno, frontend, revisor y publicar
 ├── datos/
 │   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
 │   ├── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
@@ -1655,13 +1657,13 @@ python3 catalogo/actualizar_catalogo.py --solo M   # solo Mercadona (unos 2 minu
 <ul><li><b>Nunca se vacía.</b> Si una fuente falla o trae menos de la mitad de productos que la vez anterior, se conservan sus datos anteriores y queda anotado en <code>fuentes</code> dentro del propio archivo.</li><li><b>Datos dudosos.</b> Si las kcal de un producto no cuadran con sus macros (4/4/9, ±15 %), se marca como dudoso en vez de esconderlo: la app lo enseña con un aviso.</li><li><b>Open Food Facts lo rellenan usuarios.</b> Están los productos más escaneados de cada tienda, no todos. Lo que falte se podrá añadir desde la app con el escáner.</li><li>Las piezas están separadas para cambiar una fuente sin tocar las demás: <code>catalogo/fuente_mercadona.py</code>, <code>catalogo/fuente_openFood.py</code>, <code>catalogo/comun.py</code> (descarga, formato y control de calidad) y <code>catalogo/actualizar_catalogo.py</code> (el que lo une todo).</li></ul>
 <hr>
 <h3>11. Versiones</h3>
-<div class="tscroll"><table><thead><tr><th>Versión</th><th>Qué trae</th></tr></thead><tbody><tr><td>v1.0</td><td>Siete pestañas, menús por tipo de día, Registro y app instalable</td></tr><tr><td>v1.1</td><td>Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin</td></tr><tr><td>v2.0</td><td>Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia</td></tr><tr><td>v2.1</td><td>Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil</td></tr><tr><td>v2.2</td><td>Base de ejercicios propia (<code>datos/ejercicios.csv</code>) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno</td></tr><tr><td>v2.3</td><td>Mis platos: crear platos en la app con sus cantidades lógicas, y <code>actualizar.py --importar</code> para pasarlos a <code>datos/platos.csv</code></td></tr></tbody></table></div>
-<p><i>Versión del sistema: v2.3, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.</i></p></div></section>
+<div class="tscroll"><table><thead><tr><th>Versión</th><th>Qué trae</th></tr></thead><tbody><tr><td>v1.0</td><td>Siete pestañas, menús por tipo de día, Registro y app instalable</td></tr><tr><td>v1.1</td><td>Catálogo automático de Mercadona, Lidl y Carrefour; calorías de B1, B2 y B3 revisadas con datos de Garmin</td></tr><tr><td>v2.0</td><td>Pestaña Menús rehecha: lista del día, calculadora de raciones, todos los platos en comida y cena, diario con peso y copia</td></tr><tr><td>v2.1</td><td>Escáner de códigos de barras y Mis productos: nombre sugerido, etiquetas por tienda ampliables, guardado en el móvil</td></tr><tr><td>v2.2</td><td>Base de ejercicios propia (<code>datos/ejercicios.csv</code>) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno</td></tr><tr><td>v2.3</td><td>Mis platos: crear platos en la app con sus cantidades lógicas, y <code>actualizar.py --importar</code> para pasarlos a <code>datos/platos.csv</code></td></tr><tr><td>v2.4</td><td>Agentes de Claude: un supervisor (<code>CLAUDE.md</code>) que reparte el trabajo entre <code>ajustes</code> (Haiku), <code>dieta</code>, <code>entreno</code> y <code>frontend</code> (Sonnet), un <code>revisor</code> (Opus) que hace la segunda lectura de cada cambio, y <code>publicar</code> (Haiku), que comprueba los requisitos y prepara la subida al proyecto</td></tr></tbody></table></div>
+<p><i>Versión del sistema: v2.4, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.</i></p></div></section>
 </div>
 </div>
 </main>
 <div class="sello">
-  versión 3a10f259, 16 de octubre de 2026
+  versión 8d1a2a62, 16 de octubre de 2026
 </div>
 <script>
 
