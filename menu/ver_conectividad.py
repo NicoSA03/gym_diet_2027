@@ -66,6 +66,7 @@ MALOS = [
  ("Ganar hasta un peso menor que el actual se rechaza", dict(objetivo="ganar", peso_objetivo=75), ["peso_objetivo"]),
  ("Una edad «abc» se rechaza sin pedir el pulso máximo", dict(edad="abc", objetivo="mantener"), ["edad"]),
  ("Un 5 km con 75 segundos se rechaza", dict(objetivo="5k", test_5k="27:75", objetivo_5k="25:00"), ["test_5k"]),
+ ("Un 5 km de 1:02:30 (h:mm:ss) se acepta", dict(objetivo="5k", test_5k="1:02:30", objetivo_5k="55:00"), []),
  ("Un 5 km de 62:30 se acepta", dict(objetivo="5k", test_5k="62:30", objetivo_5k="55:00"), []),
  ("Un 5 km deseado más lento que el actual se rechaza", dict(objetivo="5k", test_5k="27:30", objetivo_5k="29:00"), ["objetivo_5k"]),
 ]

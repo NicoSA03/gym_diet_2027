@@ -395,7 +395,7 @@ function resolver(reloj, manual){
   }
   /* cálculos a partir de otras */
   if(val.fc_max==null && val.edad>=14 && val.edad<=90){ val.fc_max=Math.round(208-0.7*val.edad); origen.fc_max="calculado"; }
-  if(val.vo2max==null && val.test_5k && /^\d{1,3}:[0-5]\d$/.test(val.test_5k)){ val.vo2max=r1(vdot(5000, seg(val.test_5k))); origen.vo2max="calculado"; }
+  if(val.vo2max==null && val.test_5k && /^(\d{1,2}:[0-5]\d|\d{1,3}):[0-5]\d$/.test(val.test_5k)){ val.vo2max=r1(vdot(5000, seg(val.test_5k))); origen.vo2max="calculado"; }
   if(val.semanas_parado==null){ val.semanas_parado=0; origen.semanas_parado="supuesto"; }
   const pide = new Set(METRICAS.filter(M=>M.obl).map(M=>M.k));
   (NECESITA[val.objetivo]||[]).forEach(k=>pide.add(k));
@@ -404,7 +404,7 @@ function resolver(reloj, manual){
     const x=val[M.k]; if(x==null || origen[M.k]==="calculado") return false;   /* solo se valida lo que viene de fuera */
     if(M.min!=null) return !(x>=M.min && x<=M.max);
     if(M.op) return M.op.indexOf(x)<0;
-    if(M.u==="mm:ss") return !(/^\d{1,3}:[0-5]\d$/.test(x) && seg(x)>=600 && seg(x)<=5400);   /* 5 km entre 10 y 90 min */
+    if(M.u==="mm:ss") return !(/^(\d{1,2}:[0-5]\d|\d{1,3}):[0-5]\d$/.test(x) && seg(x)>=600 && seg(x)<=5400);   /* 5 km entre 10 y 90 min */
     return false;
   }).map(M=>M.k);
   /* objetivos que se contradicen con el punto de partida */

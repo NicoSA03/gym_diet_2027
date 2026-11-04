@@ -44,7 +44,7 @@ def numero(x):
     return float(m.group(0)) if m else float("nan")
 
 
-MMSS = re.compile(r"^\d{1,3}:[0-5]\d$")
+MMSS = re.compile(r"^(\d{1,2}:[0-5]\d|\d{1,3}):[0-5]\d$")
 
 
 def r1(x):
