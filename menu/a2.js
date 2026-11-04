@@ -65,6 +65,7 @@ function guardaPeso(fecha, kg){
   r.peso = (r.peso||[]).filter(x=>x.f!==fecha); r.peso.push({f:fecha, kg});
   r.peso.sort((a,b)=>a.f<b.f?-1:1);
   try{ localStorage.setItem(KEY_REG, JSON.stringify(r)); }catch(e){ aviso("No se ha podido guardar el peso."); return; }
+  regC = null; ajMemo = {};
   window.dispatchEvent(new CustomEvent("gd:registro"));
 }
 
@@ -86,8 +87,62 @@ function dia(f){ return D.dias[f] || null; }
 function faseDia(f){ const d=dia(f); return (d && d.fase) || faseDe(f); }
 function tipoDia(f){ const d=dia(f); return (d && d.tipo) || TIPO_DE[deIso(f).getDay()]; }
 function tomas(f){ return M.tipos[tipoDia(f)].tomas; }
-function objToma(f, b){ return M.obj[faseDia(f)+"|"+tipoDia(f)][b]; }
-function objDia(f){ const o=[0,0,0,0]; tomas(f).forEach(b=>{ const t=objToma(f,b); for(let i=0;i<4;i++) o[i]+=t[i]; }); return o; }
+// v2.6: los avisos de plazos tocan el objetivo de dos formas. Las kcal extra del bloque
+// (aviso de peso aplicado) escalan todas las tomas de hoy en adelante. Y lo que vas a
+// hacer hoy (pregunta de El entreno) escala solo las tomas que aún no has comido.
+let regC = null, ajMemo = {};
+function regCache(){ if(regC===null) regC = registro() || false; return regC || null; }
+function kcTipo(fase, tipo){ const o = M.obj[fase+"|"+tipo]; return o ? M.tipos[tipo].tomas.reduce((a,b)=>a+(o[b]?o[b][0]:0), 0) : 0; }
+// kcal extra de los avisos de peso aplicados y no deshechos, desde el día en que se aplicaron
+function extraKcal(f){
+  const r = regCache(); if(!r || !Array.isArray(r.ajustes)) return 0;
+  const b = faseDia(f);
+  return r.ajustes.reduce((s,a)=>(a && !a.deshecho && a.que==="kcal" && a.bloque===b && typeof a.f==="string" && a.f<=f && a.antes && a.despues) ? s+(a.despues.kcal-a.antes.kcal) : s, 0);
+}
+function escalaExtra(f){ const base = kcTipo(faseDia(f), tipoDia(f)), ex = extraKcal(f); return base>0 && ex ? (base+ex)/base : 1; }
+function objToma(f, b){
+  const o = M.obj[faseDia(f)+"|"+tipoDia(f)][b], k = escalaExtra(f);
+  return k===1 ? o : o.map(v=>v*k);
+}
+function pesoDe(f){ const r = regCache(); let p = null; ((r && r.peso) || []).forEach(x=>{ if(x.f<=f && (!p || x.f>p.f)) p = x; }); return p ? p.kg : 0; }
+// Sesión prevista cuando el tipo del día se cambió a mano en Menús (undefined = la que toca por fecha)
+function sesionDeTipo(t, f){
+  if(t === TIPO_DE[deIso(f).getDay()]) return undefined;
+  const nat = ["L","M","X","J","V"][(deIso(f).getDay()+6)%7];
+  return t==="A" ? (nat==="L"||nat==="X" ? nat : "L") : t==="B" ? (nat==="M"||nat==="J" ? nat : "M") : t==="C" ? "V" : null;
+}
+// Ajuste de un día con lo elegido en la pregunta diaria. Vale también para días pasados:
+// el objetivo no vuelve al plan a medianoche (peso: el último pesaje igual o anterior al día).
+function ajusteDia(f){
+  if(ajMemo[f] !== undefined) return ajMemo[f];
+  let res = null;
+  try{
+    const r = regCache();
+    if(r && r.dias && r.dias[f]){
+      const fase = faseDia(f), ex = extraKcal(f);
+      const plan = {kcal: kcTipo(fase, tipoDia(f))+ex, kcalE: kcTipo(fase,"E")+ex, kcalD: kcTipo(fase,"D")+ex};
+      const ses = sesionDeTipo(tipoDia(f), f); if(ses !== undefined) plan.sesion = ses;
+      const a = PLAZOS.dietaDelDia(r, f, plan, pesoDe(f));
+      if(a && a.factor !== 1) res = a;
+    }
+  }catch(e){ res = null; }
+  return ajMemo[f] = res;
+}
+// Objetivo de una toma con el ajuste del día. Cambian las que quedan por comer y las que
+// comiste después de elegir qué ibas a hacer (la toma guarda su hora en t.h); las comidas
+// antes de elegir, o sin hora, se quedan como estaban. Así el objetivo del día no se mueve
+// al ir marcando tomas.
+function objAj(f, b){
+  const o = objToma(f, b), a = ajusteDia(f);
+  if(!a) return o;
+  const st = estado(f,b);
+  if(st.ok){
+    const r = regCache(), t0 = r && r.dias && r.dias[f] ? r.dias[f].t : 0;
+    if(!(st.h > 0 && t0 > 0 && st.h > t0)) return o;
+  }
+  return o.map(v=>v*a.factor);
+}
+function objDia(f){ const o=[0,0,0,0]; tomas(f).forEach(b=>{ const t=objAj(f,b); for(let i=0;i<4;i++) o[i]+=t[i]; }); return o; }
 function asegura(f){
   if(!D.dias[f]) D.dias[f] = {fase:faseDia(f), tipo:tipoDia(f), tomas:{}};
   return D.dias[f];
@@ -127,12 +182,12 @@ function guardaEstado(f, b, t){ asegura(f).tomas[b] = t; guarda(); }
 // Objetivo de la toma con el arrastre: lo que te has pasado o te ha faltado en las
 // tomas ya hechas se reparte entre las que quedan, en proporción a su tamaño.
 function objetivo(f, b){
-  const base = objToma(f, b), st = estado(f, b);
+  const base = objAj(f, b), st = estado(f, b);
   if(st.ok) return base;
   const od = objDia(f); let hechas=[0,0,0,0], quedan=0;
   tomas(f).forEach(x=>{ const e=estado(f,x);
     if(e.ok){ const m=e.m || calcula(f,x).tot; for(let i=0;i<4;i++) hechas[i]+=m[i]; }
-    else quedan += objToma(f,x)[0]; });
+    else quedan += objAj(f,x)[0]; });
   if(!quedan) return base;
   const fac = Math.max(0.5, Math.min(1.5, (od[0]-hechas[0]) / quedan));
   return base.map(v=>v*fac);
@@ -268,7 +323,7 @@ function calculadora(b){
   }
 
   // pie: total de la toma, estado y acciones
-  const tot = st.ok ? st.m : r.tot, obj = st.ok ? objToma(fecha,b) : r.obj;
+  const tot = st.ok ? st.m : r.tot, obj = st.ok ? objAj(fecha,b) : r.obj;
   const pie = el("div","m-pie");
   const f1 = el("div","fila1"); f1.append(el("b",null,nf(tot[0])+" kcal"), el("span",null,"objetivo "+nf(obj[0])));
   const pista = el("div","pista"), zona = el("i"), barra = el("em");
@@ -300,7 +355,7 @@ function calculadora(b){
   const acc = el("div","m-acc");
   if(st.ok){
     const ed = el("button","m-btn","Editar");
-    ed.addEventListener("click", ()=>{ const t=estado(fecha,b); t.ok=false; delete t.m; guardaEstado(fecha,b,t); render(); });
+    ed.addEventListener("click", ()=>{ const t=estado(fecha,b); t.ok=false; delete t.m; delete t.h; guardaEstado(fecha,b,t); render(); });
     acc.append(ed);
   } else {
     const rs = el("button","m-btn","Restablecer");
@@ -309,7 +364,7 @@ function calculadora(b){
     ok.addEventListener("click", ()=>{
       const t = estado(fecha, b);
       t.it = t.it.map(x=>{ const j=r.its.findIndex(it=>it.n===x[0]); return [x[0], x[1], x[2], j>=0 ? r.g[j] : x[3]]; });
-      t.ok = true; t.m = r.tot.map(v=>Math.round(v*10)/10);
+      t.ok = true; t.h = Date.now(); t.m = r.tot.map(v=>Math.round(v*10)/10);
       guardaEstado(fecha, b, t); abierta = null; aviso(M.nombres[b]+" apuntada"); render();
     });
     acc.append(rs, ok);
@@ -981,8 +1036,64 @@ document.getElementById("m-peso-ok").addEventListener("click", ()=>{
   if(!(v>30 && v<250)){ aviso("Ese peso no parece correcto"); return; }
   guardaPeso(fecha, Math.round(v*10)/10); aviso("Peso guardado"); render();
 });
-window.addEventListener("gd:peso", ()=>pintaResumen());
+window.addEventListener("gd:peso", ()=>{ regC = null; ajMemo = {}; render(); });
 
-function render(){ pintaCabecera(); pintaResumen(); pintaTomas(); pintaMisPlatos(); pintaProductos(); pintaSemana(); }
+// ---------------------------------------------------------------- v2.6: aviso del día y aviso de peso
+function guardaRegistro(r){
+  try{
+    const crudo = localStorage.getItem(KEY_REG);
+    if(crudo){ let p = null; try{ p = JSON.parse(crudo); }catch(e){} if(!p || p.v!==1) return false; }
+    localStorage.setItem(KEY_REG, JSON.stringify(r));
+  }catch(e){ return false; }
+  regC = null; ajMemo = {};
+  window.dispatchEvent(new CustomEvent("gd:registro"));
+  return true;
+}
+let hechoPeso = null;   // aviso de peso aplicado en esta visita, para poder deshacerlo
+function tarjetaProp(texto, hecho, botones){
+  const c = el("div","m-prop"+(hecho ? " hecho" : ""));
+  c.append(el("p",null,texto));
+  const f = el("div","fila");
+  botones.forEach(([t,fn,prim])=>{ const b = el("button","m-btn peq"+(prim?" prim":""),t); b.addEventListener("click", fn); f.append(b); });
+  c.append(f);
+  return c;
+}
+function pintaAjustes(){
+  const lin = document.getElementById("m-ajuste"), box = document.getElementById("m-prop");
+  const a = ajusteDia(fecha);
+  lin.hidden = !a; lin.textContent = a ? a.motivo : "";
+  const sinPeso = document.getElementById("m-sinpeso"), r0 = regCache(), d0 = r0 && r0.dias && r0.dias[fecha];
+  sinPeso.hidden = !(fecha >= hoy() && d0 && (d0.modo==="otra" || d0.modo==="descanso") && !pesoDe(fecha));
+  box.replaceChildren();
+  if(fecha !== hoy()) return;
+  const r = regCache(); if(!r) return;
+  if(hechoPeso && !(Array.isArray(r.ajustes) && r.ajustes.some(x=>x && !x.deshecho && x.que==="kcal" && x.f===fecha))) hechoPeso = null;
+  if(hechoPeso) box.append(tarjetaProp(hechoPeso.texto, true, [["Deshacer", ()=>{
+    const r2 = registro(); if(!r2) return;
+    let n; try{ n = hechoPeso.prop.deshacer(r2); }catch(e){ return; }
+    if(guardaRegistro(n)){ hechoPeso = null; render(); }
+  }]]));
+  const bl = faseDia(fecha), clave = "peso|"+bl+"|"+lunes(fecha);
+  let p = null;
+  try{ p = PLAZOS.propuestaPeso(r, fecha, bl); }catch(e){}
+  if(!p || (r.descartes && r.descartes[clave])) return;
+  box.append(tarjetaProp(p.texto, false, [
+    ["Aplicar", ()=>{
+      const r2 = registro(); if(!r2) return;
+      let n; try{ n = p.aplicar(r2); }catch(e){ return; }
+      if(guardaRegistro(n)){ hechoPeso = {texto:p.texto, prop:p}; render(); }
+    }, true],
+    ["Dejar como está", ()=>{
+      const r2 = registro(); if(!r2) return;
+      r2.descartes = (r2.descartes && typeof r2.descartes==="object") ? r2.descartes : {};
+      r2.descartes[clave] = true;
+      if(guardaRegistro(r2)) render();
+    }]
+  ]));
+}
+// Si El entreno cambia lo que vas a hacer hoy o aplicas un aviso, se repinta con el nuevo objetivo
+window.addEventListener("gd:plazos", ()=>{ render(); });
+
+function render(){ regC = null; ajMemo = {}; pintaCabecera(); pintaResumen(); pintaAjustes(); pintaTomas(); pintaMisPlatos(); pintaProductos(); pintaSemana(); }
 compacta();
 render();

@@ -126,6 +126,13 @@
 /* semana y copia */
 .m-sem{padding:16px}
 .m-sem h3{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:12px}
+.m-ajuste{font-size:14px;font-weight:700;color:var(--amber);background:var(--amber-soft);border-radius:8px;padding:9px 12px}
+.m-prop{background:var(--amber-soft);border:1px solid var(--amber);border-radius:10px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.m-prop.hecho{background:var(--surface);border-color:var(--line-2)}
+#m-prop:empty{display:none}
+.m-prop p{font-size:14.5px;line-height:1.4;color:var(--ink)}
+.m-prop .fila{display:flex;gap:8px;flex-wrap:wrap}
 .m-barras{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:96px}
 .m-barras div{display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
 .m-barras .b{width:100%;max-width:30px;height:4px;border-radius:6px 6px 2px 2px;background:var(--line-2)}
@@ -247,6 +254,9 @@
       </div>
     </section>
 
+    <p class="m-ajuste" id="m-ajuste" hidden></p>
+    <p class="m-ajuste" id="m-sinpeso" hidden>Apunta tu peso para ajustar la comida.</p>
+    <div id="m-prop"></div>
     <section class="m-tomas" id="m-tomas" aria-label="Comidas del día"></section>
 
     <section class="card m-prod" aria-label="Mis platos">

@@ -58,6 +58,21 @@ function faseDe(s){
 // Para lo que necesita un bloque sí o sí: el de hoy, y si no se sabe, el que
 // tengas elegido a mano.
 function faseHoy(){ return faseDe(hoy()) || selFase || Object.keys(R.fases)[0]; }
+// v2.6: semana con aviso aplicado de repetir o reentrada: no se sube carga, una serie menos y RIR +1
+function marcaSemana(){
+  const lun = lunes(hoy()); let m = null;
+  (Array.isArray(D.ajustes) ? D.ajustes : []).forEach(a=>{
+    if(a && !a.deshecho && (a.que==="repetir" || a.que==="reentrada") && /^\d{4}-\d{2}-\d{2}$/.test(a.f||"") && lunes(a.f)===lun) m = (m==="reentrada" ? m : a.que);
+  });
+  return m;
+}
+const TXT_MARCA = ()=>{ const m = marcaSemana(); return m ? (m==="reentrada" ? "Reentrada" : "Repetir cargas")+": no subas peso, una serie menos, RIR +1." : null; };
+const txtSeries = n=>n+(n===1 ? " serie" : " series");
+function lineaMarca(){ const t = TXT_MARCA(); if(!t) return null; const p = el("p","nota",t); p.style.color = "var(--amber)"; p.style.fontWeight = "700"; return p; }
+function esqAj(f, t){
+  const p = f.esquema[t];
+  return marcaSemana() ? [Math.max(1, p[0]-1), p[1], String(p[2]).replace(/\d+/g, n=>String(+n+1))] : p;
+}
 function diaDe(s){ const w=(deIso(s).getDay()+6)%7; return w<5 ? w : null; }
 function fmtDur(seg){
   seg = Math.max(0, Math.floor(seg));
@@ -84,17 +99,17 @@ const corporal = n=>!!(R.ej[n] && R.ej[n].corporal);
 const carga = (n,kg,fecha)=>corporal(n) ? pesoEn(fecha)+(kg||0) : (kg||0);
 const cuenta = s=>s.tipo!=="C";
 function volumen(ses){
-  let v=0; ses.ej.forEach(e=>e.series.filter(cuenta).forEach(s=>{ v+=(s.kg||0)*(s.reps||0); })); return v;
+  let v=0; (ses.ej||[]).forEach(e=>e.series.filter(cuenta).forEach(s=>{ v+=(s.kg||0)*(s.reps||0); })); return v;
 }
-function nSeries(ses){ let n=0; ses.ej.forEach(e=>{ n+=e.series.filter(cuenta).length; }); return n; }
+function nSeries(ses){ let n=0; (ses.ej||[]).forEach(e=>{ n+=e.series.filter(cuenta).length; }); return n; }
 function mejor1rm(n){
   let b=0;
-  D.sesiones.forEach(ses=>ses.ej.forEach(e=>{ if(e.n===n) e.series.filter(cuenta).forEach(s=>{ b=Math.max(b, e1rm(carga(n,s.kg,ses.fecha),s.reps)); }); }));
+  D.sesiones.forEach(ses=>(ses.ej||[]).forEach(e=>{ if(e.n===n) e.series.filter(cuenta).forEach(s=>{ b=Math.max(b, e1rm(carga(n,s.kg,ses.fecha),s.reps)); }); }));
   return b;
 }
 function anterior(n){
   for(let i=D.sesiones.length-1;i>=0;i--){
-    const e = D.sesiones[i].ej.find(x=>x.n===n);
+    const e = (D.sesiones[i].ej||[]).find(x=>x.n===n);
     if(e && e.series.length) return e.series;
   }
   return null;
@@ -179,8 +194,9 @@ function vEntrenar(box){
 
   card.append(el("h3",null,d.dia+": "+d.n), el("p","nota",d.sub));
   if(d.tipo==="fuerza"){
+    const lm = lineaMarca(); if(lm) card.append(lm);
     const l = el("div","r-prev");
-    d.ej.forEach(([t,n])=>{ const p=f.esquema[t]; const r=el("div"); r.append(el("span",null,n), el("b",null,p[0]+" × "+p[1])); l.append(r); });
+    d.ej.forEach(([t,n])=>{ const p=esqAj(f,t); const r=el("div"); r.append(el("span",null,n), el("b",null,p[0]+" × "+p[1])); l.append(r); });
     if(d.tabata){ const r=el("div"); r.append(el("span",null,"Abdominales, "+R.tabatas[d.tabata]), el("b",null,"8 × 20 s")); l.append(r); }
     card.append(l);
     const b = el("button","r-btn full","Empezar entreno");
@@ -193,7 +209,7 @@ function vEntrenar(box){
   box.append(card);
   if(D.sesiones.length){
     const u = D.sesiones[D.sesiones.length-1];
-    box.append(el("p","nota","Último entreno: "+corta(u.fecha)+", "+u.nombre+", "+nf(volumen(u),0)+" kg, "+nSeries(u)+" series"));
+    box.append(el("p","nota","Último entreno: "+corta(u.fecha)+", "+(u.nombre||"Fuerza")+(nSeries(u) ? ", "+nf(volumen(u),0)+" kg, "+txtSeries(nSeries(u)) : "")));
   }
 }
 
@@ -203,7 +219,7 @@ function empezar(fk, di){
     id: Date.now(), inicio: Date.now(), fecha: hoy(), fase: fk, dia: d.cod, nombre: d.dia+": "+d.n,
     abd: d.tabata ? {n:R.tabatas[d.tabata], hecha:false} : null,
     ej: d.ej.map(([t,n])=>({ n, t, notas:"",
-      series: Array.from({length:f.esquema[t][0]}, ()=>({kg:"", reps:"", tipo:"N", hecha:false})) }))
+      series: Array.from({length:esqAj(f,t)[0]}, ()=>({kg:"", reps:"", tipo:"N", hecha:false})) }))
   };
   resumen = null; guarda(); render(); window.scrollTo(0,0);
 }
@@ -235,6 +251,7 @@ function vSesion(box){
   });
   top.append(fin, x);
   box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase+": "+f.n+", "+corta(a.fecha)));
+  { const lm = lineaMarca(); if(lm) box.append(lm); }
   a.ej.forEach(e=>box.append(bloqueEj(e, f)));
   if(a.abd){
     const ab = el("div","r-abd");
@@ -250,7 +267,7 @@ function vSesion(box){
 }
 
 function bloqueEj(e, f){
-  const p = f.esquema[e.t], ant = anterior(e.n) || [], cor = corporal(e.n);
+  const p = esqAj(f, e.t), ant = anterior(e.n) || [], cor = corporal(e.n);
   const minReps = String(p[1]).split("-")[0];
   const w = el("div","r-ej");
   w.append(el("h3",null,e.n));
@@ -483,7 +500,7 @@ function vProgreso(box){
   // --- ejercicio
   const c = el("div","r-card");
   c.append(el("h3",null,"Por ejercicio"));
-  const conDatos = Object.keys(R.ej).filter(n=>D.sesiones.some(s=>s.ej.some(e=>e.n===n)));
+  const conDatos = Object.keys(R.ej).filter(n=>D.sesiones.some(s=>(s.ej||[]).some(e=>e.n===n)));
   if(!conDatos.length){
     c.append(hueco("Cuando termines tu primer entreno aparecerán aquí las gráficas de cada ejercicio."));
   } else {
@@ -495,7 +512,7 @@ function vProgreso(box){
     METRICAS.forEach(([k,t])=>{ const b=el("button","chip sm",t); b.setAttribute("aria-selected",k===selMet?"true":"false"); b.addEventListener("click",()=>{ selMet=k; render(); }); ch.append(b); });
     c.append(sel, ch);
     const pts = []; let rec = 0, mejor = null;
-    D.sesiones.forEach(ses=>ses.ej.filter(e=>e.n===selEj).forEach(e=>{
+    D.sesiones.forEach(ses=>(ses.ej||[]).filter(e=>e.n===selEj).forEach(e=>{
       const ss = e.series.filter(cuenta); if(!ss.length) return;
       let v = 0;
       ss.forEach(s=>{
@@ -548,7 +565,7 @@ function vProgreso(box){
   const fk = faseHoy(), f = R.fases[fk], l0 = lunes(hoy());
   c4.append(el("h3",null,"Series por grupo, esta semana"));
   const cnt = {}; R.musculos.forEach(m=>{ cnt[m]=0; });
-  D.sesiones.filter(s=>s.fecha>=l0).forEach(s=>s.ej.forEach(e=>{
+  D.sesiones.filter(s=>s.fecha>=l0).forEach(s=>(s.ej||[]).forEach(e=>{
     const k = e.series.filter(cuenta).length;
     ((R.ej[e.n]||{}).m||[]).forEach(m=>{ cnt[m]=(cnt[m]||0)+k; });
   }));
@@ -577,14 +594,16 @@ function vHistorial(box){
     const d = el("details","r-hist"), s = el("summary"), c = el("div","cuerpo");
     if(it.t==="s"){
       const x = it.o;
-      s.append(el("b",null,x.nombre), el("span",null,corta(x.fecha)+", "+fmtDur(x.dur)+", "+nf(volumen(x),0)+" kg, "+nSeries(x)+" series"));
-      x.ej.forEach(e=>{
+      // las sesiones del reloj pueden venir sin ejercicios, sin duración o sin abdominales
+      const ns = nSeries(x);
+      s.append(el("b",null,x.nombre||"Fuerza"), el("span",null,corta(x.fecha)+(x.dur>0 ? ", "+fmtDur(x.dur) : "")+(ns ? ", "+nf(volumen(x),0)+" kg, "+txtSeries(ns) : "")+(x.origen==="reloj" ? ", reloj" : "")));
+      (x.ej||[]).forEach(e=>{
         c.append(el("h5",null,e.n));
         let n=0;
         e.series.forEach(se=>{ const et = se.tipo==="C" ? "C" : se.tipo==="F" ? "F" : String(++n); c.append(el("p",null,et+"   "+txtSerie(e.n,se))); });
         if(e.notas) c.append(el("p","nota",e.notas));
       });
-      if(x.abd!==null) c.append(el("p",null,"Abdominales: "+(x.abd?"hechos":"no")));
+      if(x.abd===true || x.abd===false) c.append(el("p",null,"Abdominales: "+(x.abd?"hechos":"no")));
     } else {
       const x = it.o;
       s.append(el("b",null,"Carrera, "+x.tipo), el("span",null,corta(x.f)+", "+nf(x.km)+" km, "+nf(x.min,0)+" min, "+ritmo(x.km,x.min)));
