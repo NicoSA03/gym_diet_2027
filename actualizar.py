@@ -37,9 +37,9 @@ FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "paylo
           "a4_entreno.html", "a4.js", "a5_teoria.html", "a5.js",
           "payload_registro.py", "a6_registro.html", "a6.js", "pwa.py",
           "calculadora.js", "calculadora.py", "ver_calculadora.py", "escaner.js", "ejercicios.py",
-          "factores.json", "normas.json", "md.py", "mis_platos.js", "importar_platos.py"]
+          "factores.json", "normas.json", "mis_platos.js", "importar_platos.py"]
 RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore",
-               "datos/alimentos.csv", "datos/platos.csv", "datos/ejercicios.csv"]
+               "datos/alimentos.csv", "datos/platos.csv", "datos/ejercicios.csv", "datos/perfil_ejemplo.json"]
 
 
 def paso(titulo, script, *args, obligatorio=True, silencioso=False):

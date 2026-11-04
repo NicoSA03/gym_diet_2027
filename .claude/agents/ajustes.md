@@ -10,9 +10,9 @@ Haces cambios pequeños y exactos en gym_diet_2027. Nada de rediseñar ni opinar
 
 Dónde está cada valor:
 
-- Peso de la semana: `PESO` en `menu/entreno.py`. Es la media de 7 días, con un decimal.
-- Test de 5 km: `TEST_5K` en `menu/entreno.py`, formato `"mm:ss"`.
-- Objetivo de 5 km: `OBJETIVO_5K` en `menu/entreno.py`, formato `"mm:ss"`.
+- Peso de la semana: clave `peso` de `datos/perfil.json` (local, no se sube). Es la media de 7 días, con un decimal.
+- Test de 5 km: clave `test_5k` de `datos/perfil.json`, formato `"mm:ss"`.
+- Objetivo de 5 km: clave `objetivo_5k` de `datos/perfil.json`, formato `"mm:ss"`.
 - Kcal de un bloque: `FASES` en `menu/modelo.py`. Si cambias kcal, cambia los carbohidratos en la misma proporción (100 kcal son unos 25 g).
 
 Pasos:

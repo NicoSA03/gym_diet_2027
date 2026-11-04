@@ -12,3 +12,6 @@ datos/exercises.sql
 
 # Platos exportados desde la app (v2.3): una vez importados ya viven en datos/platos.csv
 platos_app*.csv
+
+# Métricas personales: se quedan en el PC (el repositorio es público)
+datos/perfil.json

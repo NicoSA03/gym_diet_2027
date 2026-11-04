@@ -1,16 +1,15 @@
 # Plan de entreno y dieta
 
-Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene siete pestañas:
+Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene seis pestañas:
 
 | Pestaña | Para qué |
 |---|---|
-| El entreno | La sesión de hoy: series, repeticiones, esfuerzo, abdominales, carrera y variantes |
+| El entreno | La sesión de hoy (abre en el día y el bloque que tocan según la fecha de inicio del Registro): series, repeticiones, esfuerzo, abdominales, carrera y variantes |
 | Registro | Apuntar series como en Hevy, peso corporal, carrera, gráficas de progreso e historial |
 | La teoría | El porqué de todo, el desglose de cada ejercicio y el seguimiento semanal |
 | Cómo funciona | La dieta: calorías por bloque y tipo de día, y qué hacer cuando la vida se cruza |
 | Menús | El día de hoy con sus comidas, la calculadora que ajusta las raciones y tu diario (sección 5) |
 | La compra | La lista de Mercadona de la semana, con casillas |
-| Actualizar | Este manual y los valores con los que está generado el archivo |
 
 El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de datos en Python. Cambias un dato, ejecutas una orden y sale un `planificacion_dieta_gym.html` nuevo. Para eso solo necesitas **Python 3.8 o superior**, sin librerías extra. Todo lo que se calcula (el plan, los datos del registro, la app instalable y sus iconos) se hace en Python; en el móvil solo corre el JavaScript mínimo para pintar y guardar. Y si no quieres tocar código, pídeselo a Claude en el proyecto «gym_dieta» (sección 8).
 
@@ -19,7 +18,7 @@ El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de 
 ## 1. En 30 segundos
 
 ```bash
-# 1. Cambia el dato: menu/entreno.py (entreno) o datos/*.csv (alimentos y platos)
+# 1. Cambia el dato: datos/perfil.json (peso y 5 km), menu/entreno.py (entreno) o datos/*.csv (alimentos y platos)
 # 2. Regenera todo
 python3 actualizar.py
 # 3. El resultado está en salida/planificacion_dieta_gym.html y la app instalable en docs/
@@ -46,10 +45,12 @@ gym_diet_2027/
 │   ├── alimentos.csv    ← LOS ALIMENTOS: se edita con Excel o el Bloc de notas
 │   ├── platos.csv       ← LOS PLATOS: qué lleva cada uno y cuánto
 │   ├── ejercicios.csv   ← LOS EJERCICIOS: músculos, material, nombre en Garmin y animación (sección 3)
+│   ├── perfil.json      ← TUS MÉTRICAS: peso, altura y 5 km. Solo en tu PC (está en .gitignore)
+│   ├── perfil_ejemplo.json ← la plantilla de perfil.json con valores genéricos (sí se sube)
 │   └── *.pdf, Workout.csv, exercises.sql ← material de contexto: no se sube (está en .gitignore)
 ├── catalogo/            ← descarga los alimentos de Mercadona, Lidl y Carrefour (sección 10)
 ├── menu/
-│   ├── entreno.py       ← TODO el entreno: peso, bloques, ejercicios, series, tabata, carrera, variantes
+│   ├── entreno.py       ← TODO el entreno: bloques, ejercicios, series, tabata, carrera, variantes
 │   ├── modelo.py        ← la dieta: calorías por bloque, tomas del día, tipos de día
 │   ├── db.py            ← carga datos/alimentos.csv y lo deja listo para el resto
 │   ├── platos.py        ← carga datos/platos.csv y comprueba que todo cuadre
@@ -87,11 +88,13 @@ gym_diet_2027/
 
 ### Peso de la semana
 
-`menu/entreno.py`, arriba del todo:
+`datos/perfil.json`, clave `peso`:
 
-```python
-PESO = 79.5        # kg, media real de partida
+```json
+{"peso": 75.0, "altura": 175, "test_5k": "28:00", "objetivo_5k": "25:00"}
 ```
+
+Desde la v2.5 tus métricas viven en `datos/perfil.json`, que está en `.gitignore` y no se sube (el repositorio es público). Si no existe, la app se genera con `datos/perfil_ejemplo.json` y avisa: cópialo a `datos/perfil.json` y pon tus datos.
 
 Usa la **media de 7 días**, nunca el dato de un día suelto. Este número se muestra en la teoría y sirve de base para calcular la proteína por kilo que comprueba la verificación.
 
@@ -115,12 +118,7 @@ Cuando subas o bajes kcal, cambia también los carbohidratos (C) en la misma pro
 
 ### Test de 5 km (al final de cada bloque)
 
-`menu/entreno.py`:
-
-```python
-TEST_5K = "27:30"      # último test de 5 km (mm:ss); fija las zonas de carrera
-OBJETIVO_5K = "23:00"  # 5 km objetivo en junio
-```
+`datos/perfil.json`, claves `test_5k` (último test, mm:ss; fija las zonas de carrera) y `objetivo_5k` (el objetivo de junio).
 
 Pon el tiempo nuevo y todas las zonas (Z2 a Z5) y el VO₂máx estimado se recalculan solos.
 
@@ -175,7 +173,7 @@ ej=[("T1","Sentadilla trasera"),("T1","Press banca"), ... ("T2","Press Arnold"),
 - **gif**: el código de su animación en ExerciseDB. En El entreno sale un desplegable **Cómo se hace** debajo de cada ejercicio; la animación solo se descarga al abrirlo y hace falta internet.
 - **uso**: `plan`, `sustituto` (con `sustituye_a`) o `extra`.
 
-De dónde sale: la lista oficial de Garmin (1.846 ejercicios del kit FIT de Garmin), las animaciones de `datos/exercises.sql` (ExerciseDB, 1.324 ejercicios) y los rangos de series de `datos/Workout.csv`. `datos/GYM.csv` no aporta nada: de sus 80.000 filas solo 16 son distintas.
+De dónde sale: la lista oficial de Garmin (1.846 ejercicios del kit FIT de Garmin), las animaciones de `datos/exercises.sql` (ExerciseDB, 1.324 ejercicios) y los rangos de series de `datos/Workout.csv`. `obsoleto/v2.5_csv_sin_uso/GYM.csv` no aporta nada: de sus 80.000 filas solo 16 son distintas.
 
 Para buscar el código de otra animación: abre `datos/exercises.sql` con el Bloc de notas, busca el ejercicio en inglés (por ejemplo `barbell curl`) y copia el código de 7 letras que va antes del nombre (`25GPyDY`). Puedes comprobarlo abriendo `https://static.exercisedb.dev/media/25GPyDY.gif`.
 
@@ -552,7 +550,7 @@ python3 menu/ver_calculadora.py
 
 El proyecto guarda siempre la versión vigente de tres cosas:
 
-- `claude/planificacion_dieta_gym.html` → el archivo de siete pestañas, listo para descargar desde cualquier dispositivo.
+- `claude/planificacion_dieta_gym.html` → el archivo de seis pestañas, listo para descargar desde cualquier dispositivo.
 - `claude/README.md` → este manual.
 - `claude/fuente_junio2027.txt` → todo el código en un solo archivo de texto.
 
@@ -637,5 +635,6 @@ Cosas que conviene saber:
 | v2.2 | Base de ejercicios propia (`datos/ejercicios.csv`) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno |
 | v2.3 | Mis platos: crear platos en la app con sus cantidades lógicas, y `actualizar.py --importar` para pasarlos a `datos/platos.csv` |
 | v2.4 | Agentes de Claude: un supervisor (`CLAUDE.md`) que reparte el trabajo entre `ajustes` (Haiku), `dieta`, `entreno` y `frontend` (Sonnet), un `revisor` (Opus) que hace la segunda lectura de cada cambio, y `publicar` (Haiku), que comprueba los requisitos y prepara la subida al proyecto |
+| v2.5 | Interfaz más limpia: El entreno abre en el día de hoy y en el bloque que toca (sábado y domingo se ven como descanso y puedes tocar cualquier día); fuera la pestaña Actualizar (el manual se lee aquí, en README.md; lo retirado está en `obsoleto/v2.5_pestana_actualizar/`); quitados 35 textos sobrantes de las seis pestañas. Arreglos de lógica: un yogur, leche, kéfir o skyr escaneado o del catálogo entra como lácteo (125 a 400 g) y no como base o verdura; Alubias con huevo lleva claras y las fajitas pasan a ser de ternera magra, así ya no se quedan cortas de proteína; tus métricas pasan a `datos/perfil.json` (local, no se sube); `GYM.csv` y su copia van a `obsoleto/v2.5_csv_sin_uso/` |
 
-*Versión del sistema: v2.4, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*
+*Versión del sistema: v2.5, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*

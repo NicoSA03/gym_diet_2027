@@ -1,4 +1,4 @@
-let fase = "F0", dia = 0;
+let fase = "F0", dia = 0;   // dia: 0-4 de lunes a viernes, -1 el fin de semana (descanso)
 
 const el = (t,c,x)=>{const n=document.createElement(t); if(c)n.className=c;
   if(x!==undefined)n.textContent=x; return n;};
@@ -37,15 +37,25 @@ function pintaDias(){
     b.setAttribute("aria-selected", i===dia?"true":"false");
     b.append(el("span",null,d.dia.slice(0,3)),
              el("small",null, d.tipo==="fuerza" ? d.n : "Carrera"));
-    b.addEventListener("click", ()=>{ dia=i; guarda("e_dia",String(i)); render(); });
+    b.addEventListener("click", ()=>{ dia=i; render(); });
     box.append(b);
   });
+  const fin = document.getElementById("finde");
+  fin.setAttribute("aria-selected", dia<0 ? "true":"false");
+  fin.onclick = ()=>{ dia=-1; render(); };
 }
 
 function pintaSesion(){
-  const d = E.dias[dia], f = E.fases[fase];
   const box = document.getElementById("sesion");
   box.replaceChildren();
+  if(dia < 0){
+    const w = (new Date().getDay()+6)%7;
+    const c = el("div","descanso");
+    c.append(el("h3",null, w>=5 ? "Hoy descanso" : "Fin de semana, descanso"));
+    box.append(c);
+    return;
+  }
+  const d = E.dias[dia], f = E.fases[fase];
 
   const top = el("div","ses-top");
   const izq = el("div");
@@ -181,8 +191,23 @@ function pintaVariantes(){
 
 function render(){ pintaFases(); pintaDias(); pintaSesion(); pintaKm(); }
 
+// Al abrir: el día de hoy (sábado y domingo, descanso) y el bloque que toca hoy
+// según la fecha de inicio del Registro (misma cuenta que menu/a6.js). Sin fecha
+// o fuera del ciclo, el bloque que dejaste elegido a mano.
+function faseDeHoy(){
+  const t = lee("registro_v1"); if(!t) return null;
+  const ini = JSON.parse(t).inicio;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ini||"")) return null;
+  const lun = d=>{ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-(x.getDay()+6)%7); return x.getTime(); };
+  const [a,m,d] = ini.split("-").map(Number);
+  const w = Math.round((lun(new Date())-lun(new Date(a,m-1,d)))/6048e5) + 1;
+  const ks = Object.keys(E.fases);
+  if(w < 1) return ks[0];
+  return ks.find(k=>w>=E.fases[k].s0 && w<=E.fases[k].s1) || null;
+}
 try{
   const f = lee("e_fase"); if(f && E.fases[f]) fase = f;
-  const d = lee("e_dia");  if(d !== null && E.dias[+d]) dia = +d;
 }catch(e){}
+try{ const h = faseDeHoy(); if(h) fase = h; }catch(e){}
+{ const w = (new Date().getDay()+6)%7; dia = w < 5 ? w : -1; }
 pintaZonas(); pintaVariantes(); render();

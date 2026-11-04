@@ -31,7 +31,7 @@ function pintaFase(){
   });
   document.getElementById("f-nota").textContent =
     "La media ponderada de los siete días sale en " + nf(v.media) + " kcal, frente al objetivo de " +
-    nf(v.obj[0]) + ". Lo que decide el cambio de peso es esa media, no el número de un día suelto.";
+    nf(v.obj[0]) + ".";
 }
 
 function pintaTipo(){

@@ -383,7 +383,7 @@ function cargaCatalogo(){
   catEstado = "cargando";
   catPromesa = fetch("catalogo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{ const c=j.campos; const ix=k=>c.indexOf(k);
-      CAT = j.items.map(x=>({n:x[ix("nombre")], m:x[ix("marca")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")],
+      CAT = j.items.map(x=>({n:x[ix("nombre")], m:x[ix("marca")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")], cat:x[ix("categoria")],
                              dud:x[ix("dudoso")], q:sinTildes(x[ix("nombre")]+" "+(x[ix("marca")]||""))}));
       // índice por código de barras, para el escáner (los UPC de 12 cifras, con un 0 delante)
       CAT_EAN = {};
@@ -394,8 +394,16 @@ function cargaCatalogo(){
   return catPromesa;
 }
 const TIENDA = {M:"Mercadona", L:"Lidl", C:"Carrefour"};
-// Papel que se le supone a un producto del catálogo, por sus macros
-function rolDe(k,p,g,c){
+// Papel que se le supone a un producto, calculado siempre con los macros finales que
+// tenga en ese momento (los que el usuario guardó), sin guardarlo de antemano.
+// Regla lacteo: si el nombre o la categoría dicen yogur, leche, kéfir, skyr, cuajada,
+// queso fresco, requesón (o milk, yogurt) y tiene menos de 150 kcal por 100 g, es "lacteo".
+// Se excluyen chocolate, galleta, helado, cereales, café, leche de coco y leche condensada.
+// Si no es lácteo, se decide solo por macros.
+function rolDe(k,p,g,c,nombre,cat){
+  const t = sinTildes((nombre||"")+" | "+(cat||""));
+  if(k>0 && k<150 && /yogur|yogurt|leche|kefir|skyr|cuajada|queso fresco|requeson|milk/.test(t)
+     && !/chocolate|cacao|batido|galleta|helado|cereal|cafe|postre|arroz con leche|zumo|fruta|leche de coco|leche condensada/.test(t)) return ["lacteo",125,400];
   if(p*4 >= 0.35*k && k>0) return ["proteina",60,250];
   if(g*9 >= 0.6*k && k>0) return ["grasa",5,40];
   if(k < 60) return ["verdura",50,250];
@@ -434,14 +442,13 @@ function buscador(b){
         const a=el("span",null,x.n); a.append(el("span","m-tag",x.s.split("").map(l=>TIENDA[l]).join(", ")));
         if(x.dud) a.append(el("span","m-tag dud","kcal dudosas"));
         it.append(a, el("small",null,nf(x.k)+" kcal"));
-        it.addEventListener("click", ()=>{ const [rol,lo,hi]=rolDe(x.k,x.p,x.g,x.c);
+        it.addEventListener("click", ()=>{ const [rol,lo,hi]=rolDe(x.k,x.p,x.g,x.c,x.n,x.cat);
           const nom = x.n+" ("+TIENDA[x.s[0]]+")";
           EXTRA[nom] = [x.k,x.p,x.g,x.c,rol,"","",lo,hi]; anade(b, nom, EXTRA[nom]); });
         lista.append(it); });
     }
     pie.textContent = catEstado==="cargando" ? "Cargando el catálogo de Mercadona, Lidl y Carrefour..."
-      : catEstado==="error" ? "El catálogo de las tiendas solo está en la app instalada. Mientras, elige entre tus alimentos."
-      : catEstado==="ok" ? "Primero lo tuyo; después, los de Mercadona, Lidl y Carrefour." : "";
+      : catEstado==="error" ? "El catálogo de las tiendas solo está en la app instalada. Mientras, elige entre tus alimentos." : "";
   };
   inp.addEventListener("input", pinta);
   box.append(fila, lista, pie, cerrar);
@@ -456,7 +463,7 @@ function anade(b, n, f){
   // y el resto del plato se ajusta a su alrededor.
   const g = EXTRA[n] ? 100 : Math.round((f[7]+f[8])/2/5)*5;
   t.it.push([n, g, true, g]);
-  buscando = null; guardaEstado(fecha, b, t); aviso(n+": "+g+" g. Cambia los gramos si quieres"); render();
+  buscando = null; guardaEstado(fecha, b, t); aviso(n+": "+g+" g"); render();
 }
 
 // ---------------------------------------------------------------- mis productos (v2.1)
@@ -491,7 +498,7 @@ function claveProducto(e){
 // Al añadirlo a un plato se copia a EXTRA: así el diario sigue bien aunque luego lo
 // cambies o lo borres de Mis productos.
 function anadeProducto(b, e){
-  const x = PROD.p[e], k = claveProducto(e), [rol,lo,hi] = rolDe(x[2],x[3],x[4],x[5]);
+  const x = PROD.p[e], k = claveProducto(e), [rol,lo,hi] = rolDe(x[2],x[3],x[4],x[5],x[0]);
   EXTRA[k] = [x[2],x[3],x[4],x[5],rol,"","",lo,hi];
   anade(b, k, EXTRA[k]);
 }
@@ -722,8 +729,7 @@ function fichaPlato(id, toma){
 
   function edita(){
     const p = v.panel; p.replaceChildren();
-    p.append(el("h2",null, viejo ? "Editar plato" : "Plato nuevo"),
-      el("p","m-nota","Con los alimentos de tu plan. Al guardar te digo qué cantidades encajan con el resto de platos de esa toma."));
+    p.append(el("h2",null, viejo ? "Editar plato" : "Plato nuevo"));
 
     const cNom = el("label","prod-campo"), nom = el("input");
     nom.value = st.n; nom.maxLength = 60; nom.placeholder = "Por ejemplo: Arroz con pavo y calabacín";
@@ -848,7 +854,6 @@ function fichaPlato(id, toma){
     p.append(tabla);
 
     if(!r.logicasOk) p.append(el("p","prod-aviso","Ni con estas cantidades llega a encajar: cambia o añade algún ingrediente (una base como arroz o patata, o una proteína)."));
-    p.append(el("p","m-nota","Son los gramos de la receta base. Cada día la calculadora los ajusta a lo que te toca, guardes las que guardes."));
     if(!r.encaja) p.append(el("p","m-nota","Si guardas las tuyas, el plato se puede usar en la app, pero no se exporta al CSV hasta que encaje."));
 
     const acc = el("div","prod-acc");
@@ -886,7 +891,6 @@ function exportaPlatos(){
     const li2 = el("li",null,"Ejecuta "); li2.append(el("code",null,"python3 actualizar.py --importar platos_app.csv"));
     const li3 = el("li",null,"Sube los cambios a GitHub, como siempre.");
     ol.append(li1, li2, li3); p.append(ol);
-    p.append(el("p","m-nota","Puedes importar el mismo archivo dos veces: lo que ya está en el CSV no se duplica."));
   } else p.append(el("p",null,"No hay ningún plato listo para exportar."));
   if(r.fuera.length) p.append(el("p","prod-aviso","No van porque no encajan con su toma: "+r.fuera.map(x=>x.n).join(", ")+". Ábrelos y guárdalos con las cantidades lógicas."));
   const acc = el("div","prod-acc"), ok = el("button","m-btn prim","Entendido");
@@ -938,7 +942,7 @@ function pintaSemana(){
   }
   const ns = Object.keys(D.dias).length, nw = Object.keys(D.semanas).length;
   document.getElementById("m-guardado").textContent = "En este móvil: "+ns+(ns===1?" día":" días")+" con detalle"+
-    (nw ? " y "+nw+(nw===1?" semana resumida":" semanas resumidas") : "")+". Guarda una copia de vez en cuando.";
+    (nw ? " y "+nw+(nw===1?" semana resumida":" semanas resumidas") : "")+".";
 }
 
 // ---------------------------------------------------------------- copia de seguridad
@@ -946,7 +950,7 @@ document.getElementById("m-exp").addEventListener("click", ()=>{
   const blob = new Blob([JSON.stringify({app:"gym_diet_2027", tipo:"diario", v:1, diario:D, extra:EXTRA, productos:prodParaGuardar(), platos:MIS_PLATOS.paraCopia()}, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "diario_"+hoy()+".json";
   document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-  aviso("Copia descargada: guárdala en tu carpeta del gimnasio");
+  aviso("Copia descargada");
 });
 document.getElementById("m-imp").addEventListener("click", ()=>document.getElementById("m-imp-f").click());
 document.getElementById("m-imp-f").addEventListener("change", function(){
