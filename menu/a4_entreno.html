@@ -11,9 +11,12 @@
   :root:not([data-theme="light"]) .dia-btn[aria-selected="true"] small{color:#FFFFFF}}
 :root[data-theme="dark"] .dia-btn[aria-selected="true"],
 :root[data-theme="dark"] .dia-btn[aria-selected="true"] small{color:#FFFFFF}
-.finde{grid-column:1/-1;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--ink-3);text-align:center;padding:9px;
-  border:1px dashed var(--line-2);border-radius:3px;margin-top:2px}
+.finde{display:block;width:100%;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);text-align:center;padding:12px 9px;background:none;
+  border:1px dashed var(--line-2);border-radius:3px;margin-top:2px;cursor:pointer;transition:all .12s}
+.finde[aria-selected="true"]{background:var(--accent);border:1px solid var(--accent);color:#FFFFFF}
+.descanso{padding:30px 20px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.descanso h3{font-size:21px;font-weight:700;letter-spacing:-.015em}
 
 .fase-nota{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
   padding:12px 16px;background:var(--accent-soft);border-radius:3px}
@@ -127,7 +130,6 @@
 <div class="wrap">
 <header class="masthead">
   <h1>Entrenamiento</h1>
-  <p class="dek">Eliges bloque y día y tienes la sesión entera: series, repeticiones, esfuerzo y cómo se organizan. El porqué de todo esto está en el archivo de teoría.</p>
   <div class="hermanos">
     <span class="hermano yo">El entreno</span>
     <a class="hermano" href="https://claude.ai/artifact/T36P6b5juBiQMHdDgRE2SM" target="_top">La teoría</a>
@@ -143,7 +145,7 @@
     <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
     <div class="fase-nota"><b id="f-n"></b><span id="f-f"></span></div>
     <div class="dia-grid" id="dias"></div>
-    <div class="finde">Sábado y domingo, descanso completo</div>
+    <button type="button" class="finde" id="finde" role="tab" aria-selected="false">Sábado y domingo, descanso completo</button>
     <div class="ses" id="sesion"></div>
   </div>
 </section>
@@ -167,7 +169,4 @@
   <div id="variantes"></div>
 </section>
 
-<footer>
-  <a href="#" data-ir="teoria">La teoría →</a> el porqué de cada decisión, las cargas de arranque y el seguimiento semanal.
-</footer>
 </div>

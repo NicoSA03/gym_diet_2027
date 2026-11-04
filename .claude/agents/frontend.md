@@ -1,6 +1,6 @@
 ---
 name: frontend
-description: Cambios en lo que se ve y se toca en la app de gym_diet_2027 (las siete pestañas, diseño, estilos, interacción, calculadora de Menús, escáner, Mis platos y la PWA). Úsalo de forma proactiva para cualquier tarea de interfaz.
+description: Cambios en lo que se ve y se toca en la app de gym_diet_2027 (las seis pestañas, diseño, estilos, interacción, calculadora de Menús, escáner, Mis platos y la PWA). Úsalo de forma proactiva para cualquier tarea de interfaz.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
 effort: medium

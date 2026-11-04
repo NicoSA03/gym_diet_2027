@@ -1,6 +1,6 @@
 # Plan de entreno y dieta
 
-Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene siete pestañas:
+Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, que funciona igual en el PC y en el móvil, sin Claude y sin cargar otros archivos. Además se publica como **app instalable en Android** (una PWA) desde GitHub Pages: icono propio, pantalla completa y funciona sin internet. Tiene seis pestañas:
 
 | Pestaña | Para qué |
 |---|---|
@@ -10,7 +10,6 @@ Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, q
 | Cómo funciona | La dieta: calorías por bloque y tipo de día, y qué hacer cuando la vida se cruza |
 | Menús | El día de hoy con sus comidas, la calculadora que ajusta las raciones y tu diario (sección 5) |
 | La compra | La lista de Mercadona de la semana, con casillas |
-| Actualizar | Este manual y los valores con los que está generado el archivo |
 
 El archivo no se edita a mano: se **genera** a partir de unos pocos archivos de datos en Python. Cambias un dato, ejecutas una orden y sale un `planificacion_dieta_gym.html` nuevo. Para eso solo necesitas **Python 3.8 o superior**, sin librerías extra. Todo lo que se calcula (el plan, los datos del registro, la app instalable y sus iconos) se hace en Python; en el móvil solo corre el JavaScript mínimo para pintar y guardar. Y si no quieres tocar código, pídeselo a Claude en el proyecto «gym_dieta» (sección 8).
 
@@ -551,7 +550,7 @@ python3 menu/ver_calculadora.py
 
 El proyecto guarda siempre la versión vigente de tres cosas:
 
-- `claude/planificacion_dieta_gym.html` → el archivo de siete pestañas, listo para descargar desde cualquier dispositivo.
+- `claude/planificacion_dieta_gym.html` → el archivo de seis pestañas, listo para descargar desde cualquier dispositivo.
 - `claude/README.md` → este manual.
 - `claude/fuente_junio2027.txt` → todo el código en un solo archivo de texto.
 
@@ -636,6 +635,6 @@ Cosas que conviene saber:
 | v2.2 | Base de ejercicios propia (`datos/ejercicios.csv`) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno |
 | v2.3 | Mis platos: crear platos en la app con sus cantidades lógicas, y `actualizar.py --importar` para pasarlos a `datos/platos.csv` |
 | v2.4 | Agentes de Claude: un supervisor (`CLAUDE.md`) que reparte el trabajo entre `ajustes` (Haiku), `dieta`, `entreno` y `frontend` (Sonnet), un `revisor` (Opus) que hace la segunda lectura de cada cambio, y `publicar` (Haiku), que comprueba los requisitos y prepara la subida al proyecto |
-| v2.5 | Arreglos de interfaz: El entreno abre en el día de hoy y en el bloque que toca; la pestaña Actualizar ya no se sale de ancho en el móvil. Arreglos de lógica: un yogur, leche, kéfir o skyr escaneado o del catálogo entra como lácteo (125 a 400 g) y no como base o verdura; Alubias con huevo lleva claras y las fajitas pasan a ser de ternera magra, así ya no se quedan cortas de proteína; tus métricas pasan a `datos/perfil.json` (local, no se sube); `GYM.csv` y su copia van a `obsoleto/v2.5_csv_sin_uso/` |
+| v2.5 | Interfaz más limpia: El entreno abre en el día de hoy y en el bloque que toca (sábado y domingo se ven como descanso y puedes tocar cualquier día); fuera la pestaña Actualizar (el manual se lee aquí, en README.md; lo retirado está en `obsoleto/v2.5_pestana_actualizar/`); quitados 35 textos sobrantes de las seis pestañas. Arreglos de lógica: un yogur, leche, kéfir o skyr escaneado o del catálogo entra como lácteo (125 a 400 g) y no como base o verdura; Alubias con huevo lleva claras y las fajitas pasan a ser de ternera magra, así ya no se quedan cortas de proteína; tus métricas pasan a `datos/perfil.json` (local, no se sube); `GYM.csv` y su copia van a `obsoleto/v2.5_csv_sin_uso/` |
 
 *Versión del sistema: v2.5, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
