@@ -8,7 +8,7 @@ SECCIONES = [
     ("menus",   "Menús",        "menu/a2_menus.html",   ("menu/plazos.js", "menu/calculadora.js", "menu/escaner.js", "menu/mis_platos.js", "menu/a2.js"), "menu/pay_menus.json",   "M"),
     ("compra",  "La compra",    "menu/a3_compra.html",  "menu/a3.js", "menu/pay_compra.json",  "C"),
     ("entreno", "El entreno",   "menu/a4_entreno.html", ("menu/plazos.js", "menu/a4.js"), "menu/pay_entreno.json", "E"),
-    ("registro","Registro",     "menu/a6_registro.html","menu/a6.js", "menu/pay_registro.json","R"),
+    ("registro","Registro",     "menu/a6_registro.html",("menu/conectividad.js", "menu/a6.js"), "menu/pay_registro.json","R"),
     ("teoria",  "La teoría",    "menu/a5_teoria.html",  "menu/a5.js", "menu/pay_entreno.json", "T"),
     ("info",    "Cómo funciona","menu/a1_info.html",    "menu/a1.js", "menu/pay_info.json",    "I"),
 ]

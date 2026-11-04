@@ -120,7 +120,7 @@ function txtSerie(n, s){
 }
 
 // ---------------------------------------------------------------- navegación
-const VISTAS = [["entrenar","Entrenar"],["cuerpo","Peso y carrera"],["progreso","Progreso"],["historial","Historial"]];
+const VISTAS = [["entrenar","Entrenar"],["cuerpo","Peso y carrera"],["progreso","Progreso"],["historial","Historial"],["reloj","Reloj"]];
 let vista = "entrenar";
 try{ const v=localStorage.getItem("reg_vista"); if(v && VISTAS.some(x=>x[0]===v)) vista=v; }catch(e){}
 if(D.activa) vista = "entrenar";
@@ -154,7 +154,7 @@ document.getElementById("r-ini").addEventListener("change", function(){
 function render(){
   pintaTabs(); paraReloj(); pintaInicio();
   const box = document.getElementById("r-vista"); box.replaceChildren();
-  ({entrenar:vEntrenar, cuerpo:vCuerpo, progreso:vProgreso, historial:vHistorial})[vista](box);
+  ({entrenar:vEntrenar, cuerpo:vCuerpo, progreso:vProgreso, historial:vHistorial, reloj:vReloj})[vista](box);
 }
 
 // ---------------------------------------------------------------- entrenar
@@ -451,6 +451,108 @@ function vCuerpo(box){
       l.append(r);
     });
     c2.append(l);
+  }
+  box.append(c2);
+}
+
+// ---------------------------------------------------------------- Reloj (v3.0, usa Conectividad)
+const MAN_KEY = "perfil_manual_v1";
+const manualLee = ()=>{ try{ return JSON.parse(localStorage.getItem(MAN_KEY)) || {}; }catch(e){ return {}; } };
+const manualGuarda = m=>{ try{ localStorage.setItem(MAN_KEY, JSON.stringify(m)); }catch(e){ aviso("No se ha podido guardar."); } };
+let relMarca = "garmin", relDatos = null, relSes = [], relMsg = "";
+
+function vReloj(box){
+  const CN = Conectividad;
+  const c = el("div","r-card");
+  c.append(el("h3",null,"Reloj"));
+  const chips = el("div","chips");
+  CN.MARCAS.forEach(m=>{
+    const b = el("button","chip",m.n); b.setAttribute("aria-selected", m.id===relMarca?"true":"false");
+    b.addEventListener("click", ()=>{ relMarca = m.id; render(); });
+    chips.append(b);
+  });
+  c.append(chips);
+  const M = CN.MARCAS.find(x=>x.id===relMarca);
+  const ol = el("ol","nota"); M.pasos.forEach(p=>ol.append(el("li",null,p))); c.append(ol);
+  if(M.url && /^https/.test(M.url)){ const a = el("a","r-btn ancho","Abrir "+M.n); a.href = M.url; a.target = "_blank"; a.rel = "noopener"; a.style.textAlign = "center"; c.append(a); }
+  const fi = el("input"); fi.type = "file"; fi.multiple = true; fi.accept = M.tipos.join(",");
+  fi.setAttribute("aria-label","Subir archivos del reloj");
+  const lista = el("div","r-lista");
+  fi.addEventListener("change", async ()=>{
+    const lecs = [], errs = [];
+    for(const f of Array.from(fi.files)){
+      try{
+        const cont = /\.fit$/i.test(f.name) ? await f.arrayBuffer() : await f.text();
+        lecs.push(CN.leerArchivo(f.name, cont));
+      }catch(e){ errs.push(f.name+": "+(e.message||"no se pudo leer")); }
+    }
+    if(lecs.length){ const r = CN.juntar(lecs, hoy()); relDatos = r; relSes = r.sesiones; }
+    relMsg = errs.join("\n");
+    render();
+  });
+  c.append(fi);
+  if(relMsg){ relMsg.split("\n").forEach(t=>{ const p = el("p","nota",t); p.style.color = "var(--amber)"; c.append(p); }); }
+  if(relDatos){
+    c.append(el("p",null,relDatos.actividades+(relDatos.actividades===1?" actividad":" actividades")));
+    const ks = Object.keys(relDatos.datos).filter(k=>CN.METRICAS.some(m=>m.k===k));
+    if(ks.length){
+      const st = el("div","r-lista");
+      ks.forEach(k=>{ const m = CN.METRICAS.find(x=>x.k===k), r = el("div"); r.append(el("span",null,m.n), el("b",null,relDatos.datos[k]+(m.u?" "+m.u:""))); st.append(r); });
+      c.append(st);
+    } else c.append(el("p","nota","No hay métricas en esos archivos."));
+    const add = el("button","r-btn ancho","Añadir al Registro");
+    add.addEventListener("click", ()=>{
+      const n = CN.aRegistro(relSes, D);
+      if(!n.carrera.length && !n.sesiones.length){ aviso("No hay nada nuevo que añadir."); return; }
+      if(!confirm("Se añadirán "+n.carrera.length+(n.carrera.length===1?" carrera":" carreras")+" y "+n.sesiones.length+(n.sesiones.length===1?" fuerza nueva.":" fuerzas nuevas."))) return;
+      D.carrera = D.carrera.concat(n.carrera).sort((x,y)=>x.f<y.f?-1:x.f>y.f?1:0);
+      D.sesiones = D.sesiones.concat(n.sesiones).sort((x,y)=>x.fecha<y.fecha?-1:x.fecha>y.fecha?1:0);
+      guarda();
+      try{ window.dispatchEvent(new CustomEvent("gd:registro")); }catch(e){}
+      aviso("Añadido al Registro"); render();
+    });
+    c.append(add);
+  }
+  box.append(c);
+
+  // Datos que faltan
+  const man = manualLee();
+  const ev = CN.evaluar(relDatos ? relDatos.datos : {}, man);
+  const c2 = el("div","r-card");
+  c2.append(el("h3",null,"Datos que faltan"));
+  const pedir = CN.METRICAS.filter(m=>ev.faltan.indexOf(m.k)>=0 || ev.malas.indexOf(m.k)>=0);
+  if(pedir.length){
+    const w = el("div","r-form"), campos = {};
+    pedir.forEach(m=>{
+      const mala = ev.malas.indexOf(m.k)>=0;
+      const l = el("label",null,m.n+(m.u?" ("+m.u+")":"")+(mala?" revisa":""));
+      let inp;
+      if(m.op){ inp = el("select"); [""].concat(m.op).forEach(o=>{ const op = el("option",null,o); op.value = o; inp.append(op); }); }
+      else { inp = el("input"); inp.inputMode = "decimal"; }
+      if(man[m.k]!=null) inp.value = man[m.k];
+      if(mala){ inp.style.borderColor = "var(--amber)"; l.style.color = "var(--amber)"; }
+      campos[m.k] = inp; l.append(inp); w.append(l);
+    });
+    const b = el("button","r-btn ancho","Guardar datos");
+    b.addEventListener("click", ()=>{
+      const m2 = Object.assign({}, man);
+      for(const k in campos){ const v = campos[k].value.trim(); if(v!=="") m2[k] = v; else delete m2[k]; }
+      manualGuarda(m2); render();
+    });
+    w.append(b); c2.append(w);
+  } else if(ev.estado==="listo"){
+    const v = ev.viabilidad;
+    if(v.ok){ const p = el("p",null,"Plan viable en "+ev.valores.dias_plan+" días"); p.style.fontWeight = "700"; c2.append(p); }
+    else {
+      const t = el("div","r-card"); t.style.borderColor = "var(--amber)";
+      const p = el("p",null,v.aviso); p.style.fontWeight = "700"; t.append(p);
+      v.motivos.forEach(x=>t.append(el("p","nota",x)));
+      const a = el("button","r-btn ancho","Alargar a "+v.min_dias+" días");
+      a.addEventListener("click", ()=>{ manualGuarda(Object.assign({}, man, {dias_plan:v.min_dias})); render(); });
+      const b = el("button","r-btn ancho","Bajar el objetivo");
+      b.addEventListener("click", ()=>{ manualGuarda(Object.assign({}, man, v.alcanzable)); render(); });
+      t.append(a); if(v.alcanzable && Object.keys(v.alcanzable).length) t.append(b); c2.append(t);
+    }
   }
   box.append(c2);
 }

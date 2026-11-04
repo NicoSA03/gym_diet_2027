@@ -679,7 +679,7 @@ Cosas que conviene saber:
 
 ## 12. Conectar el reloj (v3.0, en preparación)
 
-Todavía no se ve en la app: es la parte de cálculo, lista para que se le pongan las pantallas. No cambia nada del plan en curso ni del Registro, y no guarda nada en el móvil por su cuenta.
+Se usa desde **Registro, vista «Reloj»**: eliges tu marca (te dice cómo exportar y te lleva a su web), subes uno o varios archivos, ves cuántas actividades y qué métricas salen, y con «Añadir al Registro» (pide confirmación y no duplica) pasan al Registro y al calendario. Debajo pide solo los datos que falten (se guardan en `perfil_manual_v1`) y, si el plan no cabe en los días elegidos, muestra el aviso de imposible con «Alargar a N días» o «Bajar el objetivo». No cambia nada del plan en curso.
 
 **Archivos**
 
