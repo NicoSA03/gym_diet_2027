@@ -16,7 +16,7 @@ function pintaFases(){
   const box = document.getElementById("fases");
   box.replaceChildren();
   Object.keys(E.fases).forEach(k=>{
-    const c = el("button","chip", k+": "+E.fases[k].n);
+    const c = el("button","chip", k.replace(/^F/,"B")+": "+E.fases[k].n);
     c.setAttribute("role","tab");
     c.setAttribute("aria-selected", k===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=k; guarda("e_fase",k); render(); });
@@ -25,7 +25,7 @@ function pintaFases(){
   const f = E.fases[fase];
   document.getElementById("f-n").textContent = f.lema;
   document.getElementById("f-f").textContent =
-    "Semanas " + f.s0 + "-" + f.s1 + ", dieta " + f.dieta;
+    "Semanas " + f.s0 + "-" + f.s1;
 }
 
 function pintaDias(){
@@ -413,7 +413,7 @@ function semanaCiclo(lun, r){
   const w = Math.round((deIso(lun)-deIso(lunesDe(r.inicio)))/6048e5) + 1;
   const ks = Object.keys(E.fases);
   const k = ks.find(x=>w>=E.fases[x].s0 && w<=E.fases[x].s1);
-  return k ? k+", sem "+w : null;
+  return k ? k.replace(/^F/,"B")+", sem "+w : null;
 }
 // Kcal extra de los avisos de peso aplicados y no deshechos, desde el día en que se aplicaron
 function extraDesde(r, bloque, f){

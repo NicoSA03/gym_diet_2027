@@ -215,7 +215,7 @@ function pintaCabecera(){
   document.getElementById("m-sub").textContent = dif===0 ? "Hoy" : dif===-1 ? "Ayer" : dif===1 ? "Mañana" : (dif<0 ? "Hace "+(-dif)+" días" : "Dentro de "+dif+" días");
   document.getElementById("m-hoy").hidden = dif===0;
   const sf = document.getElementById("m-fase"); sf.replaceChildren();
-  Object.keys(M.fases).forEach(k=>{ const o=el("option",null,M.fases[k].n+" ("+k+")"); o.value=k; sf.append(o); });
+  Object.keys(M.fases).forEach(k=>{ const o=el("option",null,k+": "+M.fases[k].n); o.value=k; sf.append(o); });
   sf.value = faseDia(fecha);
   const r = registro(); sf.title = r && r.inicio ? "Sale de la fecha de inicio del Registro" : "Elige tu bloque";
   const stp = document.getElementById("m-tipo"); stp.replaceChildren();
