@@ -383,7 +383,7 @@ function cargaCatalogo(){
   catEstado = "cargando";
   catPromesa = fetch("catalogo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{ const c=j.campos; const ix=k=>c.indexOf(k);
-      CAT = j.items.map(x=>({n:x[ix("nombre")], m:x[ix("marca")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")],
+      CAT = j.items.map(x=>({n:x[ix("nombre")], m:x[ix("marca")], s:x[ix("super")], k:x[ix("kcal")], p:x[ix("p")], g:x[ix("g")], c:x[ix("c")], cat:x[ix("categoria")],
                              dud:x[ix("dudoso")], q:sinTildes(x[ix("nombre")]+" "+(x[ix("marca")]||""))}));
       // índice por código de barras, para el escáner (los UPC de 12 cifras, con un 0 delante)
       CAT_EAN = {};
@@ -394,8 +394,16 @@ function cargaCatalogo(){
   return catPromesa;
 }
 const TIENDA = {M:"Mercadona", L:"Lidl", C:"Carrefour"};
-// Papel que se le supone a un producto del catálogo, por sus macros
-function rolDe(k,p,g,c){
+// Papel que se le supone a un producto, calculado siempre con los macros finales que
+// tenga en ese momento (los que el usuario guardó), sin guardarlo de antemano.
+// Regla lacteo: si el nombre o la categoría dicen yogur, leche, kéfir, skyr, cuajada,
+// queso fresco, requesón (o milk, yogurt) y tiene menos de 150 kcal por 100 g, es "lacteo".
+// Se excluyen chocolate, galleta, helado, cereales, café, leche de coco y leche condensada.
+// Si no es lácteo, se decide solo por macros.
+function rolDe(k,p,g,c,nombre,cat){
+  const t = sinTildes((nombre||"")+" | "+(cat||""));
+  if(k>0 && k<150 && /yogur|yogurt|leche|kefir|skyr|cuajada|queso fresco|requeson|milk/.test(t)
+     && !/chocolate|cacao|batido|galleta|helado|cereal|cafe|postre|arroz con leche|zumo|fruta|leche de coco|leche condensada/.test(t)) return ["lacteo",125,400];
   if(p*4 >= 0.35*k && k>0) return ["proteina",60,250];
   if(g*9 >= 0.6*k && k>0) return ["grasa",5,40];
   if(k < 60) return ["verdura",50,250];
@@ -434,7 +442,7 @@ function buscador(b){
         const a=el("span",null,x.n); a.append(el("span","m-tag",x.s.split("").map(l=>TIENDA[l]).join(", ")));
         if(x.dud) a.append(el("span","m-tag dud","kcal dudosas"));
         it.append(a, el("small",null,nf(x.k)+" kcal"));
-        it.addEventListener("click", ()=>{ const [rol,lo,hi]=rolDe(x.k,x.p,x.g,x.c);
+        it.addEventListener("click", ()=>{ const [rol,lo,hi]=rolDe(x.k,x.p,x.g,x.c,x.n,x.cat);
           const nom = x.n+" ("+TIENDA[x.s[0]]+")";
           EXTRA[nom] = [x.k,x.p,x.g,x.c,rol,"","",lo,hi]; anade(b, nom, EXTRA[nom]); });
         lista.append(it); });
@@ -491,7 +499,7 @@ function claveProducto(e){
 // Al añadirlo a un plato se copia a EXTRA: así el diario sigue bien aunque luego lo
 // cambies o lo borres de Mis productos.
 function anadeProducto(b, e){
-  const x = PROD.p[e], k = claveProducto(e), [rol,lo,hi] = rolDe(x[2],x[3],x[4],x[5]);
+  const x = PROD.p[e], k = claveProducto(e), [rol,lo,hi] = rolDe(x[2],x[3],x[4],x[5],x[0]);
   EXTRA[k] = [x[2],x[3],x[4],x[5],rol,"","",lo,hi];
   anade(b, k, EXTRA[k]);
 }

@@ -1,16 +1,48 @@
 # -*- coding: utf-8 -*-
 """Modelo del macrociclo de entrenamiento: 5 días, 39 semanas, 6 bloques.
    Fuente única de verdad para la página interactiva y para la verificación."""
-import json, math, datetime as dt
+import json, math, re, sys, datetime as dt
+from pathlib import Path
 
-PESO = 79.5        # kg, media real de partida
-TEST_5K = "27:30"   # último test de 5 km (mm:ss); fija las zonas de carrera
-OBJETIVO_5K = "23:00"  # 5 km objetivo en junio
+# Métricas personales: viven en datos/perfil.json (no se sube, ver .gitignore).
+# Si no existe se usa datos/perfil_ejemplo.json y se avisa por stderr.
+_DATOS = Path(__file__).resolve().parent.parent / "datos"
+
+def _cargar_perfil():
+    ruta = _DATOS / "perfil.json"
+    if not ruta.is_file():
+        ruta = _DATOS / "perfil_ejemplo.json"
+        sys.stderr.write("AVISO: Usando datos/perfil_ejemplo.json: "
+                         "copia a datos/perfil.json con tus datos\n")
+    try:
+        with open(str(ruta), encoding="utf-8") as f:
+            p = json.load(f)
+    except (OSError, ValueError) as e:
+        raise SystemExit("Error en %s: no se puede leer (%s)" % (ruta.name, e))
+    if not isinstance(p, dict):
+        raise SystemExit("Error en %s: debe ser un objeto JSON con peso, altura, test_5k y objetivo_5k" % ruta.name)
+    for k in ("peso", "altura"):
+        v = p.get(k)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or v <= 0:
+            raise SystemExit("Error en %s: '%s' debe ser un número mayor que 0, y es %r" % (ruta.name, k, v))
+    for k in ("test_5k", "objetivo_5k"):
+        v = p.get(k)
+        if not isinstance(v, str) or not re.match(r"^\d{1,3}:[0-5]\d$", v):
+            raise SystemExit("Error en %s: '%s' debe tener formato mm:ss (por ejemplo 27:30), y es %r"
+                             % (ruta.name, k, v))
+        if sum(int(x) for x in v.split(":")) == 0:
+            raise SystemExit("Error en %s: '%s' no puede ser 0:00" % (ruta.name, k))
+    return p
+
+_PERFIL = _cargar_perfil()
+PESO = _PERFIL["peso"]               # kg, media real de partida
+ALTURA = _PERFIL["altura"]           # cm
+TEST_5K = _PERFIL["test_5k"]         # último test de 5 km (mm:ss); fija las zonas de carrera
+OBJETIVO_5K = _PERFIL["objetivo_5k"] # 5 km objetivo en junio
 
 def seg(mmss):
     m, s = mmss.split(":")
     return int(m)*60 + int(s)
-ALTURA = 182
 
 # ---------------------------------------------------------------- bloques
 # El ciclo son 39 semanas seguidas. No lleva fechas: la de inicio la pones tú

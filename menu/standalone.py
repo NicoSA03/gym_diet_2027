@@ -58,14 +58,14 @@ def seccion_manual():
                      f"<td class='num'>{d[2]:,}".replace(",", ".") + f"</td><td class='num'>{max(f['km'])}</td></tr>")
     valores = f"""
 <div class="vgrid">
-  <div><div class="v">{str(PESO).replace('.',',')} kg</div><div class="eyebrow">PESO, entreno.py</div></div>
+  <div><div class="v">{str(PESO).replace('.',',')} kg</div><div class="eyebrow">PESO, perfil.json</div></div>
   <div><div class="v">{TEST_5K}</div><div class="eyebrow">TEST_5K</div></div>
   <div><div class="v">{OBJETIVO_5K}</div><div class="eyebrow">OBJETIVO_5K</div></div>
   <div><div class="v">{vdot(5000, seg(TEST_5K)):.0f} → {vdot(5000, seg(OBJETIVO_5K)):.0f}</div><div class="eyebrow">VO₂máx estimado</div></div>
 </div>
 <div class="tscroll valores"><table><thead><tr><th>Bloque</th><th>Semanas</th><th class="num">kcal/día</th><th class="num">km/sem</th></tr></thead>
 <tbody>{''.join(filas)}</tbody></table></div>
-<p class="nota">Las kcal se cambian en <code>menu/modelo.py</code>; el resto de valores, en <code>menu/entreno.py</code>.</p>"""
+<p class="nota">Las kcal se cambian en <code>menu/modelo.py</code>; peso y 5 km, en <code>datos/perfil.json</code>; el resto, en <code>menu/entreno.py</code>.</p>"""
     manual = convertir(open('README.md', encoding='utf-8').read())
     return ('<div class="wrap">\n<header class="masthead">'
             '<p class="eyebrow">Manual, cómo se actualiza este archivo</p>'
