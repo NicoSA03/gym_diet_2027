@@ -88,9 +88,10 @@ def cantidad(n,g):
     if n=="Verduras asadas (batch)": return f"{g} g de calabacín, pimiento y cebolla"
     base = f"{g/1000:.1f} kg".replace(".",",") if g>=1000 else f"{g} g"
     sem = fmt/g if g else 0
-    if sem>=1.6: base += f", 1 envase de {fmt} g dura {round(sem)} sem"
-    elif g>fmt:  base += f", {-(-g//fmt)} envases de {fmt} g"
-    else:        base += f", 1 envase de {fmt} g"
+    fg = f"{fmt:g}".replace(".",",")    # 1000.0 -> 1000, 2.5 -> 2,5
+    if sem>=1.6: base += f", 1 envase de {fg} g dura {round(sem)} sem"
+    elif g>fmt:  base += f", {int(-(-g//fmt))} envases de {fg} g"
+    else:        base += f", 1 envase de {fg} g"
     return base
 
 COMPRA={}
