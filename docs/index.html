@@ -1406,7 +1406,7 @@ body{padding-top:0}
 </div>
 </main>
 <div class="sello">
-  versión 91489701, 4 de noviembre de 2026
+  versión df9a9548, 4 de noviembre de 2026
 </div>
 <script>
 
@@ -2434,7 +2434,7 @@ function pintaCabecera(){
   $("m-sub").textContent = dif===0 ? "Hoy" : dif===-1 ? "Ayer" : dif===1 ? "Mañana" : (dif<0 ? "Hace "+(-dif)+" días" : "Dentro de "+dif+" días");
   $("m-hoy").hidden = dif===0;
   const sf = $("m-fase"); sf.replaceChildren();
-  Object.keys(M.fases).forEach(k=>{ const o=el("option",null,M.fases[k].n+" ("+k+")"); o.value=k; sf.append(o); });
+  Object.keys(M.fases).forEach(k=>{ const o=el("option",null,k+": "+M.fases[k].n); o.value=k; sf.append(o); });
   sf.value = faseDia(fecha);
   const r = registro(); sf.title = r && r.inicio ? "Sale de la fecha de inicio del Registro" : "Elige tu bloque";
   const stp = $("m-tipo"); stp.replaceChildren();
@@ -3781,7 +3781,7 @@ function pintaFases(){
   const box = $("fases");
   box.replaceChildren();
   Object.keys(E.fases).forEach(k=>{
-    const c = el("button","chip", k+": "+E.fases[k].n);
+    const c = el("button","chip", k.replace(/^F/,"B")+": "+E.fases[k].n);
     c.setAttribute("role","tab");
     c.setAttribute("aria-selected", k===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=k; guarda("e_fase",k); render(); });
@@ -3790,7 +3790,7 @@ function pintaFases(){
   const f = E.fases[fase];
   $("f-n").textContent = f.lema;
   $("f-f").textContent =
-    "Semanas " + f.s0 + "-" + f.s1 + ", dieta " + f.dieta;
+    "Semanas " + f.s0 + "-" + f.s1;
 }
 
 function pintaDias(){
@@ -4178,7 +4178,7 @@ function semanaCiclo(lun, r){
   const w = Math.round((deIso(lun)-deIso(lunesDe(r.inicio)))/6048e5) + 1;
   const ks = Object.keys(E.fases);
   const k = ks.find(x=>w>=E.fases[x].s0 && w<=E.fases[x].s1);
-  return k ? k+", sem "+w : null;
+  return k ? k.replace(/^F/,"B")+", sem "+w : null;
 }
 // Kcal extra de los avisos de peso aplicados y no deshechos, desde el día en que se aplicaron
 function extraDesde(r, bloque, f){
@@ -4547,7 +4547,7 @@ function vEntrenar(box){
   card.append(el("p","eyebrow","Bloque"));
   const fc = el("div","chips");
   Object.keys(R.fases).forEach(k=>{
-    const c = el("button","chip sm",k+": "+R.fases[k].n);
+    const c = el("button","chip sm",k.replace(/^F/,"B")+": "+R.fases[k].n);
     c.setAttribute("aria-selected", k===selFase?"true":"false");
     c.addEventListener("click", ()=>{ selFase=k; render(); });
     fc.append(c);
@@ -4625,7 +4625,7 @@ function vSesion(box){
     if(confirm("¿Descartar este entreno? Se pierde todo lo apuntado.")){ D.activa=null; guarda(); paraDescanso(); render(); }
   });
   top.append(fin, x);
-  box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase+": "+f.n+", "+corta(a.fecha)));
+  box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase.replace(/^F/,"B")+": "+f.n+", "+corta(a.fecha)));
   { const lm = lineaMarca(); if(lm) box.append(lm); }
   a.ej.forEach(e=>box.append(bloqueEj(e, f)));
   if(a.abd){
@@ -5046,10 +5046,10 @@ const TIER = {
   TF:["Fijo","Gemelo: la misma prescripción todo el año, porque la carrera ya lo castiga"]
 };
 const GRUPOS = [
-  ["V","Volumen","F0, F1, F3"],
-  ["F","Fuerza","F2"],
-  ["D","Definición","F4"],
-  ["P","Pico","F5"]
+  ["V","Volumen","B0, B1, B3"],
+  ["F","Fuerza","B2"],
+  ["D","Definición","B4"],
+  ["P","Pico","B5"]
 ];
 
 function pintaCabecera(){
@@ -5063,7 +5063,7 @@ function pintaFases(){
   const box = $("fases");
   box.replaceChildren();
   Object.keys(T.fases).forEach(k=>{
-    const c = el("button","chip", k+": "+T.fases[k].n);
+    const c = el("button","chip", k.replace(/^F/,"B")+": "+T.fases[k].n);
     c.setAttribute("role","tab");
     c.setAttribute("aria-selected", k===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=k; guarda("t_fase",k); pintaFases(); pintaBloque(); });
@@ -5293,7 +5293,7 @@ function pintaTipo(){
 function render(){
   const fb=$("fases"); fb.replaceChildren();
   Object.keys(I.fases).forEach(f=>{
-    const c=el("button","chip", f+": "+I.fases[f].n);
+    const c=el("button","chip", f.replace(/^F/,"B")+": "+I.fases[f].n);
     c.setAttribute("role","tab"); c.setAttribute("aria-selected", f===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=f; guarda("fase-info",f); render(); });
     fb.append(c);
