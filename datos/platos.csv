@@ -40,12 +40,12 @@ N;Garbanzos con pavo;Garbanzos cocidos (bote)|Filete de pavo|Verdura congelada;2
 N;Lentejas con pollo;Lentejas cocidas (bote)|Pechuga de pollo|Champiñón laminado;300|125|100;
 N;Alubias con pavo;Alubias cocidas (bote)|Filete de pavo|Champiñón laminado;330|110|100;
 N;Ñoquis con ternera;Ñoquis de patata|Ternera magra (babilla)|Champiñón laminado;150|130|250;
-T2;Frutos secos y bocadillo;Nueces|Bolsita de fruta|Tortitas de arroz integral|Pan de semillas|Pavo en lonchas;30|100|30|80|50;Bocadillo de pavo
-T2;Botella y bocadillo;Batido proteínas (botella)|Almendras|Tortitas de arroz integral|Pan de semillas|Pavo en lonchas;330|20|30|80|50;Bocadillo de pavo
-T2;Fruta, almendras y bocadillo;Almendras|Manzana|Tortitas de arroz integral|Pan de semillas|Pavo en lonchas;30|200|30|80|50;Bocadillo de pavo
-T;Frutos secos, batido y bocadillo;Nueces|Plátano|Proteína en polvo|Tortitas de arroz integral|Pan de semillas|Jamón serrano (lonchas);32|100|20|30|80|40;Bocadillo de jamón
-T;Botella, almendras y bocadillo;Batido proteínas (botella)|Almendras|Bolsita de fruta|Tortitas de arroz integral|Pan de semillas|Jamón serrano (lonchas);330|28|100|30|80|40;Bocadillo de jamón
-T;Mezcla y bocadillo;Almendras|Nueces|Manzana|Proteína en polvo|Tortitas de arroz integral|Pan de semillas|Jamón serrano (lonchas);25|15|200|16|30|80|40;Bocadillo de jamón
+T2;Frutos secos y lonchas de pavo;Nueces|Bolsita de fruta|Tortitas de arroz integral|Pavo en lonchas;40|100|45|70;Lonchas de pavo con tortitas, sin montar nada
+T2;Botella y lonchas de pavo;Batido proteínas (botella)|Almendras|Tortitas de arroz integral|Pavo en lonchas;330|30|45|70;Lonchas de pavo con tortitas, sin montar nada
+T2;Fruta, almendras y lonchas de pavo;Almendras|Manzana|Tortitas de arroz integral|Pavo en lonchas;40|200|45|70;Lonchas de pavo con tortitas, sin montar nada
+T;Frutos secos, batido y lonchas de jamón;Nueces|Plátano|Proteína en polvo|Tortitas de arroz integral|Jamón serrano (lonchas);42|100|20|45|60;Lonchas de jamón con tortitas, sin montar nada
+T;Botella, almendras y lonchas de jamón;Batido proteínas (botella)|Almendras|Bolsita de fruta|Tortitas de arroz integral|Jamón serrano (lonchas);330|38|100|45|60;Lonchas de jamón con tortitas, sin montar nada
+T;Mezcla y lonchas de jamón;Almendras|Nueces|Manzana|Proteína en polvo|Tortitas de arroz integral|Jamón serrano (lonchas);35|25|200|16|45|60;Lonchas de jamón con tortitas, sin montar nada
 Z;Kéfir con nueces;Kéfir natural|Proteína en polvo|Nueces;150|8|14;
 Z;Leche;Leche semidesnatada|Proteína en polvo;300|19;
 Z;Yogur;Yogur natural|Proteína en polvo;250|18;

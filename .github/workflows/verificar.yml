@@ -1,0 +1,32 @@
+# Comprueba en cada subida que el plan sigue cuadrando (las mismas
+# verificaciones que python3 actualizar.py, sin construir nada).
+name: Verificaciones
+
+on:
+  push:
+    branches-ignore: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      - name: Perfil de ejemplo
+        run: cp datos/perfil_ejemplo.json datos/perfil.json
+      - name: Verificar
+        run: |
+          python3 menu/ver_entreno.py
+          python3 menu/ver_alimentos.py
+          python3 menu/ver_platos.py
+          python3 menu/ver_menu.py
+          python3 menu/payload3.py && python3 menu/ver_calculadora.py
+          python3 menu/ver_plazos.py
