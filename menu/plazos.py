@@ -386,7 +386,10 @@ def propuesta_dia(registro, hoy, plan=None, desde=None):
             return c
 
         return {"tipo": "recuperar",
-                "texto": "El %s %s tocaba %s y no hay registro. ¿La haces hoy?" % (NOMBRES_DIA[k], _corta(f), nombre),
+                "texto": "El %s %s tocaba %s%s ¿La haces hoy?" % (
+                    NOMBRES_DIA[k], _corta(f), nombre,
+                    " e hiciste otro entreno." if any(x.get("fecha") == f for x in (r.get("sesiones") or []))
+                    or any(x.get("f") == f for x in (r.get("carrera") or [])) else " y no hay registro."),
                 "aplicar": aplicar,
                 "deshacer": lambda reg: _deshacer_ultimo(reg, hoy, "recuperar", lun)}
     return None

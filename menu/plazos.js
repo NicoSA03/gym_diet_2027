@@ -91,6 +91,8 @@ const PLAZOS = (function(){
   }
 
   // dietaDelDia(registro, fecha, objPlan, peso)
+  //   Si en Menús se elige a mano el tipo E (descanso), pasa sesion:null para no
+  //   restar un entreno que ya no está en el objetivo.
   //   objPlan = {kcal, kcalE, kcalD, sesion?}: kcal previstas del día, las del día de
   //   descanso (tipo E), las del sábado (tipo D) y, si el día no es el de siempre,
   //   la sesión que toca (código o null).
@@ -263,9 +265,10 @@ const PLAZOS = (function(){
       const dd = r.dias && r.dias[f];
       if(dd && (dd.modo === "descanso" || dd.modo === "otra")) continue;
       const cod = s.sesion, nombre = dias[k].n;
+      const hubo = (r.sesiones || []).some(x => x.fecha === f) || (r.carrera || []).some(x => x.f === f);
       return {
         tipo:"recuperar",
-        texto:"El " + NOMBRES_DIA[k] + " " + corta(f) + " tocaba " + nombre + " y no hay registro. ¿La haces hoy?",
+        texto:"El " + NOMBRES_DIA[k] + " " + corta(f) + " tocaba " + nombre + (hubo ? " e hiciste otro entreno." : " y no hay registro.") + " ¿La haces hoy?",
         aplicar: (reg, ahora) => {
           const antes = (reg.dias && reg.dias[hoy]) ? clon(reg.dias[hoy]) : null;
           const c = conAjuste(reg, {f:hoy, que:"recuperar", semana:lun, antes:{dia:antes}, despues:{dia:{modo:"otro_plan", sesion:cod}}, deshecho:false});
