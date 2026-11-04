@@ -36,7 +36,7 @@ FUENTE = ["db.py", "platos.py", "modelo.py", "entreno.py", "payload3.py", "paylo
           "a1_info.html", "a1.js", "a2_menus.html", "a2.js", "a3_compra.html", "a3.js",
           "a4_entreno.html", "a4.js", "a5_teoria.html", "a5.js",
           "payload_registro.py", "a6_registro.html", "a6.js", "pwa.py",
-          "calculadora.js", "calculadora.py", "ver_calculadora.py", "escaner.js", "ejercicios.py",
+          "calculadora.js", "calculadora.py", "ver_calculadora.py", "plazos.js", "plazos.py", "ver_plazos.py", "escaner.js", "ejercicios.py",
           "factores.json", "normas.json", "mis_platos.js", "importar_platos.py"]
 RAIZ_FUENTE = ["README.md", "actualizar.py", "restaurar.py", ".gitignore",
                "datos/alimentos.csv", "datos/platos.csv", "datos/ejercicios.csv", "datos/perfil_ejemplo.json"]
@@ -107,7 +107,8 @@ def main():
     ok1 = paso("Verificando el entreno", "ver_entreno.py", obligatorio=False, silencioso=True)
     ok2 = paso("Verificando la dieta", "ver_menu.py", obligatorio=False, silencioso=True)
     ok3 = paso("Verificando la calculadora de Menús", "ver_calculadora.py", obligatorio=False, silencioso=True)
-    if not (ok0 and okp and ok1 and ok2 and ok3) and not a.forzar:
+    ok4 = paso("Verificando los plazos y el reajuste", "ver_plazos.py", obligatorio=False, silencioso=True)
+    if not (ok0 and okp and ok1 and ok2 and ok3 and ok4) and not a.forzar:
         sys.exit("\n✗ La verificación ha encontrado fallos. No se ha generado nada nuevo.\n"
                  "  Mira las líneas FALLO de arriba. Si sabes lo que haces: --forzar")
 
