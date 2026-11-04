@@ -4,7 +4,7 @@ Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, q
 
 | Pestaña | Para qué |
 |---|---|
-| El entreno | La sesión de hoy: series, repeticiones, esfuerzo, abdominales, carrera y variantes |
+| El entreno | La sesión de hoy (abre en el día y el bloque que tocan según la fecha de inicio del Registro): series, repeticiones, esfuerzo, abdominales, carrera y variantes |
 | Registro | Apuntar series como en Hevy, peso corporal, carrera, gráficas de progreso e historial |
 | La teoría | El porqué de todo, el desglose de cada ejercicio y el seguimiento semanal |
 | Cómo funciona | La dieta: calorías por bloque y tipo de día, y qué hacer cuando la vida se cruza |
@@ -637,5 +637,6 @@ Cosas que conviene saber:
 | v2.2 | Base de ejercicios propia (`datos/ejercicios.csv`) con el nombre de Garmin, y animación desplegable «Cómo se hace» en El entreno |
 | v2.3 | Mis platos: crear platos en la app con sus cantidades lógicas, y `actualizar.py --importar` para pasarlos a `datos/platos.csv` |
 | v2.4 | Agentes de Claude: un supervisor (`CLAUDE.md`) que reparte el trabajo entre `ajustes` (Haiku), `dieta`, `entreno` y `frontend` (Sonnet), un `revisor` (Opus) que hace la segunda lectura de cada cambio, y `publicar` (Haiku), que comprueba los requisitos y prepara la subida al proyecto |
+| v2.5 | Arreglos de interfaz: El entreno abre en el día de hoy y en el bloque que toca; la pestaña Actualizar ya no se sale de ancho en el móvil |
 
 *Versión del sistema: v2.4, octubre de 2026. Peso de partida 79,5 kg, 5 km en 27:30, ciclo de 39 semanas sin fechas fijas.*

@@ -181,8 +181,23 @@ function pintaVariantes(){
 
 function render(){ pintaFases(); pintaDias(); pintaSesion(); pintaKm(); }
 
+// Al abrir: el día de hoy (sábado y domingo, el lunes) y el bloque que toca hoy
+// según la fecha de inicio del Registro (misma cuenta que menu/a6.js). Sin fecha
+// o fuera del ciclo, el bloque que dejaste elegido a mano.
+function faseDeHoy(){
+  const t = lee("registro_v1"); if(!t) return null;
+  const ini = JSON.parse(t).inicio;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ini||"")) return null;
+  const lun = d=>{ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-(x.getDay()+6)%7); return x.getTime(); };
+  const [a,m,d] = ini.split("-").map(Number);
+  const w = Math.round((lun(new Date())-lun(new Date(a,m-1,d)))/6048e5) + 1;
+  const ks = Object.keys(E.fases);
+  if(w < 1) return ks[0];
+  return ks.find(k=>w>=E.fases[k].s0 && w<=E.fases[k].s1) || null;
+}
 try{
   const f = lee("e_fase"); if(f && E.fases[f]) fase = f;
-  const d = lee("e_dia");  if(d !== null && E.dias[+d]) dia = +d;
 }catch(e){}
+try{ const h = faseDeHoy(); if(h) fase = h; }catch(e){}
+{ const w = (new Date().getDay()+6)%7; dia = w < 5 ? w : 0; }
 pintaZonas(); pintaVariantes(); render();

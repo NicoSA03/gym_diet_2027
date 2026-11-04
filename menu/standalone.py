@@ -25,6 +25,7 @@ CSS_MANUAL = """
 .doc ul,.doc ol{margin:0 0 14px;padding-left:22px;display:flex;flex-direction:column;gap:4px}
 .doc code{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
   border-radius:3px;padding:1px 5px;color:var(--ink)}
+.doc p code,.doc li code,.doc blockquote code{overflow-wrap:anywhere}
 .doc pre{background:var(--surface);border:1px solid var(--line);border-radius:3px;
   padding:13px 15px;overflow-x:auto;margin:0 0 14px}
 .doc pre code{background:none;padding:0;font-size:12.5px;line-height:1.55;white-space:pre}
