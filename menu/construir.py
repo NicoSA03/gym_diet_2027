@@ -13,6 +13,9 @@ def pagina(titulo, cuerpo_f, js_f, datos=None, nombre_var=None):
     bloque_datos = ""
     if datos:
         bloque_datos = f"const {nombre_var} = " + open(datos,encoding='utf8').read() + ";\n"
+        if nombre_var == 'E':
+            from standalone import objetivos_menus
+            bloque_datos += "const MO = " + objetivos_menus() + ";\n"
     return (f"<title>{titulo}</title>\n{FUENTES}\n<style>\n{CSS}\n</style>\n"
             f"{cuerpo}\n<script>\n{bloque_datos}{js}\n</script>\n")
 
@@ -20,7 +23,7 @@ import sys
 if __name__=="__main__":
     cual = sys.argv[1] if len(sys.argv)>1 else "todos"
     if cual in ("todos","2"):
-        h = pagina("Qué Como Hoy",'menu/a2_menus.html',('menu/calculadora.js','menu/escaner.js','menu/mis_platos.js','menu/a2.js'),'menu/pay_menus.json','M')
+        h = pagina("Qué Como Hoy",'menu/a2_menus.html',('menu/plazos.js','menu/calculadora.js','menu/escaner.js','menu/mis_platos.js','menu/a2.js'),'menu/pay_menus.json','M')
         open('salida/paginas/menus.html','w',encoding='utf8').write(h)
         print("menus.html:", len(h)//1024, "KB")
     if cual in ("todos","3"):
@@ -28,7 +31,7 @@ if __name__=="__main__":
         open('salida/paginas/compra.html','w',encoding='utf8').write(h)
         print("compra.html:", len(h)//1024, "KB")
     if cual in ("todos","4"):
-        h = pagina("Entrenamiento",'menu/a4_entreno.html','menu/a4.js','menu/pay_entreno.json','E')
+        h = pagina("Entrenamiento",'menu/a4_entreno.html',('menu/plazos.js','menu/a4.js'),'menu/pay_entreno.json','E')
         open('salida/paginas/entreno.html','w',encoding='utf8').write(h)
         print("entreno.html:", len(h)//1024, "KB")
     if cual in ("todos","5"):

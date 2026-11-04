@@ -107,6 +107,83 @@
   font-variant-numeric:tabular-nums}
 @media (max-width:560px){.zmini{grid-template-columns:repeat(2,1fr)}}
 
+/* v2.6: pregunta diaria, avisos y calendario */
+.hq{--ok:#3DDC84;background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:10px}
+.hq h3{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.hq-ops{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hq-op{font-family:var(--sans);font-size:14.5px;font-weight:700;padding:12px 8px;min-height:56px;border-radius:3px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);cursor:pointer;
+  display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;text-align:center}
+.hq-op small{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink-3)}
+.hq-op[aria-pressed="true"]{border-color:var(--accent);color:var(--accent-ink)}
+.hq-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hq-lin{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
+  border-radius:3px;padding:9px 14px}
+.hq-lin .et{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.hq-lin b{font-size:15px;flex:1;min-width:0;overflow-wrap:anywhere}
+.hq-btn{font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 14px;min-height:40px;border-radius:3px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.hq-btn.prim{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.hq-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hq-form label{display:flex;flex-direction:column;gap:3px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:.06em;min-width:0}
+.hq-form .full{grid-column:1/-1}
+.hq-form input,.hq-form select{font-family:var(--sans);font-size:16px;padding:10px;border-radius:3px;min-width:0;width:100%;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink)}
+.hq-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.hq-fila{display:flex;gap:8px}
+.hq-fila .hq-btn{flex:1}
+.hq-err{font-size:14px;font-weight:700;color:var(--clay);padding:10px 14px;border:1px solid var(--clay);border-radius:3px}
+.avisos{display:flex;flex-direction:column;gap:10px}
+.avi{background:var(--amber-soft);border:1px solid var(--amber);border-radius:3px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:10px}
+.avi p{font-size:14.5px;color:var(--ink);line-height:1.4}
+.avi.hecho{background:var(--surface);border-color:var(--line-2)}
+.avi .hq-fila{flex-wrap:wrap}
+.ses-marca{padding:11px 20px;background:var(--amber-soft);border-bottom:1px solid var(--line);font-size:14px;
+  font-weight:700;color:var(--amber)}
+.calen{background:var(--surface);border:1px solid var(--line);border-radius:3px}
+.calen>summary{padding:13px 16px;cursor:pointer;list-style:none;font-family:var(--sans);font-weight:700;font-size:15px;
+  display:flex;justify-content:space-between;align-items:center}
+.calen>summary::-webkit-details-marker{display:none}
+.calen>summary::after{content:"+";font-family:var(--mono);font-size:19px;color:var(--accent-ink)}
+.calen[open]>summary::after{content:"-"}
+.cal-cuerpo{padding:0 10px 14px;display:flex;flex-direction:column;gap:8px;--ok:#3DDC84}
+.cal-cab{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cal-cab b{font-size:15px;text-transform:capitalize}
+.cal-cab button{font-size:20px;width:44px;height:40px;border-radius:3px;border:1px solid var(--line-2);
+  background:var(--surface-2);color:var(--ink);cursor:pointer}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.cal-sem{grid-column:1/-1;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink-3);
+  text-transform:uppercase;margin-top:5px}
+.cal-dow{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:center}
+.cal-d{position:relative;min-height:46px;padding:4px 0 7px;border-radius:3px;border:1px solid transparent;
+  background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-size:12.5px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:4px}
+.cal-d.fuera{opacity:.3}
+.cal-d.hoy{border-color:var(--ink)}
+.cal-d.sel{background:var(--accent-soft);border-color:var(--accent)}
+.cal-pts{display:flex;gap:3px;height:8px;align-items:center}
+.cal-pt{width:7px;height:7px;border-radius:50%;display:block}
+.cal-pt.f{background:var(--accent)}
+.cal-pt.c{background:var(--amber)}
+.cal-pt.o{background:var(--ink-2);border-radius:1px;transform:rotate(45deg);width:6px;height:6px}
+.cal-pt.x{background:var(--line-2)}
+.cal-pt.pf{border:1px solid var(--accent);opacity:.45}
+.cal-pt.pc{border:1px solid var(--amber);opacity:.45}
+.cal-dieta{position:absolute;left:5px;right:5px;bottom:2px;height:3px;border-radius:2px}
+.cal-dieta.ok{background:var(--ok)}
+.cal-dieta.corta{background:var(--amber)}
+.cal-dieta.pasada{background:var(--clay)}
+.cal-aj{position:absolute;top:2px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--ink)}
+.cal-det{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.cal-det h5{font-size:14px;font-weight:700;text-transform:capitalize}
+.cal-det p{font-size:14px;color:var(--ink-2)}
+.cal-det .fila{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cal-leyenda{display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.cal-leyenda span{display:inline-flex;align-items:center;gap:4px}
+
 .varcard{background:var(--surface);border:1px solid var(--line);border-radius:3px;
   margin-bottom:10px;overflow:hidden}
 .varcard summary{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;
@@ -142,6 +219,9 @@
 <section>
   <div class="sec-head"><span class="num">01</span><h2>La sesión de hoy</h2></div>
   <div class="stack">
+    <div id="hoyq"></div>
+    <div class="avisos" id="avisos"></div>
+    <details class="calen" id="calen"><summary>Calendario</summary><div class="cal-cuerpo" id="calen-cuerpo"></div></details>
     <div class="chips" id="fases" role="tablist" aria-label="Bloque"></div>
     <div class="fase-nota"><b id="f-n"></b><span id="f-f"></span></div>
     <div class="dia-grid" id="dias"></div>

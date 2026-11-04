@@ -60,6 +60,9 @@ gym_diet_2027/
 │   ├── mis_platos.js    ← Mis platos de la pestaña Menús: guardado, cantidades lógicas y exportación (sección 5)
 │   ├── importar_platos.py ← mete en datos/platos.csv los platos exportados desde la app (sección 4)
 │   ├── ver_calculadora.py ← verificación de la calculadora: cualquier plato en cualquier toma sale bien
+│   ├── plazos.js        ← el reajuste dinámico cuando fallas: comida del día, cuenta de la semana y avisos (sección 3)
+│   ├── plazos.py        ← la misma cuenta en Python
+│   ├── ver_plazos.py    ← verificación del reajuste: casos fijos y plazos.js igual que plazos.py
 │   ├── escaner.js       ← la cámara que lee códigos de barras en Menús (sección 5, Mis productos)
 │   ├── ejercicios.py    ← carga datos/ejercicios.csv para El entreno y la verificación
 │   ├── ver_alimentos.py ← verificación de la base de datos y lista de datos que faltan
@@ -98,7 +101,7 @@ Desde la v2.5 tus métricas viven en `datos/perfil.json`, que está en `.gitigno
 
 Usa la **media de 7 días**, nunca el dato de un día suelto. Este número se muestra en la teoría y sirve de base para calcular la proteína por kilo que comprueba la verificación.
 
-**Cuándo tocar las calorías** (esto es criterio, no automático). Mira la tendencia de dos semanas:
+**Cuándo tocar las calorías.** Desde la v2.6 la app lo comprueba sola y te lo propone (sección «Cuando fallas»); tú decides si lo aplicas. Mira la tendencia de dos semanas:
 
 | Bloque | Ritmo buscado | Si dos semanas seguidas vas… | Haz esto |
 |---|---|---|---|
@@ -229,6 +232,33 @@ Esa misma fecha es el ajuste cuando la vida se cruza: si paras dos semanas por u
 Al pasar la semana 39 el plan **no** encadena otro ciclo por su cuenta: te avisa de que has terminado y eliges tú con qué bloque sigues. Si quieres empezar un ciclo entero de nuevo, pon la fecha de inicio de hoy.
 
 Mientras no haya fecha, la app funciona igual: eliges el bloque a mano y no se enseña ninguna semana.
+
+### Cuando fallas: el reajuste dinámico (v2.6)
+
+La app da por hecho que no siempre se cumple el plan al 100 %. La lógica está en `menu/plazos.js` (la que usa el móvil) y en su gemela `menu/plazos.py`; `menu/ver_plazos.py` comprueba que las dos den lo mismo. **Nada se aplica solo**: cada ajuste sale como aviso con «Aplicar» o «Dejar como está», se apunta en el Registro y se puede deshacer.
+
+**Cada día** eliges qué vas a hacer: lo que toca, otro entreno del plan, otra actividad (escribes qué, el tipo, los minutos y la intensidad) o descanso. Puedes cambiarlo durante el día y se recalculan la comida de lo que queda y la cuenta de la semana. Se guarda en `registro_v1.dias`.
+
+**La comida del día:** objetivo del día menos el entreno previsto más lo que vayas a hacer, calculado con MET (MET menos 1, porque el reposo ya está contado) y tu peso. Se queda siempre entre el objetivo de un día de descanso (tipo E) y el de un sábado (tipo D). Solo cambia lo que queda por comer; si un día te pasas o te quedas corto, al día siguiente no se compensa.
+
+**La semana** (sesiones hechas de las 5 previstas, de la app o del reloj):
+
+| La semana pasada hiciste | Qué propone |
+|---|---|
+| 4 o 5 (80 % o más) | Nada: sigues el plan |
+| 3 | La semana cuenta, pero esta repites cargas en vez de subir |
+| 2 o menos | La semana no cuenta: alargar el bloque una semana |
+| 10 días seguidos sin entrenar | Una semana de reentrada (una serie menos y RIR +1) |
+
+Si una semana tiene menos de 5 sesiones previstas (la primera, si empiezas a mitad), se mira el porcentaje: 80 % o más va bien, 60 % o más repite cargas y por debajo alarga.
+
+Una otra actividad del mismo tipo que la sesión prevista cuenta entera; de otro tipo, con 30 minutos o más a intensidad media o alta, cuenta media. Si fallas una sesión entre semana, te la ofrece otro día de la misma semana. La semana en que empiezas solo cuenta las sesiones desde tu fecha de inicio, y no se juzga nada anterior a instalar la v2.6. Sin fecha de inicio no propone nada. Lo aplicado se puede deshacer cuando quieras, también otro día.
+
+**Dónde se ve:** en **El entreno**, arriba de la sesión, la pregunta «¿Qué vas a hacer hoy?» (una vez respondida queda en una línea con el botón «Cambiar»), los avisos de uno en uno con «Aplicar» y «Dejar como está» (tras aplicar, «Deshacer») y el **calendario**, plegado: el mes con un punto por día de fuerza, carrera u otra actividad, en gris lo que tocaba y no se hizo, la marca de la dieta de los últimos 14 días y, encima de cada semana, el bloque y la semana del ciclo. Al tocar un día ves lo que hiciste, lo que comiste frente al objetivo y los ajustes de ese día, que puedes deshacer ahí. Si hay una semana de repetir cargas o de reentrada, la sesión lo indica y quita una serie con RIR +1, también al empezar el entreno en Registro. En **Menús** sale una línea con el motivo cuando cambia la comida de lo que queda, y el aviso de peso con los mismos botones. Los descartes («Dejar como está») se guardan en `registro_v1.descartes` para no repetir el aviso.
+
+**Alargar un bloque** es mover la fecha de inicio una semana hacia delante, así que **se retrasa el final** del ciclo (no se recortan los bloques siguientes). Lo aplicado queda en `registro_v1.ajustes` con la fecha anterior, para deshacerlo.
+
+**El peso:** la regla de «Cuándo tocar las calorías» de la sección «Peso de la semana» la comprueba la app sola con la media de 7 días y te propone los ±100 kcal. Compara las tres últimas semanas (21 días) y necesita al menos 10 pesajes en total y 3 en cada semana; si no, no propone nada. Tras aplicar un ajuste, no propone otro hasta pasados 14 días.
 
 ### El Registro
 
@@ -532,6 +562,12 @@ En el pie del archivo aparece `versión xxxxxxxx`: una huella de todo su conteni
 - Avisa, sin parar la construcción, de los platos que van cortos de proteína.
 - Si tienes Node instalado, comprueba que `calculadora.js` y `calculadora.py` dan los mismos gramos.
 
+**Reajuste dinámico** (`ver_plazos.py`):
+
+- Casos fijos: semana de 5, 4, 3 y 2 sesiones, primera semana empezada a mitad, cambio de año, 9 y 10 días sin entrenar, otra actividad en vez de la sesión, sesión del reloj, cambio de actividad a media tarde, límites de la comida del día y avisos de peso.
+- Aplicar y deshacer nunca cambian el registro que reciben (en JS y en Python); deshacer devuelve la fecha de inicio o las kcal a su valor anterior y deja el apunte marcado como deshecho.
+- Si tienes Node instalado, comprueba que `plazos.js` y `plazos.py` dan lo mismo.
+
 Si algo falla verás líneas que empiezan por `FALLO` con el motivo. Puedes ejecutar cualquiera por separado para ver el informe completo:
 
 ```bash
@@ -540,6 +576,7 @@ python3 menu/ver_alimentos.py
 python3 menu/ver_platos.py
 python3 menu/ver_menu.py
 python3 menu/ver_calculadora.py
+python3 menu/ver_plazos.py
 ```
 
 `--forzar` construye aunque haya fallos. Úsalo solo si entiendes exactamente qué falla y por qué no importa.
@@ -636,5 +673,6 @@ Cosas que conviene saber:
 | v2.3 | Mis platos: crear platos en la app con sus cantidades lógicas, y `actualizar.py --importar` para pasarlos a `datos/platos.csv` |
 | v2.4 | Agentes de Claude: un supervisor (`CLAUDE.md`) que reparte el trabajo entre `ajustes` (Haiku), `dieta`, `entreno` y `frontend` (Sonnet), un `revisor` (Opus) que hace la segunda lectura de cada cambio, y `publicar` (Haiku), que comprueba los requisitos y prepara la subida al proyecto |
 | v2.5 | Interfaz más limpia: El entreno abre en el día de hoy y en el bloque que toca (sábado y domingo se ven como descanso y puedes tocar cualquier día); fuera la pestaña Actualizar (el manual se lee aquí, en README.md; lo retirado está en `obsoleto/v2.5_pestana_actualizar/`); quitados 35 textos sobrantes de las seis pestañas. Arreglos de lógica: un yogur, leche, kéfir o skyr escaneado o del catálogo entra como lácteo (125 a 400 g) y no como base o verdura; Alubias con huevo lleva claras y las fajitas pasan a ser de ternera magra, así ya no se quedan cortas de proteína; tus métricas pasan a `datos/perfil.json` (local, no se sube); `GYM.csv` y su copia van a `obsoleto/v2.5_csv_sin_uso/` |
+| v2.6 | Reajuste dinámico cuando fallas: cada día eliges qué vas a hacer (lo que toca, otro entreno del plan, otra actividad o descanso) y se recalcula la comida de lo que queda; cada semana propone repetir cargas, alargar el bloque (retrasando el final) o una semana de reentrada; avisos de ±100 kcal según el peso. Lógica en `menu/plazos.js` y `menu/plazos.py`, verificada con `menu/ver_plazos.py`. En la app: pregunta diaria, avisos y calendario plegado en El entreno, y la comida del día ajustada en Menús (lo que queda y lo apuntado después de elegir) |
 
-*Versión del sistema: v2.5, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
+*Versión del sistema: v2.6, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
