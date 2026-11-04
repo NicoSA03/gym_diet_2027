@@ -53,7 +53,7 @@ TIPOS = {
  "A": ("Fuerza + universidad por la tarde",  "Lunes y miércoles", 0.91, ["P","D","C","S1","S2","N"]),
  "B": ("Carrera + universidad desde 12:30",  "Martes y jueves",   1.00, ["P","D","C","S1","S2","N"]),
  "C": ("Entreno + universidad + turno",      "Viernes",           1.07, ["P","D","C","S1","S2","N","T"]),
- "D": ("Tirada larga + turno de 9 h",        "Sábado",            1.21, ["P","D","C","S1","S2","T2","T","Z"]),
+ "D": ("Turno de 9 h o recuperación",        "Sábado",            1.21, ["P","D","C","S1","S2","T2","T","Z"]),
  "E": ("Descanso total",                     "Domingo",           0.88, ["D","C","S1","S2","N"]),
 }
 DIAS_SEM = {"A":2,"B":2,"C":1,"D":1,"E":1}
