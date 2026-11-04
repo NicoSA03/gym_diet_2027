@@ -122,23 +122,23 @@ def viabilidad(v):
     sem = v["dias_plan"] / 7
     motivos, alc, necesarias = [], {}, 0
     rearr = RITMO["rearranque"] if float(v.get("semanas_parado") or 0) >= 4 else 0
-    util = max(0, sem - rearr)
+    util = max(0, math.floor(sem) - rearr)   # semanas enteras: lo alcanzable debe pasar la comprobación
     if v["objetivo"] == "5k":
         a, b = vdot(5000, seg(v["test_5k"])), vdot(5000, seg(v["objetivo_5k"]))
         necesarias = max(0, (b - a) / RITMO["vdot"])
         motivos.append("Bajar el 5 km de %s a %s son %s puntos de VDOT: unas %d semanas."
                        % (v["test_5k"], v["objetivo_5k"], fmt(b - a), math.ceil(necesarias)))
-        alc["objetivo_5k"] = mmss(tiempo_para(a + RITMO["vdot"] * util, 5000))
+        alc["objetivo_5k"] = mmss(math.ceil(tiempo_para(a + RITMO["vdot"] * util, 5000)))
     elif v["objetivo"] == "perder":
         kg = v["peso"] - v["peso_objetivo"]
         necesarias = max(0, kg / (v["peso"] * RITMO["perder"]))
         motivos.append("Perder %s kg sin perder músculo lleva unas %d semanas." % (fmt(kg), math.ceil(necesarias)))
-        alc["peso_objetivo"] = r1(v["peso"] - v["peso"] * RITMO["perder"] * util)
+        alc["peso_objetivo"] = math.ceil((v["peso"] - v["peso"] * RITMO["perder"] * util) * 10) / 10
     elif v["objetivo"] == "ganar":
         kg = v["peso_objetivo"] - v["peso"]
         necesarias = max(0, kg / RITMO["ganar"])
         motivos.append("Ganar %s kg de músculo lleva unas %d semanas." % (fmt(kg), math.ceil(necesarias)))
-        alc["peso_objetivo"] = r1(v["peso"] + RITMO["ganar"] * util)
+        alc["peso_objetivo"] = math.floor((v["peso"] + RITMO["ganar"] * util) * 10) / 10
     if rearr:
         motivos.append("Llevas %s semanas parado: se suman %d de rearranque." % (v["semanas_parado"], rearr))
     total = max(RITMO["minimo"], math.ceil(necesarias + rearr))

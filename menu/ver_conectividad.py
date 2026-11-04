@@ -45,6 +45,14 @@ for txt, reloj, manual, esperado in CASOS:
         a = v["alcanzable"]["objetivo_5k"]
         comprueba("23:00" < a <= "27:30", "  5 km alcanzable en ese tiempo: %s" % a)
 
+CASOS.append(("Perder de 90 a 70 kg en 30 días", None, dict(BASE, peso=90, objetivo="perder", peso_objetivo=70, dias_plan=30), False))
+CASOS.append(("Perder de 90 a 70 kg en 60 días", None, dict(BASE, peso=90, objetivo="perder", peso_objetivo=70, dias_plan=60), False))
+for txt, reloj, manual, esperado in CASOS:
+    v = evaluar(reloj, manual).get("viabilidad") or {}
+    if v.get("alcanzable"):
+        r = evaluar(reloj, dict(manual, **v["alcanzable"]))
+        comprueba(r["estado"] == "listo" and r["viabilidad"]["ok"],
+                  "Bajar el objetivo deja el plan viable: %s con %s" % (txt, v["alcanzable"]))
 print("2. Qué métricas se piden")
 r = evaluar(None, dict(objetivo="5k", dias_plan=200))
 comprueba(r["estado"] == "faltan" and r["faltan"] == ["edad", "sexo", "altura", "peso", "dias_semana", "test_5k", "objetivo_5k"],

@@ -716,7 +716,7 @@ Las fechas salen en la hora local del móvil, igual que las guarda el Registro, 
 | Si llevas 4 semanas o más parado | Se suman 4 semanas de rearranque |
 | Cualquier plan | 4 semanas como mínimo |
 
-Junto al aviso devuelve los días mínimos y lo que sí se alcanza en el tiempo elegido. Ejemplo: 5 km de 27:30 a 23:00 necesita 189 días; en 90 días lo alcanzable es 25:08.
+Junto al aviso devuelve los días mínimos y lo que sí se alcanza en el tiempo elegido. Ejemplo: 5 km de 27:30 a 23:00 necesita 189 días; en 90 días lo alcanzable es 25:17 (se cuenta con semanas enteras, para que al aceptarlo el plan pase la comprobación).
 
 **Calendario.** `sesionesCalendario()` devuelve las sesiones del reloj (fecha AAAA-MM-DD, tipo, km, minutos, pulso medio y `origen: "reloj"`). `aRegistro()` las pasa al formato del Registro (`registro_v1.carrera` y `registro_v1.sesiones` de `menu/a6.js`) y devuelve solo las nuevas: si ese día ya hay una carrera o una fuerza apuntada en la app, manda la de la app. No escribe nada: la pantalla que lo use debe preguntar antes de añadirlas.
 

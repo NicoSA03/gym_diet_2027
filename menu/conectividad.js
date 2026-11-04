@@ -422,20 +422,20 @@ function viabilidad(v){
   const sem = v.dias_plan/7, motivos=[], alc={};
   let necesarias = 0;
   const rearr = (+v.semanas_parado||0) >= 4 ? RITMO.rearranque : 0;
-  const util = Math.max(0, sem - rearr);
+  const util = Math.max(0, Math.floor(sem) - rearr);   /* semanas enteras: lo alcanzable debe pasar la comprobación */
   if(v.objetivo==="5k"){
     const a=vdot(5000,seg(v.test_5k)), b=vdot(5000,seg(v.objetivo_5k));
     const n=Math.max(0,(b-a)/RITMO.vdot); necesarias=n;
     motivos.push("Bajar el 5 km de "+v.test_5k+" a "+v.objetivo_5k+" son "+r1(b-a).toString().replace(".",",")+" puntos de VDOT: unas "+Math.ceil(n)+" semanas.");
-    alc.objetivo_5k = mmss(tiempoPara(a + RITMO.vdot*util, 5000));
+    alc.objetivo_5k = mmss(Math.ceil(tiempoPara(a + RITMO.vdot*util, 5000)));
   } else if(v.objetivo==="perder"){
     const kg=v.peso-v.peso_objetivo, n=Math.max(0,kg/(v.peso*RITMO.perder)); necesarias=n;
     motivos.push("Perder "+r1(kg).toString().replace(".",",")+" kg sin perder músculo lleva unas "+Math.ceil(n)+" semanas.");
-    alc.peso_objetivo = r1(v.peso - v.peso*RITMO.perder*util);
+    alc.peso_objetivo = Math.ceil((v.peso - v.peso*RITMO.perder*util)*10)/10;
   } else if(v.objetivo==="ganar"){
     const kg=v.peso_objetivo-v.peso, n=Math.max(0,kg/RITMO.ganar); necesarias=n;
     motivos.push("Ganar "+r1(kg).toString().replace(".",",")+" kg de músculo lleva unas "+Math.ceil(n)+" semanas.");
-    alc.peso_objetivo = r1(v.peso + RITMO.ganar*util);
+    alc.peso_objetivo = Math.floor((v.peso + RITMO.ganar*util)*10)/10;
   }
   if(rearr) motivos.push("Llevas "+v.semanas_parado+" semanas parado: se suman "+rearr+" de rearranque.");
   const total = Math.max(RITMO.minimo, Math.ceil(necesarias + rearr));
