@@ -677,5 +677,54 @@ Cosas que conviene saber:
 | v2.5 | Interfaz más limpia: El entreno abre en el día de hoy y en el bloque que toca (sábado y domingo se ven como descanso y puedes tocar cualquier día); fuera la pestaña Actualizar (el manual se lee aquí, en README.md; lo retirado está en `obsoleto/v2.5_pestana_actualizar/`); quitados 35 textos sobrantes de las seis pestañas. Arreglos de lógica: un yogur, leche, kéfir o skyr escaneado o del catálogo entra como lácteo (125 a 400 g) y no como base o verdura; Alubias con huevo lleva claras y las fajitas pasan a ser de ternera magra, así ya no se quedan cortas de proteína; tus métricas pasan a `datos/perfil.json` (local, no se sube); `GYM.csv` y su copia van a `obsoleto/v2.5_csv_sin_uso/` |
 | v2.6 | Reajuste dinámico cuando fallas: cada día eliges qué vas a hacer (lo que toca, otro entreno del plan, otra actividad o descanso) y se recalcula la comida de lo que queda; cada semana propone repetir cargas, alargar el bloque (retrasando el final) o una semana de reentrada; avisos de ±100 kcal según el peso. Lógica en `menu/plazos.js` y `menu/plazos.py`, verificada con `menu/ver_plazos.py`. En la app: pregunta diaria, avisos y calendario plegado en El entreno, y la comida del día ajustada en Menús (lo que queda y lo apuntado después de elegir) |
 | v2.7 | Un solo nombre de bloque en toda la app (B0 a B5, el de la dieta) en vez de F0 a F5 en El entreno, Registro, La teoría y Cómo funciona. Por dentro y en lo guardado en el móvil no cambia nada. El kit del turno ya no lleva bocadillos: lonchas de pavo o jamón con tortitas y frutos secos, sin montar nada. La tarea del catálogo reintenta el push si hay commits nuevos y usa checkout v5 y setup-python v6. Verificaciones automáticas en GitHub Actions |
+| v3.0 | Conectividad con relojes: en Registro, vista «Reloj», lector de archivos del reloj (Garmin, Polar, Apple Watch, Suunto, Coros, Strava), métricas que faltan por pantalla, aviso de plan imposible en X días y sesiones del reloj que pasan al Registro y al calendario solo si lo confirmas (sección 12) |
 
-*Versión del sistema: v2.7, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
+
+## 12. Conectar el reloj (v3.0)
+
+Se usa desde **Registro, vista «Reloj»**: eliges tu marca (te dice cómo exportar y te lleva a su web), subes uno o varios archivos, ves cuántas actividades y qué métricas salen, y con «Añadir al Registro» (pide confirmación y no duplica) pasan al Registro y al calendario. Debajo pide solo los datos que falten (se guardan en `perfil_manual_v1`) y, si el plan no cabe en los días elegidos, muestra el aviso de imposible con «Alargar a N días» o «Bajar el objetivo». No cambia nada del plan en curso.
+
+**Archivos**
+
+| Archivo | Qué hace |
+|---|---|
+| `menu/conectividad.js` | Lee los archivos del reloj, saca las métricas, dice cuáles faltan, comprueba si el plan cabe en X días y prepara las sesiones para el calendario |
+| `menu/conectividad.py` | Gemelo en Python de la parte de cálculo (métricas y viabilidad) para la verificación |
+| `menu/ver_conectividad.py` | La verificación (abajo) |
+
+**Cómo llegan los datos del reloj.** No hay conexión automática: el usuario elige su marca, la app le lleva a la página donde se descargan sus datos y le explica qué archivo bajar, y luego lo sube. Lee estos formatos:
+
+| Marca | Archivo |
+|---|---|
+| Garmin | `.FIT` de una actividad o el CSV de la lista de actividades de Garmin Connect |
+| Polar | `.TCX` o `.GPX` de Polar Flow |
+| Apple Watch | `export.xml` de Apple Salud (Exportar todos los datos de salud, y descomprimir). Vale el formato de iOS 16 en adelante. Ojo: con años de datos pesa cientos de MB y puede tardar o colgar el navegador del móvil; mejor subirlo desde el PC |
+| Suunto y Coros | `.FIT` |
+| Strava | `activities.csv` o los `.GPX` de la descarga de la cuenta |
+| Cualquier otro | `.FIT`, `.GPX`, `.TCX` o `.CSV` |
+
+Las claves de las métricas (`peso`, `altura`, `test_5k`, `objetivo_5k`...) son las mismas que `datos/perfil.json` de la v2.5, así que el perfil se le puede pasar tal cual como datos escritos a mano.
+
+**Qué métricas usa.** Obligatorias: edad, sexo, altura, peso, objetivo (5 km, perder, ganar o mantener), días que dura el plan y días de entreno por semana. Según el objetivo pide además el 5 km actual y el deseado, o el peso deseado. Opcionales: VO2máx, pulso en reposo y máximo, km por semana, semanas sin entrenar y actividad diaria. Cada una se busca primero en el reloj, luego se calcula si se puede (pulso máximo por la edad, VO2máx por el 5 km) y si no, se pide por pantalla. Lo escrito a mano manda sobre lo del reloj. Se rechaza (y se vuelve a pedir) lo que no es un número o se sale de lo razonable, un 5 km que no esté en mm:ss (o h:mm:ss) entre 10 y 90 minutos, y los objetivos que se contradicen: perder hasta un peso mayor que el actual, ganar hasta uno menor o un 5 km deseado más lento que el actual. Se admite la coma decimal («79,5»).
+
+Las fechas salen en la hora local del móvil, igual que las guarda el Registro, para que una sesión a las 00:30 no caiga en el día anterior. En el CSV, la distancia se lee fila a fila: más de 300 son metros (natación de Garmin, export de Strava) y si no, kilómetros.
+
+**Cuándo sale «Imposible hacer rutina con esas métricas en este tiempo, reajuste».** Cuando los días del plan son menos de los que hacen falta con estos ritmos máximos (en `RITMO`, iguales en el JS y el Python):
+
+| Objetivo | Ritmo máximo |
+|---|---|
+| Bajar grasa | 0,7 % del peso por semana |
+| Ganar músculo | 0,25 kg por semana |
+| Mejorar el 5 km | 0,3 puntos de VDOT por semana |
+| Si llevas 4 semanas o más parado | Se suman 4 semanas de rearranque |
+| Cualquier plan | 4 semanas como mínimo |
+
+Junto al aviso devuelve los días mínimos y lo que sí se alcanza en el tiempo elegido. Ejemplo: 5 km de 27:30 a 23:00 necesita 189 días; en 90 días lo alcanzable es 25:17 (se cuenta con semanas enteras, para que al aceptarlo el plan pase la comprobación).
+
+**Calendario.** `sesionesCalendario()` devuelve las sesiones del reloj (fecha AAAA-MM-DD, tipo, km, minutos, pulso medio y `origen: "reloj"`). `aRegistro()` las pasa al formato del Registro (`registro_v1.carrera` y `registro_v1.sesiones` de `menu/a6.js`) y devuelve solo las nuevas: si ese día ya hay una carrera o una fuerza apuntada en la app, manda la de la app. No escribe nada: la pantalla que lo use debe preguntar antes de añadirlas.
+
+**Pulso en directo.** `conectarPulso()` lee el pulso por Bluetooth de cualquier reloj o banda que lo emita. Solo funciona en Chrome de Android y del PC; en iPhone no.
+
+**Verificación.** `python3 menu/ver_conectividad.py` comprueba nueve casos de viabilidad, nueve de datos mal metidos o en el límite, qué métricas se piden y, si Node está instalado, lee un archivo de prueba de cada formato y comprueba que el JS y el Python dan lo mismo. Debe acabar en «TODO OK: conectividad». De momento no forma parte de `actualizar.py`.
+
+*Versión del sistema: v3.0, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
