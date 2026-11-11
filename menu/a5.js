@@ -12,10 +12,10 @@ const TIER = {
   TF:["Fijo","Gemelo: la misma prescripción todo el año, porque la carrera ya lo castiga"]
 };
 const GRUPOS = [
-  ["V","Volumen","F0, F1, F3"],
-  ["F","Fuerza","F2"],
-  ["D","Definición","F4"],
-  ["P","Pico","F5"]
+  ["V","Volumen","B0, B1, B3"],
+  ["F","Fuerza","B2"],
+  ["D","Definición","B4"],
+  ["P","Pico","B5"]
 ];
 
 function pintaCabecera(){
@@ -29,7 +29,7 @@ function pintaFases(){
   const box = document.getElementById("fases");
   box.replaceChildren();
   Object.keys(T.fases).forEach(k=>{
-    const c = el("button","chip", k+": "+T.fases[k].n);
+    const c = el("button","chip", k.replace(/^F/,"B")+": "+T.fases[k].n);
     c.setAttribute("role","tab");
     c.setAttribute("aria-selected", k===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=k; guarda("t_fase",k); pintaFases(); pintaBloque(); });

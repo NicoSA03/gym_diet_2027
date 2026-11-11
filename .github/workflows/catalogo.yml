@@ -23,9 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -43,5 +43,17 @@ jobs:
             echo "Sin cambios."
           else
             git commit -m "catálogo: actualización automática $(date +%F)"
-            git push
+            # Si alguien ha subido algo mientras tanto, se baja lo nuevo, se pone
+            # encima el catálogo recién descargado y se vuelve a intentar.
+            for i in 1 2 3; do
+              git push && exit 0
+              cp docs/catalogo.json /tmp/catalogo.json
+              git fetch origin "$GITHUB_REF_NAME"
+              git reset --hard "origin/$GITHUB_REF_NAME"
+              cp /tmp/catalogo.json docs/catalogo.json
+              git add docs/catalogo.json
+              git diff --cached --quiet && exit 0
+              git commit -m "catálogo: actualización automática $(date +%F)"
+            done
+            exit 1
           fi

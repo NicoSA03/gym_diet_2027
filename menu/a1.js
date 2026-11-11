@@ -53,7 +53,7 @@ function pintaTipo(){
 function render(){
   const fb=document.getElementById("fases"); fb.replaceChildren();
   Object.keys(I.fases).forEach(f=>{
-    const c=el("button","chip", f+": "+I.fases[f].n);
+    const c=el("button","chip", f.replace(/^F/,"B")+": "+I.fases[f].n);
     c.setAttribute("role","tab"); c.setAttribute("aria-selected", f===fase?"true":"false");
     c.addEventListener("click", ()=>{ fase=f; guarda("fase-info",f); render(); });
     fb.append(c);

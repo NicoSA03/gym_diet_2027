@@ -643,7 +643,9 @@ Las cinco páginas publicadas en claude.ai **solo** se actualizan desde Claude. 
 | Mercadona | [MercaAPI](https://mercaapi.sgn.space), una API **no oficial** y gratuita que copia la tienda online | Macros, precio, formato y código de barras |
 | Lidl y Carrefour | [Open Food Facts](https://world.openfoodfacts.org), la base de datos abierta de alimentos | Macros, formato y código de barras (sin precio) |
 
-**Se actualiza solo** cada lunes por la mañana: lo hace GitHub con `.github/workflows/catalogo.yml` y, si hay cambios, deja un commit «catálogo: actualización automática». Por eso, **antes de subir tus cambios haz `git pull`**, o el push te dará error.
+**Se actualiza solo** cada lunes por la mañana: lo hace GitHub con `.github/workflows/catalogo.yml` y, si hay cambios, deja un commit «catálogo: actualización automática». Por eso, **antes de subir tus cambios haz `git pull`**, o el push te dará error. Si mientras tanto alguien ha subido algo, la tarea baja lo nuevo, pone encima el catálogo y lo vuelve a intentar (hasta tres veces).
+
+Además, `.github/workflows/verificar.yml` pasa las seis verificaciones en cada subida a una rama que no sea `main` y en cada pull request, con el perfil de ejemplo. Si sale en rojo en la pestaña Actions, algo del plan no cuadra.
 
 Para lanzarlo a mano: en GitHub, pestaña **Actions → Catálogo de alimentos → Run workflow**. O en tu PC:
 
@@ -674,5 +676,6 @@ Cosas que conviene saber:
 | v2.4 | Agentes de Claude: un supervisor (`CLAUDE.md`) que reparte el trabajo entre `ajustes` (Haiku), `dieta`, `entreno` y `frontend` (Sonnet), un `revisor` (Opus) que hace la segunda lectura de cada cambio, y `publicar` (Haiku), que comprueba los requisitos y prepara la subida al proyecto |
 | v2.5 | Interfaz más limpia: El entreno abre en el día de hoy y en el bloque que toca (sábado y domingo se ven como descanso y puedes tocar cualquier día); fuera la pestaña Actualizar (el manual se lee aquí, en README.md; lo retirado está en `obsoleto/v2.5_pestana_actualizar/`); quitados 35 textos sobrantes de las seis pestañas. Arreglos de lógica: un yogur, leche, kéfir o skyr escaneado o del catálogo entra como lácteo (125 a 400 g) y no como base o verdura; Alubias con huevo lleva claras y las fajitas pasan a ser de ternera magra, así ya no se quedan cortas de proteína; tus métricas pasan a `datos/perfil.json` (local, no se sube); `GYM.csv` y su copia van a `obsoleto/v2.5_csv_sin_uso/` |
 | v2.6 | Reajuste dinámico cuando fallas: cada día eliges qué vas a hacer (lo que toca, otro entreno del plan, otra actividad o descanso) y se recalcula la comida de lo que queda; cada semana propone repetir cargas, alargar el bloque (retrasando el final) o una semana de reentrada; avisos de ±100 kcal según el peso. Lógica en `menu/plazos.js` y `menu/plazos.py`, verificada con `menu/ver_plazos.py`. En la app: pregunta diaria, avisos y calendario plegado en El entreno, y la comida del día ajustada en Menús (lo que queda y lo apuntado después de elegir) |
+| v2.7 | Un solo nombre de bloque en toda la app (B0 a B5, el de la dieta) en vez de F0 a F5 en El entreno, Registro, La teoría y Cómo funciona. Por dentro y en lo guardado en el móvil no cambia nada. El kit del turno ya no lleva bocadillos: lonchas de pavo o jamón con tortitas y frutos secos, sin montar nada. La tarea del catálogo reintenta el push si hay commits nuevos y usa checkout v5 y setup-python v6. Verificaciones automáticas en GitHub Actions |
 
-*Versión del sistema: v2.6, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
+*Versión del sistema: v2.7, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*

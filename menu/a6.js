@@ -172,7 +172,7 @@ function vEntrenar(box){
   card.append(el("p","eyebrow","Bloque"));
   const fc = el("div","chips");
   Object.keys(R.fases).forEach(k=>{
-    const c = el("button","chip sm",k+": "+R.fases[k].n);
+    const c = el("button","chip sm",k.replace(/^F/,"B")+": "+R.fases[k].n);
     c.setAttribute("aria-selected", k===selFase?"true":"false");
     c.addEventListener("click", ()=>{ selFase=k; render(); });
     fc.append(c);
@@ -250,7 +250,7 @@ function vSesion(box){
     if(confirm("¿Descartar este entreno? Se pierde todo lo apuntado.")){ D.activa=null; guarda(); paraDescanso(); render(); }
   });
   top.append(fin, x);
-  box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase+": "+f.n+", "+corta(a.fecha)));
+  box.append(top, el("h2","r-tit",a.nombre), el("p","nota",a.fase.replace(/^F/,"B")+": "+f.n+", "+corta(a.fecha)));
   { const lm = lineaMarca(); if(lm) box.append(lm); }
   a.ej.forEach(e=>box.append(bloqueEj(e, f)));
   if(a.abd){
