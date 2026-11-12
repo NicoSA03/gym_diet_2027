@@ -603,6 +603,8 @@ function vProgreso(box){
   const c = el("div","r-card");
   c.append(el("h3",null,"Por ejercicio"));
   const conDatos = Object.keys(R.ej).filter(n=>D.sesiones.some(s=>(s.ej||[]).some(e=>e.n===n)));
+  // ejercicios que ya no están en el plan (cambiados por otro) pero tienen registros: se siguen viendo
+  D.sesiones.forEach(s=>(s.ej||[]).forEach(e=>{ if(e.n && !conDatos.includes(e.n)) conDatos.push(e.n); }));
   if(!conDatos.length){
     c.append(hueco("Cuando termines tu primer entreno aparecerán aquí las gráficas de cada ejercicio."));
   } else {

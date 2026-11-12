@@ -180,7 +180,9 @@ De dónde sale: la lista oficial de Garmin (1.846 ejercicios del kit FIT de Garm
 
 Para buscar el código de otra animación: abre `datos/exercises.sql` con el Bloc de notas, busca el ejercicio en inglés (por ejemplo `barbell curl`) y copia el código de 7 letras que va antes del nombre (`25GPyDY`). Puedes comprobarlo abriendo `https://static.exercisedb.dev/media/25GPyDY.gif`.
 
-Tres ejercicios del plan no tienen animación exacta y llevan la más parecida: el face pull (un remo alto con cuerda), la zancada búlgara (zancada con el pie de atrás en el banco) y el press francés (con barra recta).
+Cuatro ejercicios del plan no tienen animación exacta y llevan la más parecida: el face pull (un remo alto con cuerda), la zancada búlgara (zancada con el pie de atrás en el banco), el press francés (con barra recta) y el remo sentado en máquina (la versión en polea). La sentadilla jaca no tiene animación ni nombre propio en Garmin.
+
+Si un ejercicio del plan se cambia por otro, el antiguo pasa a sustituto en `datos/ejercicios.csv` y sus registros se siguen viendo en Registro, Progreso; las gráficas del nuevo empiezan desde cero.
 
 ### Cómo se organizan las series de un ejercicio
 
@@ -678,6 +680,7 @@ Cosas que conviene saber:
 | v2.6 | Reajuste dinámico cuando fallas: cada día eliges qué vas a hacer (lo que toca, otro entreno del plan, otra actividad o descanso) y se recalcula la comida de lo que queda; cada semana propone repetir cargas, alargar el bloque (retrasando el final) o una semana de reentrada; avisos de ±100 kcal según el peso. Lógica en `menu/plazos.js` y `menu/plazos.py`, verificada con `menu/ver_plazos.py`. En la app: pregunta diaria, avisos y calendario plegado en El entreno, y la comida del día ajustada en Menús (lo que queda y lo apuntado después de elegir) |
 | v2.7 | Un solo nombre de bloque en toda la app (B0 a B5, el de la dieta) en vez de F0 a F5 en El entreno, Registro, La teoría y Cómo funciona. Por dentro y en lo guardado en el móvil no cambia nada. El kit del turno ya no lleva bocadillos: lonchas de pavo o jamón con tortitas y frutos secos, sin montar nada. La tarea del catálogo reintenta el push si hay commits nuevos y usa checkout v5 y setup-python v6. Verificaciones automáticas en GitHub Actions |
 | v3.0 | Conectividad con relojes: en Registro, vista «Reloj», lector de archivos del reloj (Garmin, Polar, Apple Watch, Suunto, Coros, Strava), métricas que faltan por pantalla, aviso de plan imposible en X días y sesiones del reloj que pasan al Registro y al calendario solo si lo confirmas (sección 12) |
+| v3.1 | Lunes: remo sentado en máquina (BH Fitness L290) en vez de remo con barra y peso muerto rumano con mancuernas en vez de con barra. Viernes: sentadilla jaca en vez de sentadilla frontal. Mismas series, repeticiones y RIR. Los ejercicios antiguos quedan como sustitutos y sus registros siguen en Progreso |
 
 
 ## 12. Conectar el reloj (v3.0)

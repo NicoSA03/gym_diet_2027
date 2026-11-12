@@ -1,8 +1,9 @@
 nombre;grupo;musculos;secundarios;patron;material;series;reps;garmin;gif;uso;sustituye_a;notas
 Sentadilla trasera;Pierna;Cuádriceps|Glúteo;Isquios|Core;Rodilla;Barra;3-4;6-10;squat/barbell_back_squat;qXTaZnJ;plan;;
 Press banca;Pecho;Pectoral|Tríceps;Hombro;Empuje horizontal;Barra;3-4;6-10;bench_press/barbell_bench_press;EIeI8Vf;plan;;
-Peso muerto rumano;Pierna;Isquios|Glúteo;Espalda baja;Cadera;Barra;3-4;8-12;deadlift/romanian_deadlift;wQ2c4XD;plan;;
-Remo con barra;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Barra;3-4;8-12;row/bent_over_row_with_barbell;eZyBC3j;plan;;
+Peso muerto rumano;Pierna;Isquios|Glúteo;Espalda baja;Cadera;Barra;3-4;8-12;deadlift/romanian_deadlift;wQ2c4XD;sustituto;Peso muerto rumano con mancuernas;
+Remo con barra;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Barra;3-4;8-12;row/bent_over_row_with_barbell;eZyBC3j;sustituto;Remo sentado en máquina;
+Remo sentado en máquina;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Máquina BH Fitness L290;3-4;8-12;row/seated_cable_row;fUBheHs;plan;;Animación y nombre en Garmin de la versión en polea, el gesto es el mismo
 Flexión clásica;Pecho;Pectoral|Tríceps;Hombro|Core;Empuje horizontal;Peso corporal;3-4;máximas-2;push_up/push_up;I4hDWkc;plan;;
 Curl de bíceps con barra Z;Brazo;Bíceps;Antebrazo;Aislamiento;Barra Z;3-4;8-12;curl/standing_ez_bar_biceps_curl;6TG6x2w;plan;;
 Peso muerto convencional;Pierna;Isquios|Glúteo|Espalda;Trapecio|Antebrazo;Cadera;Barra;3-4;3-6;deadlift/barbell_deadlift;ila4NZS;plan;;
@@ -11,7 +12,8 @@ Zancada búlgara;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla unilateral;Mancuerna
 Press militar de pie;Hombro;Hombro|Tríceps;Core|Trapecio;Empuje vertical;Barra;3-4;6-10;shoulder_press/military_press;Kyd9Rz5;plan;;
 Extensión de tríceps en polea;Brazo;Tríceps;;Aislamiento;Polea;3-4;10-15;triceps_extension/triceps_pressdown;3ZflifB;plan;;
 Elevación de talones;Pierna;Gemelo;;Aislamiento;Máquina;3-4;12-20;calf_raise/standing_calf_raise;ykUOVze;plan;;
-Sentadilla frontal;Pierna;Cuádriceps;Glúteo|Core;Rodilla;Barra;3-4;6-10;squat/barbell_front_squat;zG0zs85;plan;;
+Sentadilla frontal;Pierna;Cuádriceps;Glúteo|Core;Rodilla;Barra;3-4;6-10;squat/barbell_front_squat;zG0zs85;sustituto;Sentadilla jaca;
+Sentadilla jaca;Pierna;Cuádriceps;Glúteo;Rodilla;Máquina jaca;3-4;6-10;;;plan;;Garmin no la tiene como ejercicio propio
 Press inclinado con mancuernas;Pecho;Pectoral|Hombro;Tríceps;Empuje inclinado;Mancuernas;3-4;8-12;bench_press/incline_dumbbell_bench_press;ns0SIbU;plan;;
 Hip thrust;Pierna;Glúteo|Isquios;Core;Cadera;Barra y banco;3-4;8-12;hip_raise/barbell_hip_thrust_with_bench;qg2PGl6;plan;;
 Remo con mancuerna a una mano;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Mancuerna y banco;3-4;8-12;row/one_arm_bent_over_row;C0MA9bC;plan;;
@@ -24,8 +26,8 @@ Crunch en polea alta;Core;Abdomen;;Aislamiento;Polea;3-4;10-15;crunch/kneeling_c
 Sentadilla en máquina Smith;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla;Máquina Smith;3-4;8-12;;NNoHCEA;sustituto;Sentadilla trasera;Garmin no la tiene como ejercicio propio
 Prensa a 45°;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla;Máquina;3-4;8-12;squat/leg_press;2Qh2J1e;sustituto;Sentadilla trasera;
 Press con mancuernas en banco plano;Pecho;Pectoral|Tríceps;Hombro;Empuje horizontal;Mancuernas;3-4;8-12;bench_press/dumbbell_bench_press;SpYC0Kp;sustituto;Press banca;
-Peso muerto rumano con mancuernas;Pierna;Isquios|Glúteo;Espalda baja;Cadera;Mancuernas;3-4;8-12;deadlift/romanian_deadlift;rR0LJzx;sustituto;Peso muerto rumano;
-Remo en punta;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Barra en T o máquina;3-4;8-12;row/t_bar_row;aaXr7ld;sustituto;Remo con barra;
+Peso muerto rumano con mancuernas;Pierna;Isquios|Glúteo;Espalda baja;Cadera;Mancuernas;3-4;8-12;deadlift/romanian_deadlift;rR0LJzx;plan;;
+Remo en punta;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Barra en T o máquina;3-4;8-12;row/t_bar_row;aaXr7ld;sustituto;Remo sentado en máquina;
 Curl con mancuernas;Brazo;Bíceps;Antebrazo;Aislamiento;Mancuernas;3-4;8-12;curl/dumbbell_biceps_curl;BU15nH4;sustituto;Curl de bíceps con barra Z;
 Peso muerto con trap bar;Pierna;Cuádriceps|Glúteo|Isquios;Espalda|Trapecio;Cadera;Barra hexagonal;3-4;3-6;deadlift/trap_bar_deadlift;jQGwmxN;sustituto;Peso muerto convencional;
 Jalón al pecho;Espalda;Espalda|Bíceps;Hombro;Tirón vertical;Polea;3-4;8-12;pull_up/lat_pulldown;eYnzaCm;sustituto;Dominadas lastradas;
@@ -33,7 +35,7 @@ Zancadas caminando;Pierna;Cuádriceps|Glúteo;Isquios;Rodilla unilateral;Peso co
 Press con mancuernas sentado;Hombro;Hombro|Tríceps;Trapecio;Empuje vertical;Mancuernas;3-4;8-12;shoulder_press/seated_dumbbell_shoulder_press;znQUdHY;sustituto;Press militar de pie;
 Press francés con barra Z;Brazo;Tríceps;;Aislamiento;Barra Z;3-4;8-12;triceps_extension/lying_ez_bar_triceps_extension;h8LFzo9;sustituto;Extensión de tríceps en polea;Es el «skull crusher» de Workout.csv; el GIF es con barra recta
 Elevación de talones de pie con mancuerna;Pierna;Gemelo;;Aislamiento;Mancuerna;3-4;12-20;calf_raise/standing_dumbbell_calf_raise;dPmaUaU;sustituto;Elevación de talones;
-Sentadilla goblet;Pierna;Cuádriceps|Glúteo;Core;Rodilla;Mancuerna;3-4;8-12;squat/goblet_squat;yn8yg1r;sustituto;Sentadilla frontal;
+Sentadilla goblet;Pierna;Cuádriceps|Glúteo;Core;Rodilla;Mancuerna;3-4;8-12;squat/goblet_squat;yn8yg1r;sustituto;Sentadilla jaca;
 Press inclinado en máquina;Pecho;Pectoral|Hombro;Tríceps;Empuje inclinado;Máquina;3-4;8-12;;jHAnWmT;sustituto;Press inclinado con mancuernas;Garmin no lo tiene como ejercicio propio
 Puente de glúteo con barra;Pierna;Glúteo|Isquios;Core;Cadera;Barra;3-4;8-12;hip_raise/barbell_hip_thrust_on_floor;qKBpF7I;sustituto;Hip thrust;
 Remo en polea baja unilateral;Espalda;Espalda|Bíceps;Hombro;Tirón horizontal;Polea;3-4;10-12;row/single_arm_cable_row;vpp9Ku2;sustituto;Remo con mancuerna a una mano;
