@@ -313,7 +313,8 @@ function pintaPregunta(){
   }
   box.append(c);
 }
-function formActividad(act){
+function formActividad(act, alGuardar){
+  alGuardar = alGuardar || guardaDia;
   const f = el("div","hq-form");
   const campo = (txt, nodo, cl)=>{ const l = el("label",cl||null,txt); l.append(nodo); f.append(l); return nodo; };
   const nom = el("input"); nom.type = "text"; nom.maxLength = 30; nom.placeholder = "Qué haces"; nom.value = (act && act.nombre) || "";
@@ -339,7 +340,7 @@ function formActividad(act){
     const mm = parseInt(min.value, 10);
     if(!(mm>0 && mm<=600)){ err.textContent = "Pon los minutos."; err.hidden = false; return; }
     const lbl = TIPOS_ACT.find(x=>x[0]===tipo.value)[1];
-    guardaDia({modo:"otra", sesion:null, act:{nombre: nom.value.trim() || lbl, tipo:tipo.value, min:mm, int:inten}});
+    alGuardar({modo:"otra", sesion:null, act:{nombre: nom.value.trim() || lbl, tipo:tipo.value, min:mm, int:inten}});
   });
   f.append(err, ok);
   return f;
@@ -543,6 +544,10 @@ function detalleDia(f, r, h, ctx){
   });
   (ctx.car[f]||[]).forEach(x=>linea("Carrera: "+(x.km!=null ? String(x.km).replace(".",",")+" km" : "")+(x.min!=null ? ", "+Math.round(x.min)+" min" : "")+(x.origen==="reloj" ? ", reloj" : "")));
   const dd = r.dias && r.dias[f];
+  if(dd && dd.hecho && !(ctx.ses[f]||[]).length && !(ctx.car[f]||[]).length){
+    const ih = idxDia(dd.sesion);
+    linea((ih>=0 ? E.dias[ih].n : "Entreno")+", marcada a mano");
+  }
   if(dd && dd.modo==="otra" && dd.act) linea("Otra: "+(dd.act.nombre||"actividad")+", "+dd.act.min+" min, "+dd.act.int);
   if(dd && dd.modo==="descanso") linea("Descanso");
   if(m.falta) linea("Tocaba "+E.dias[k].n+" y no se hizo.");
@@ -566,7 +571,88 @@ function detalleDia(f, r, h, ctx){
     c.append(fila); n++;
   });
   if(!n) c.append(el("p",null,"Sin registro."));
+  if(f <= h) pintaCambio(c, f, r, h, ctx, dd);
   return c;
+}
+
+// ---- corregir un día pasado (o el de hoy) desde el calendario
+let cambF = null, cambSub = null, cambAv = null, cambMsg = null;
+function guardaCambio(f, dia){
+  const h = hoy();
+  if(registroIlegible()){ cambMsg = {f:f, t:"No se puede leer el registro."}; pintaCalendario(); return; }
+  const r = leeReg() || regVacio();
+  let nr = null;
+  try{ nr = PLAZOS.corregirDia(r, f, dia, h); }catch(e){}
+  if(!nr){ cambMsg = {f:f, t:"No se puede guardar este cambio."}; pintaCalendario(); return; }
+  if(!guardaReg(nr)){ cambMsg = {f:f, t:"No se pudo guardar."}; pintaCalendario(); return; }
+  let idx = [];
+  try{ idx = PLAZOS.revisarAjustes(nr, f, PLAN_E, esFecha(nr.plazos_desde) ? nr.plazos_desde : undefined) || []; }catch(e){}
+  cambF = null; cambSub = null; cambMsg = null;
+  cambAv = idx.length ? {f:f, idx:idx} : null;
+  render();
+}
+function pintaCambio(c, f, r, h, ctx, dd){
+  if(cambMsg && cambMsg.f===f) c.append(el("p","nota",cambMsg.t));
+  if(cambAv && cambAv.f===f){
+    cambAv.idx.forEach(i=>{
+      const a = r.ajustes && r.ajustes[i];
+      if(!a || a.deshecho) return;
+      const av = el("div","avi");
+      av.append(el("p",null,"Con este cambio, este ajuste ya no hace falta: "+(ETQ_AJ[a.que]||a.que)));
+      const b = el("button","hq-btn","Deshacer"); b.type = "button";
+      b.addEventListener("click", ()=>{
+        const r2 = leeReg(); if(!r2) return;
+        let nr; try{ nr = PLAZOS.deshacerAjuste(r2, i); }catch(e){ return; }
+        if(guardaReg(nr)) render();
+      });
+      av.append(b); c.append(av);
+    });
+  }
+  const fila = el("div","hq-fila");
+  if(cambF !== f){
+    const b = el("button","hq-btn","Cambiar"); b.type = "button";
+    b.addEventListener("click", ()=>{ cambF = f; cambSub = null; cambMsg = null; pintaCalendario(); });
+    fila.append(b);
+    if(dd && dd.corregido === true){
+      const q = el("button","hq-btn","Quitar"); q.type = "button";
+      q.addEventListener("click", ()=>guardaCambio(f, null));
+      fila.append(q);
+    }
+    c.append(fila); return;
+  }
+  const k = (deIso(f).getDay()+6)%7, cod = k<5 ? E.dias[k].cod : null;
+  const pasado = f < h, sinSes = !(ctx.ses[f]||[]).length && !(ctx.car[f]||[]).length;
+  const manual = pasado && sinSes ? {hecho:true} : {};
+  const cuerpo = el("div","hq");
+  cuerpo.append(el("h3",null,"¿Qué hiciste?"));
+  const ops = el("div","hq-ops");
+  const m = dd && dd.modo;
+  const op = (txt, sub, activo, fn)=>{
+    const b = el("button","hq-op"); b.type = "button"; b.append(document.createTextNode(txt));
+    if(sub) b.append(el("small",null,sub));
+    b.setAttribute("aria-pressed", activo ? "true":"false");
+    b.addEventListener("click", fn); ops.append(b);
+  };
+  op("Lo que toca", cod ? E.dias[k].n : "Fin de semana", m==="plan", ()=>guardaCambio(f, Object.assign({modo:"plan", sesion:cod}, manual)));
+  op("Otro entreno", "del plan", cambSub==="otro" || m==="otro_plan", ()=>{ cambSub = "otro"; pintaCalendario(); });
+  op("Otra actividad", null, cambSub==="otra" || m==="otra", ()=>{ cambSub = "otra"; pintaCalendario(); });
+  op("Descanso", null, m==="descanso", ()=>guardaCambio(f, {modo:"descanso", sesion:null}));
+  cuerpo.append(ops);
+  if(cambSub==="otro"){
+    const ch = el("div","hq-chips");
+    E.dias.forEach(x=>{
+      const b = el("button","chip",x.n); b.type = "button";
+      b.setAttribute("aria-selected", dd && dd.modo==="otro_plan" && dd.sesion===x.cod ? "true":"false");
+      b.addEventListener("click", ()=>guardaCambio(f, Object.assign({modo:"otro_plan", sesion:x.cod}, manual)));
+      ch.append(b);
+    });
+    cuerpo.append(ch);
+  }
+  if(cambSub==="otra") cuerpo.append(formActividad(dd && dd.modo==="otra" ? dd.act : null, d=>guardaCambio(f, d)));
+  const x = el("button","hq-btn","Dejarlo como está"); x.type = "button";
+  x.addEventListener("click", ()=>{ cambF = null; cambSub = null; pintaCalendario(); });
+  cuerpo.append(x);
+  c.append(cuerpo);
 }
 document.getElementById("calen").addEventListener("toggle", pintaCalendario);
 
