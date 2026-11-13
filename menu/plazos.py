@@ -150,6 +150,9 @@ def dieta_del_dia(registro, fecha, obj_plan, peso):
         return {"factor": 1, "kcal": base, "motivo": m}
 
     d = ((registro or {}).get("dias") or {}).get(fecha)
+    # Un día corregido después (corregir_dia) no cambia su comida: vale lo que se marcó aquel día
+    if d and d.get("corregido"):
+        d = d.get("comida") or None
     if not d or not (peso and peso > 0):
         return igual("Sin cambios sobre el plan")
     prev = obj_plan["sesion"] if "sesion" in obj_plan else _sesion_de_hoy(fecha)
@@ -205,6 +208,12 @@ def _prueba_dia(r, f, plan):
         t = _tipo_act(d["act"].get("tipo"))
         medio = (d["act"].get("min") or 0) >= 30 and _sin_tildes(d["act"].get("int")) in ("media", "alta")
         e = {"tipo": t, "via": "otra"} if t != "otro" and t == tipo_nat else {"tipo": "otro", "via": "otra", "medio": medio}
+    elif d and d.get("hecho") and d.get("modo") in ("plan", "otro_plan"):
+        # Sesión del plan hecha pero sin apuntar las series (marcada a mano, corregir_dia)
+        cod = d.get("sesion") or natural
+        dp = next((x for x in _plan_de(plan) if x["cod"] == cod), None)
+        if dp:
+            e = {"tipo": dp["tipo"], "via": "manual"}
     if not e:
         return None
     e["slot"], e["natural"] = explicito, natural
@@ -336,10 +345,95 @@ def _deshacer_ultimo(r, f, que, semana=None):
 
 
 # ---------------------------------------------------------------- propuestas
+def _es_iso(f):
+    try:
+        return isinstance(f, str) and len(f) == 10 and _a_iso(_a_dias(f)) == f
+    except (ValueError, TypeError):
+        return False
+
+
+def corregir_dia(registro, fecha, dia, hoy, ahora=None):
+    """Marca o cambia qué se hizo un día de hoy hacia atrás. Devuelve un registro nuevo,
+       o None si no se puede (día futuro, fecha o datos no válidos). dia=None quita la corrección.
+       Un día pasado queda con corregido=True y su comida no cambia."""
+    if not _es_iso(fecha) or not _es_iso(hoy) or fecha > hoy:
+        return None
+    c = copy.deepcopy(registro or {})
+    if not isinstance(c.get("dias"), dict):
+        c["dias"] = {}
+    prev = c["dias"].get(fecha)
+    pasado = fecha < hoy
+    if not prev:
+        comida = None
+    elif prev.get("corregido"):
+        comida = prev.get("comida") or None
+    else:
+        comida = {"modo": prev.get("modo"), "sesion": prev.get("sesion") or None,
+                  "act": prev.get("act") or None, "t": prev.get("t") or 0}
+    if dia is None:
+        if pasado and comida:
+            c["dias"][fecha] = comida
+        else:
+            c["dias"].pop(fecha, None)
+        return c
+    t = int(datetime.datetime.now().timestamp() * 1000) if ahora is None else ahora
+    modo = dia.get("modo")
+    if modo == "plan":
+        cod = dia.get("sesion") or _sesion_de_hoy(fecha)
+        if cod and cod not in PREVISTO:
+            return None
+        n = {"modo": "plan", "sesion": cod or None, "act": None}
+    elif modo == "otro_plan":
+        if dia.get("sesion") not in PREVISTO:
+            return None
+        n = {"modo": "otro_plan", "sesion": dia["sesion"], "act": None}
+    elif modo == "otra":
+        act = dia.get("act")
+        if not act or not (isinstance(act.get("min"), (int, float)) and act["min"] > 0):
+            return None
+        n = {"modo": "otra", "sesion": None, "act": copy.deepcopy(act)}
+    elif modo == "descanso":
+        n = {"modo": "descanso", "sesion": None, "act": None}
+    else:
+        return None
+    if dia.get("hecho") and n["sesion"]:
+        n["hecho"] = True
+    if pasado:
+        n.update({"t": comida["t"] if comida else t, "corregido": True, "tc": t, "comida": comida})
+    else:
+        n["t"] = t
+    c["dias"][fecha] = n
+    return c
+
+
+def revisar_ajustes(registro, fecha, plan=None, desde=None):
+    """Índices de los «repetir» o «alargar» activos de la semana de `fecha` que la cuenta
+       ya no justifica (tras corregir un día). No deshace nada."""
+    r = registro or {}
+    if not _es_iso(fecha):
+        return []
+    lun, out = _lunes_de(fecha), []
+    for i, a in enumerate(_ajustes(r)):
+        if not a or a.get("deshecho") or a.get("semana") != lun or a.get("que") not in ("repetir", "alargar"):
+            continue
+        base = r
+        if a["que"] == "alargar" and (a.get("antes") or {}).get("inicio") and r.get("inicio") == (a.get("despues") or {}).get("inicio"):
+            base = dict(r, inicio=a["antes"]["inicio"])
+        ad = adherencia(base, lun, plan, desde)
+        if not ad["previstas"]:
+            continue
+        corte = 4 if a["que"] == "repetir" else 3
+        if ad["hechas"] * 5 >= ad["previstas"] * corte:
+            out.append(i)
+    return out
+
+
 def _ultima_actividad(r, hoy):
     fs = [s.get("fecha") for s in (r.get("sesiones") or [])]
     fs += [c.get("f") for c in (r.get("carrera") or [])]
-    fs += [f for f, d in (r.get("dias") or {}).items() if d and d.get("modo") == "otra" and d.get("act")]
+    fs += [f for f, d in (r.get("dias") or {}).items()
+           if d and ((d.get("modo") == "otra" and d.get("act"))
+                     or (d.get("hecho") and d.get("modo") in ("plan", "otro_plan")))]
     return _ultima_de([f for f in fs if f and f <= hoy])
 
 

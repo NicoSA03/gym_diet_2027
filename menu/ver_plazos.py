@@ -195,9 +195,37 @@ u_recup = caso("deshacer recuperar", "deshacerAjuste", AP_RECUP, 0)
 u_fuera = caso("deshacer un índice que no existe", "deshacerAjuste", AP_ALARGAR, 5)
 u_neg = caso("deshacer índice negativo", "deshacerAjuste", AP_ALARGAR, -1)
 
+# corregir un día pasado (v3.2)
+X_HOY = "2026-10-12"
+g_hecho = caso("corregir: fuerza del lunes hecha sin apuntar", "corregirDia", R_DOS, "2026-10-07", {"modo": "plan", "hecho": True}, X_HOY, AHORA)
+g_futuro = caso("corregir: día futuro", "corregirDia", R_DOS, "2026-10-13", {"modo": "descanso"}, X_HOY, AHORA)
+g_malo = caso("corregir: modo que no existe", "corregirDia", R_DOS, "2026-10-07", {"modo": "siesta"}, X_HOY, AHORA)
+g_fecha = caso("corregir: fecha que no existe", "corregirDia", R_DOS, "2026-02-30", {"modo": "descanso"}, X_HOY, AHORA)
+g_hoy = caso("corregir: hoy se marca como siempre", "corregirDia", R_DOS, X_HOY, {"modo": "otra", "act": PADEL}, X_HOY, AHORA)
+R_MARCA = reg(sesiones=[ses("2026-10-05")], dias={"2026-10-06": {"modo": "otra", "sesion": None, "act": PADEL, "t": 77}})
+g_sobre = caso("corregir: sobre un día ya marcado", "corregirDia", R_MARCA, "2026-10-06", {"modo": "otro_plan", "sesion": "M", "hecho": True}, X_HOY, AHORA)
+G_SOBRE = ida_y_vuelta(P.corregir_dia(R_MARCA, "2026-10-06", {"modo": "otro_plan", "sesion": "M", "hecho": True}, X_HOY, AHORA))
+g_dos = caso("corregir: dos veces el mismo día", "corregirDia", G_SOBRE, "2026-10-06", {"modo": "descanso"}, X_HOY, AHORA + 1)
+g_quitar = caso("corregir: quitar vuelve a lo de aquel día", "corregirDia", G_SOBRE, "2026-10-06", None, X_HOY, AHORA)
+g_quitar0 = caso("corregir: quitar sin nada antes", "corregirDia", ida_y_vuelta(P.corregir_dia(R_DOS, "2026-10-07", {"modo": "descanso"}, X_HOY, AHORA)), "2026-10-07", None, X_HOY, AHORA)
+G_HECHO = ida_y_vuelta(P.corregir_dia(R_DOS, "2026-10-07", {"modo": "plan", "hecho": True}, X_HOY, AHORA))
+g_adh = caso("corregir: la sesión marcada cuenta 1", "adherencia", G_HECHO, LUN)
+G_OTRA = ida_y_vuelta(P.corregir_dia(G_HECHO, "2026-10-09", {"modo": "otra", "act": PADEL}, X_HOY, AHORA))
+g_adh_otra = caso("corregir: pádel olvidado el viernes cuenta 0,5", "adherencia", G_OTRA, LUN)
+g_dieta = caso("corregir: la comida del día pasado no cambia", "dietaDelDia", G_OTRA, "2026-10-09", obj_plan("B1", "C"), 75)
+g_dieta_antes = caso("corregir: la comida sigue lo marcado aquel día", "dietaDelDia", G_SOBRE, "2026-10-06", obj_plan("B1", "B"), 75)
+g_dieta_ref = caso("referencia: pádel marcado el mismo martes", "dietaDelDia", R_MARCA, "2026-10-06", obj_plan("B1", "B"), 75)
+g_ree = caso("corregir: una sesión marcada corta la reentrada", "propuestaDia", ida_y_vuelta(P.corregir_dia(reg(sesiones=[ses("2026-10-02")]), "2026-10-08", {"modo": "plan", "hecho": True}, HOY, AHORA)), HOY)
+# ajustes que dejan de sostenerse: 2 de 5 con alargar aplicado, y luego se corrigen dos días
+G_ALARGADO = ida_y_vuelta(P.corregir_dia(AP_ALARGAR, "2026-10-07", {"modo": "plan", "hecho": True}, X_HOY, AHORA))
+g_rev1 = caso("revisar: 3 de 5 ya no justifica alargar", "revisarAjustes", G_ALARGADO, "2026-10-07")
+g_rev0 = caso("revisar: 2 de 5 sigue justificando alargar", "revisarAjustes", AP_ALARGAR, "2026-10-07")
+g_rev_otra = caso("revisar: otra semana no tiene ajustes", "revisarAjustes", G_ALARGADO, "2026-09-30")
+
 FNS = {"adherencia": P.adherencia, "propuestaSemana": P.propuesta_semana, "propuestaDia": P.propuesta_dia,
        "propuestaPeso": P.propuesta_peso, "dietaDelDia": P.dieta_del_dia, "kcalActividad": P.kcal_actividad,
-       "deshacerAjuste": P.deshacer_ajuste}
+       "deshacerAjuste": P.deshacer_ajuste,
+       "corregirDia": P.corregir_dia, "revisarAjustes": P.revisar_ajustes}
 
 
 def resumen(res, r):
@@ -375,6 +403,29 @@ ok("2026-10-07" not in R[u_recup]["dias"] and R[u_recup]["ajustes"][0]["deshecho
 ok(R[u_fuera] == AP_ALARGAR and R[u_neg] == AP_ALARGAR, "deshacerAjuste con un índice que no existe: no cambia nada")
 otra_vez = P.deshacer_ajuste(R[u_alargar], 0)
 ok(otra_vez == R[u_alargar], "deshacerAjuste dos veces: la segunda no cambia nada")
+
+# corregir un día pasado
+d = R[g_hecho]["dias"]["2026-10-07"]
+ok(d == {"modo": "plan", "sesion": "X", "act": None, "hecho": True, "t": AHORA, "corregido": True, "tc": AHORA, "comida": None},
+   f"corregir: el miércoles queda como Fuerza B hecha ({d})")
+ok(R[g_hecho]["sesiones"] == R_DOS["sesiones"] and R[g_hecho]["inicio"] == INICIO, "corregir: no toca sesiones ni inicio")
+ok(R[g_futuro] is None and R[g_malo] is None and R[g_fecha] is None, "corregir: día futuro, modo o fecha no válidos devuelven nada")
+ok(R[g_hoy]["dias"][X_HOY] == {"modo": "otra", "sesion": None, "act": PADEL, "t": AHORA}, "corregir hoy: igual que la pregunta diaria, sin marca de corregido")
+d = R[g_sobre]["dias"]["2026-10-06"]
+ok(d["comida"] == {"modo": "otra", "sesion": None, "act": PADEL, "t": 77} and d["t"] == 77 and d["tc"] == AHORA,
+   "corregir sobre un día marcado: guarda lo de aquel día y su hora")
+ok(R[g_dos]["dias"]["2026-10-06"]["comida"] == d["comida"] and R[g_dos]["dias"]["2026-10-06"]["modo"] == "descanso",
+   "corregir dos veces: se conserva lo marcado el primer día")
+ok(R[g_quitar]["dias"]["2026-10-06"] == {"modo": "otra", "sesion": None, "act": PADEL, "t": 77}, "quitar la corrección: vuelve lo de aquel día")
+ok("2026-10-07" not in R[g_quitar0]["dias"], "quitar la corrección sin nada antes: el día queda sin marcar")
+ok(R[g_adh]["hechas"] == 3 and R[g_adh]["detalle"][2]["via"] == "manual" and R[g_adh]["detalle"][2]["fecha"] == "2026-10-07",
+   "corregir: la Fuerza B marcada a mano cuenta 1")
+ok(R[g_adh_otra]["hechas"] == 3.5 and R[g_adh_otra]["detalle"][4]["valor"] == 0.5, "corregir: el pádel del viernes cuenta 0,5")
+ok(R[g_dieta]["factor"] == 1, "corregir: la comida de un día pasado no cambia")
+ok(R[g_dieta_antes] == R[g_dieta_ref] and R[g_dieta_ref]["factor"] != 1, "corregir: la comida del día sigue lo que se marcó aquel día")
+ok(R[g_ree] is None or R[g_ree]["tipo"] != "reentrada", "corregir: una sesión marcada a mano corta la reentrada")
+ok(R[g_rev1] == [0] and R[g_rev0] == [] and R[g_rev_otra] == [], f"revisar ajustes: {R[g_rev1]}, {R[g_rev0]}, {R[g_rev_otra]}")
+ok(P.deshacer_ajuste(G_ALARGADO, R[g_rev1][0])["inicio"] == INICIO if R[g_rev1] else False, "revisar ajustes: deshacer el alargar devuelve el inicio")
 
 # ---------------------------------------------------------------- comparar con Node
 node = shutil.which("node")
