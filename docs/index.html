@@ -1406,7 +1406,7 @@ body{padding-top:0}
 </div>
 </main>
 <div class="sello">
-  versión 354f738e, 13 de noviembre de 2026
+  versión ac34623c, 13 de noviembre de 2026
 </div>
 <script>
 
@@ -5448,7 +5448,12 @@ function vCuerpo(box){
 const MAN_KEY = "perfil_manual_v1";
 const manualLee = ()=>{ try{ return JSON.parse(localStorage.getItem(MAN_KEY)) || {}; }catch(e){ return {}; } };
 const manualGuarda = m=>{ try{ localStorage.setItem(MAN_KEY, JSON.stringify(m)); }catch(e){ aviso("No se ha podido guardar."); } };
-let relMarca = "garmin", relDatos = null, relSes = [], relMsg = "";
+// v3.3: lo leído del reloj se guarda en el móvil (clave propia, no toca registro_v1) para que no se pierda al recargar
+const REL_KEY = "reloj_v1";
+const relojLee = ()=>{ try{ const d = JSON.parse(localStorage.getItem(REL_KEY)); return d && d.v===1 && d.datos ? d : null; }catch(e){ return null; } };
+const relojGuarda = d=>{ try{ if(d) localStorage.setItem(REL_KEY, JSON.stringify(Object.assign({v:1, leido:hoy()}, d))); else localStorage.removeItem(REL_KEY); }catch(e){ aviso("No se ha podido guardar lo leído del reloj."); } };
+const OBJ_TXT = {"5k":"Mejorar mi 5 km", perder:"Perder grasa", ganar:"Ganar músculo", mantener:"Mantenerme"};
+let relMarca = "garmin", relDatos = relojLee(), relSes = relDatos ? (relDatos.sesiones||[]) : [], relMsg = "";
 
 function vReloj(box){
   const CN = Conectividad;
@@ -5475,14 +5480,14 @@ function vReloj(box){
         lecs.push(CN.leerArchivo(f.name, cont));
       }catch(e){ errs.push(f.name+": "+(e.message||"no se pudo leer")); }
     }
-    if(lecs.length){ const r = CN.juntar(lecs, hoy()); relDatos = r; relSes = r.sesiones; }
+    if(lecs.length){ const r = CN.juntar(lecs, hoy()); relDatos = r; relSes = r.sesiones; relDatos = Object.assign({v:1, leido:hoy()}, r); relojGuarda(r); }
     relMsg = errs.join("\n");
     render();
   });
   c.append(fi);
   if(relMsg){ relMsg.split("\n").forEach(t=>{ const p = el("p","nota",t); p.style.color = "var(--amber)"; c.append(p); }); }
   if(relDatos){
-    c.append(el("p",null,relDatos.actividades+(relDatos.actividades===1?" actividad":" actividades")));
+    c.append(el("p",null,relDatos.actividades+(relDatos.actividades===1?" actividad":" actividades")+(relDatos.leido?", leído el "+corta(relDatos.leido):"")));
     const ks = Object.keys(relDatos.datos).filter(k=>CN.METRICAS.some(m=>m.k===k));
     if(ks.length){
       const st = el("div","r-lista");
@@ -5501,6 +5506,9 @@ function vReloj(box){
       aviso("Añadido al Registro"); render();
     });
     c.append(add);
+    const qu = el("button","r-btn ancho","Olvidar lo leído");
+    qu.addEventListener("click", ()=>{ if(!confirm("Se borra lo leído del reloj. Tu Registro no cambia.")) return; relojGuarda(null); relDatos = null; relSes = []; render(); });
+    c.append(qu);
   }
   box.append(c);
 
@@ -5508,8 +5516,16 @@ function vReloj(box){
   const man = manualLee();
   const ev = CN.evaluar(relDatos ? relDatos.datos : {}, man);
   const c2 = el("div","r-card");
+  c2.append(el("h3",null,"Tu objetivo"));
+  // v3.3: el objetivo va siempre a la vista, en un desplegable, para poder cambiarlo
+  const lo = el("label",null,"Objetivo"), so = el("select");
+  so.setAttribute("aria-label","Objetivo");
+  [""].concat(CN.METRICAS.find(m=>m.k==="objetivo").op).forEach(o=>{ const op = el("option",null,o ? OBJ_TXT[o]||o : "Elige"); op.value = o; so.append(op); });
+  so.value = man.objetivo || "";
+  so.addEventListener("change", ()=>{ const m2 = Object.assign({}, man); if(so.value) m2.objetivo = so.value; else delete m2.objetivo; manualGuarda(m2); render(); });
+  const wo = el("div","r-form"); lo.append(so); wo.append(lo); c2.append(wo);
   c2.append(el("h3",null,"Datos que faltan"));
-  const pedir = CN.METRICAS.filter(m=>ev.faltan.indexOf(m.k)>=0 || ev.malas.indexOf(m.k)>=0);
+  const pedir = CN.METRICAS.filter(m=>m.k!=="objetivo" && (ev.faltan.indexOf(m.k)>=0 || ev.malas.indexOf(m.k)>=0));
   if(pedir.length){
     const w = el("div","r-form"), campos = {};
     pedir.forEach(m=>{
@@ -5529,7 +5545,8 @@ function vReloj(box){
       manualGuarda(m2); render();
     });
     w.append(b); c2.append(w);
-  } else if(ev.estado==="listo"){
+  } else if(ev.estado!=="listo"){ c2.append(el("p","nota","Elige un objetivo."));
+  } else {
     const v = ev.viabilidad;
     if(v.ok){ const p = el("p",null,"Plan viable en "+ev.valores.dias_plan+" días"); p.style.fontWeight = "700"; c2.append(p); }
     else {
