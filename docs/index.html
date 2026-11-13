@@ -1406,7 +1406,7 @@ body{padding-top:0}
 </div>
 </main>
 <div class="sello">
-  versión 9ed2c800, 12 de noviembre de 2026
+  versión 49f7b18c, 13 de noviembre de 2026
 </div>
 <script>
 
@@ -1557,7 +1557,9 @@ const PLAZOS = (function(){
   function dietaDelDia(registro, fecha, objPlan, peso){
     const base = objPlan.kcal;
     const igual = m => ({factor:1, kcal:base, motivo:m});
-    const d = registro && registro.dias && registro.dias[fecha];
+    let d = registro && registro.dias && registro.dias[fecha];
+    // Un día corregido después (corregirDia) no cambia su comida: vale lo que se marcó aquel día, si lo hubo
+    if(d && d.corregido) d = d.comida || null;
     if(!d || !(peso > 0)) return igual("Sin cambios sobre el plan");
     const prev = objPlan.sesion !== undefined ? objPlan.sesion : sesionDeHoy(fecha);
     const kPrev = prev ? kcalPrevista(prev, peso) : 0;
@@ -1597,6 +1599,11 @@ const PLAZOS = (function(){
       const t = tipoAct(d.act.tipo);
       const medio = d.act.min >= 30 && (sinTildes(d.act.int) === "media" || sinTildes(d.act.int) === "alta");
       e = (t !== "otro" && t === tipoNat) ? {tipo:t, via:"otra"} : {tipo:"otro", via:"otra", medio};
+    }
+    else if(d && d.hecho && (d.modo === "plan" || d.modo === "otro_plan")){
+      // Sesión del plan hecha pero sin apuntar las series (marcada a mano, corregirDia)
+      const cod = d.sesion || natural, dp = planDe(plan).filter(x => x.cod === cod)[0];
+      if(dp) e = {tipo:dp.tipo, via:"manual"};
     }
     if(!e) return null;
     e.slot = explicito; e.natural = natural;
@@ -1686,12 +1693,74 @@ const PLAZOS = (function(){
   }
   const deshacerUltimo = (r, f, que, semana) => deshacerAjuste(r, buscaAjuste(r, f, que, semana));
 
+  // ---------------------------------------------------------------- corregir un día
+  const esIso = f => typeof f === "string" && /^\d{4}-\d{2}-\d{2}$/.test(f) && aIso(aDias(f)) === f;
+
+  // corregirDia(registro, fecha, dia, hoy, ahora?) -> registro nuevo, o null si no se puede.
+  //   Marca o cambia qué se hizo un día de hoy hacia atrás (nunca un día futuro).
+  //   dia = {modo, sesion?, act?, hecho?} o null para quitar la corrección.
+  //   hecho:true (solo con plan u otro_plan) = «la hice, pero no apunté las series»: cuenta 1 en la semana.
+  //   Un día pasado queda con corregido:true y su comida no cambia: si aquel día ya se
+  //   había marcado algo, se guarda en `comida` y la dieta de ese día sigue saliendo de ahí.
+  function corregirDia(registro, fecha, dia, hoy, ahora){
+    if(!esIso(fecha) || !esIso(hoy) || fecha > hoy) return null;
+    const c = clon(registro || {}); c.dias = (c.dias && typeof c.dias === "object") ? c.dias : {};
+    const prev = c.dias[fecha] || null, pasado = fecha < hoy;
+    const comida = !prev ? null : prev.corregido ? (prev.comida || null)
+                 : {modo:prev.modo, sesion:prev.sesion || null, act:prev.act || null, t:prev.t || 0};
+    if(dia === null || dia === undefined){
+      if(pasado && comida) c.dias[fecha] = comida; else delete c.dias[fecha];
+      return c;
+    }
+    const t = ahora === undefined ? Date.now() : ahora;
+    let n;
+    if(dia.modo === "plan"){
+      const cod = dia.sesion || sesionDeHoy(fecha);
+      if(cod && !PREVISTO[cod]) return null;
+      n = {modo:"plan", sesion:cod || null, act:null};
+    } else if(dia.modo === "otro_plan"){
+      if(!PREVISTO[dia.sesion]) return null;
+      n = {modo:"otro_plan", sesion:dia.sesion, act:null};
+    } else if(dia.modo === "otra"){
+      if(!dia.act || !(dia.act.min > 0)) return null;
+      n = {modo:"otra", sesion:null, act:clon(dia.act)};
+    } else if(dia.modo === "descanso"){
+      n = {modo:"descanso", sesion:null, act:null};
+    } else return null;
+    if(dia.hecho && n.sesion) n.hecho = true;
+    if(pasado){ n.t = comida ? comida.t : t; n.corregido = true; n.tc = t; n.comida = comida; }
+    else n.t = t;
+    c.dias[fecha] = n;
+    return c;
+  }
+
+  // revisarAjustes(registro, fecha, plan?, desde?) -> índices de `ajustes` que ya no se sostienen
+  //   Tras corregir un día: los «repetir» o «alargar» activos de esa semana cuya cuenta ya
+  //   no los justifica. No deshace nada: la interfaz ofrece deshacerAjuste(registro, i).
+  function revisarAjustes(registro, fecha, plan, desde){
+    const r = registro || {};
+    if(!esIso(fecha)) return [];
+    const lun = lunesDe(fecha), out = [];
+    let ad = null;
+    ajustesDe(r).forEach((a, i) => {
+      if(!a || a.deshecho || a.semana !== lun || (a.que !== "repetir" && a.que !== "alargar")) return;
+      // con el inicio de antes de alargar, para contar la semana igual que cuando salió el aviso
+      const base = (a.que === "alargar" && a.antes && a.antes.inicio && r.inicio === (a.despues || {}).inicio)
+                 ? Object.assign({}, r, {inicio:a.antes.inicio}) : r;
+      ad = adherencia(base, lun, plan, desde);
+      if(!ad.previstas) return;
+      const corte = a.que === "repetir" ? 4 : 3;
+      if(ad.hechas * 5 >= ad.previstas * corte) out.push(i);
+    });
+    return out;
+  }
+
   // ---------------------------------------------------------------- propuestas
   function ultimaActividad(r, hoy){
     const fs = [];
     (r.sesiones || []).forEach(s => fs.push(s.fecha));
     (r.carrera || []).forEach(c => fs.push(c.f));
-    Object.keys(r.dias || {}).forEach(f => { const d = r.dias[f]; if(d && d.modo === "otra" && d.act) fs.push(f); });
+    Object.keys(r.dias || {}).forEach(f => { const d = r.dias[f]; if(d && ((d.modo === "otra" && d.act) || (d.hecho && (d.modo === "plan" || d.modo === "otro_plan")))) fs.push(f); });
     return ultimaDe(fs.filter(f => f && f <= hoy));
   }
 
@@ -1820,7 +1889,7 @@ const PLAZOS = (function(){
   }
 
   return {kcalActividad, dietaDelDia, adherencia, propuestaDia, propuestaSemana, propuestaPeso,
-          deshacerAjuste, kcalExtra, PLAN};
+          deshacerAjuste, kcalExtra, corregirDia, revisarAjustes, PLAN};
 })();
 if (typeof module !== "undefined") module.exports = PLAZOS;
 
@@ -3496,7 +3565,9 @@ const PLAZOS = (function(){
   function dietaDelDia(registro, fecha, objPlan, peso){
     const base = objPlan.kcal;
     const igual = m => ({factor:1, kcal:base, motivo:m});
-    const d = registro && registro.dias && registro.dias[fecha];
+    let d = registro && registro.dias && registro.dias[fecha];
+    // Un día corregido después (corregirDia) no cambia su comida: vale lo que se marcó aquel día, si lo hubo
+    if(d && d.corregido) d = d.comida || null;
     if(!d || !(peso > 0)) return igual("Sin cambios sobre el plan");
     const prev = objPlan.sesion !== undefined ? objPlan.sesion : sesionDeHoy(fecha);
     const kPrev = prev ? kcalPrevista(prev, peso) : 0;
@@ -3536,6 +3607,11 @@ const PLAZOS = (function(){
       const t = tipoAct(d.act.tipo);
       const medio = d.act.min >= 30 && (sinTildes(d.act.int) === "media" || sinTildes(d.act.int) === "alta");
       e = (t !== "otro" && t === tipoNat) ? {tipo:t, via:"otra"} : {tipo:"otro", via:"otra", medio};
+    }
+    else if(d && d.hecho && (d.modo === "plan" || d.modo === "otro_plan")){
+      // Sesión del plan hecha pero sin apuntar las series (marcada a mano, corregirDia)
+      const cod = d.sesion || natural, dp = planDe(plan).filter(x => x.cod === cod)[0];
+      if(dp) e = {tipo:dp.tipo, via:"manual"};
     }
     if(!e) return null;
     e.slot = explicito; e.natural = natural;
@@ -3625,12 +3701,74 @@ const PLAZOS = (function(){
   }
   const deshacerUltimo = (r, f, que, semana) => deshacerAjuste(r, buscaAjuste(r, f, que, semana));
 
+  // ---------------------------------------------------------------- corregir un día
+  const esIso = f => typeof f === "string" && /^\d{4}-\d{2}-\d{2}$/.test(f) && aIso(aDias(f)) === f;
+
+  // corregirDia(registro, fecha, dia, hoy, ahora?) -> registro nuevo, o null si no se puede.
+  //   Marca o cambia qué se hizo un día de hoy hacia atrás (nunca un día futuro).
+  //   dia = {modo, sesion?, act?, hecho?} o null para quitar la corrección.
+  //   hecho:true (solo con plan u otro_plan) = «la hice, pero no apunté las series»: cuenta 1 en la semana.
+  //   Un día pasado queda con corregido:true y su comida no cambia: si aquel día ya se
+  //   había marcado algo, se guarda en `comida` y la dieta de ese día sigue saliendo de ahí.
+  function corregirDia(registro, fecha, dia, hoy, ahora){
+    if(!esIso(fecha) || !esIso(hoy) || fecha > hoy) return null;
+    const c = clon(registro || {}); c.dias = (c.dias && typeof c.dias === "object") ? c.dias : {};
+    const prev = c.dias[fecha] || null, pasado = fecha < hoy;
+    const comida = !prev ? null : prev.corregido ? (prev.comida || null)
+                 : {modo:prev.modo, sesion:prev.sesion || null, act:prev.act || null, t:prev.t || 0};
+    if(dia === null || dia === undefined){
+      if(pasado && comida) c.dias[fecha] = comida; else delete c.dias[fecha];
+      return c;
+    }
+    const t = ahora === undefined ? Date.now() : ahora;
+    let n;
+    if(dia.modo === "plan"){
+      const cod = dia.sesion || sesionDeHoy(fecha);
+      if(cod && !PREVISTO[cod]) return null;
+      n = {modo:"plan", sesion:cod || null, act:null};
+    } else if(dia.modo === "otro_plan"){
+      if(!PREVISTO[dia.sesion]) return null;
+      n = {modo:"otro_plan", sesion:dia.sesion, act:null};
+    } else if(dia.modo === "otra"){
+      if(!dia.act || !(dia.act.min > 0)) return null;
+      n = {modo:"otra", sesion:null, act:clon(dia.act)};
+    } else if(dia.modo === "descanso"){
+      n = {modo:"descanso", sesion:null, act:null};
+    } else return null;
+    if(dia.hecho && n.sesion) n.hecho = true;
+    if(pasado){ n.t = comida ? comida.t : t; n.corregido = true; n.tc = t; n.comida = comida; }
+    else n.t = t;
+    c.dias[fecha] = n;
+    return c;
+  }
+
+  // revisarAjustes(registro, fecha, plan?, desde?) -> índices de `ajustes` que ya no se sostienen
+  //   Tras corregir un día: los «repetir» o «alargar» activos de esa semana cuya cuenta ya
+  //   no los justifica. No deshace nada: la interfaz ofrece deshacerAjuste(registro, i).
+  function revisarAjustes(registro, fecha, plan, desde){
+    const r = registro || {};
+    if(!esIso(fecha)) return [];
+    const lun = lunesDe(fecha), out = [];
+    let ad = null;
+    ajustesDe(r).forEach((a, i) => {
+      if(!a || a.deshecho || a.semana !== lun || (a.que !== "repetir" && a.que !== "alargar")) return;
+      // con el inicio de antes de alargar, para contar la semana igual que cuando salió el aviso
+      const base = (a.que === "alargar" && a.antes && a.antes.inicio && r.inicio === (a.despues || {}).inicio)
+                 ? Object.assign({}, r, {inicio:a.antes.inicio}) : r;
+      ad = adherencia(base, lun, plan, desde);
+      if(!ad.previstas) return;
+      const corte = a.que === "repetir" ? 4 : 3;
+      if(ad.hechas * 5 >= ad.previstas * corte) out.push(i);
+    });
+    return out;
+  }
+
   // ---------------------------------------------------------------- propuestas
   function ultimaActividad(r, hoy){
     const fs = [];
     (r.sesiones || []).forEach(s => fs.push(s.fecha));
     (r.carrera || []).forEach(c => fs.push(c.f));
-    Object.keys(r.dias || {}).forEach(f => { const d = r.dias[f]; if(d && d.modo === "otra" && d.act) fs.push(f); });
+    Object.keys(r.dias || {}).forEach(f => { const d = r.dias[f]; if(d && ((d.modo === "otra" && d.act) || (d.hecho && (d.modo === "plan" || d.modo === "otro_plan")))) fs.push(f); });
     return ultimaDe(fs.filter(f => f && f <= hoy));
   }
 
@@ -3759,7 +3897,7 @@ const PLAZOS = (function(){
   }
 
   return {kcalActividad, dietaDelDia, adherencia, propuestaDia, propuestaSemana, propuestaPeso,
-          deshacerAjuste, kcalExtra, PLAN};
+          deshacerAjuste, kcalExtra, corregirDia, revisarAjustes, PLAN};
 })();
 if (typeof module !== "undefined") module.exports = PLAZOS;
 
@@ -4078,7 +4216,8 @@ function pintaPregunta(){
   }
   box.append(c);
 }
-function formActividad(act){
+function formActividad(act, alGuardar){
+  alGuardar = alGuardar || guardaDia;
   const f = el("div","hq-form");
   const campo = (txt, nodo, cl)=>{ const l = el("label",cl||null,txt); l.append(nodo); f.append(l); return nodo; };
   const nom = el("input"); nom.type = "text"; nom.maxLength = 30; nom.placeholder = "Qué haces"; nom.value = (act && act.nombre) || "";
@@ -4104,7 +4243,7 @@ function formActividad(act){
     const mm = parseInt(min.value, 10);
     if(!(mm>0 && mm<=600)){ err.textContent = "Pon los minutos."; err.hidden = false; return; }
     const lbl = TIPOS_ACT.find(x=>x[0]===tipo.value)[1];
-    guardaDia({modo:"otra", sesion:null, act:{nombre: nom.value.trim() || lbl, tipo:tipo.value, min:mm, int:inten}});
+    alGuardar({modo:"otra", sesion:null, act:{nombre: nom.value.trim() || lbl, tipo:tipo.value, min:mm, int:inten}});
   });
   f.append(err, ok);
   return f;
@@ -4308,6 +4447,10 @@ function detalleDia(f, r, h, ctx){
   });
   (ctx.car[f]||[]).forEach(x=>linea("Carrera: "+(x.km!=null ? String(x.km).replace(".",",")+" km" : "")+(x.min!=null ? ", "+Math.round(x.min)+" min" : "")+(x.origen==="reloj" ? ", reloj" : "")));
   const dd = r.dias && r.dias[f];
+  if(dd && dd.hecho && !(ctx.ses[f]||[]).length && !(ctx.car[f]||[]).length){
+    const ih = idxDia(dd.sesion);
+    linea((ih>=0 ? E.dias[ih].n : "Entreno")+", marcada a mano");
+  }
   if(dd && dd.modo==="otra" && dd.act) linea("Otra: "+(dd.act.nombre||"actividad")+", "+dd.act.min+" min, "+dd.act.int);
   if(dd && dd.modo==="descanso") linea("Descanso");
   if(m.falta) linea("Tocaba "+E.dias[k].n+" y no se hizo.");
@@ -4331,7 +4474,88 @@ function detalleDia(f, r, h, ctx){
     c.append(fila); n++;
   });
   if(!n) c.append(el("p",null,"Sin registro."));
+  if(f <= h) pintaCambio(c, f, r, h, ctx, dd);
   return c;
+}
+
+// ---- corregir un día pasado (o el de hoy) desde el calendario
+let cambF = null, cambSub = null, cambAv = null, cambMsg = null;
+function guardaCambio(f, dia){
+  const h = hoy();
+  if(registroIlegible()){ cambMsg = {f:f, t:"No se puede leer el registro."}; pintaCalendario(); return; }
+  const r = leeReg() || regVacio();
+  let nr = null;
+  try{ nr = PLAZOS.corregirDia(r, f, dia, h); }catch(e){}
+  if(!nr){ cambMsg = {f:f, t:"No se puede guardar este cambio."}; pintaCalendario(); return; }
+  if(!guardaReg(nr)){ cambMsg = {f:f, t:"No se pudo guardar."}; pintaCalendario(); return; }
+  let idx = [];
+  try{ idx = PLAZOS.revisarAjustes(nr, f, PLAN_E, esFecha(nr.plazos_desde) ? nr.plazos_desde : undefined) || []; }catch(e){}
+  cambF = null; cambSub = null; cambMsg = null;
+  cambAv = idx.length ? {f:f, idx:idx} : null;
+  render();
+}
+function pintaCambio(c, f, r, h, ctx, dd){
+  if(cambMsg && cambMsg.f===f) c.append(el("p","nota",cambMsg.t));
+  if(cambAv && cambAv.f===f){
+    cambAv.idx.forEach(i=>{
+      const a = r.ajustes && r.ajustes[i];
+      if(!a || a.deshecho) return;
+      const av = el("div","avi");
+      av.append(el("p",null,"Con este cambio, este ajuste ya no hace falta: "+(ETQ_AJ[a.que]||a.que)));
+      const b = el("button","hq-btn","Deshacer"); b.type = "button";
+      b.addEventListener("click", ()=>{
+        const r2 = leeReg(); if(!r2) return;
+        let nr; try{ nr = PLAZOS.deshacerAjuste(r2, i); }catch(e){ return; }
+        if(guardaReg(nr)) render();
+      });
+      av.append(b); c.append(av);
+    });
+  }
+  const fila = el("div","hq-fila");
+  if(cambF !== f){
+    const b = el("button","hq-btn","Cambiar"); b.type = "button";
+    b.addEventListener("click", ()=>{ cambF = f; cambSub = null; cambMsg = null; pintaCalendario(); });
+    fila.append(b);
+    if(dd && dd.corregido === true){
+      const q = el("button","hq-btn","Quitar"); q.type = "button";
+      q.addEventListener("click", ()=>guardaCambio(f, null));
+      fila.append(q);
+    }
+    c.append(fila); return;
+  }
+  const k = (deIso(f).getDay()+6)%7, cod = k<5 ? E.dias[k].cod : null;
+  const pasado = f < h, sinSes = !(ctx.ses[f]||[]).length && !(ctx.car[f]||[]).length;
+  const manual = pasado && sinSes ? {hecho:true} : {};
+  const cuerpo = el("div","hq");
+  cuerpo.append(el("h3",null,"¿Qué hiciste?"));
+  const ops = el("div","hq-ops");
+  const m = dd && dd.modo;
+  const op = (txt, sub, activo, fn)=>{
+    const b = el("button","hq-op"); b.type = "button"; b.append(document.createTextNode(txt));
+    if(sub) b.append(el("small",null,sub));
+    b.setAttribute("aria-pressed", activo ? "true":"false");
+    b.addEventListener("click", fn); ops.append(b);
+  };
+  op("Lo que toca", cod ? E.dias[k].n : "Fin de semana", m==="plan", ()=>guardaCambio(f, Object.assign({modo:"plan", sesion:cod}, manual)));
+  op("Otro entreno", "del plan", cambSub==="otro" || m==="otro_plan", ()=>{ cambSub = "otro"; pintaCalendario(); });
+  op("Otra actividad", null, cambSub==="otra" || m==="otra", ()=>{ cambSub = "otra"; pintaCalendario(); });
+  op("Descanso", null, m==="descanso", ()=>guardaCambio(f, {modo:"descanso", sesion:null}));
+  cuerpo.append(ops);
+  if(cambSub==="otro"){
+    const ch = el("div","hq-chips");
+    E.dias.forEach(x=>{
+      const b = el("button","chip",x.n); b.type = "button";
+      b.setAttribute("aria-selected", dd && dd.modo==="otro_plan" && dd.sesion===x.cod ? "true":"false");
+      b.addEventListener("click", ()=>guardaCambio(f, Object.assign({modo:"otro_plan", sesion:x.cod}, manual)));
+      ch.append(b);
+    });
+    cuerpo.append(ch);
+  }
+  if(cambSub==="otra") cuerpo.append(formActividad(dd && dd.modo==="otra" ? dd.act : null, d=>guardaCambio(f, d)));
+  const x = el("button","hq-btn","Dejarlo como está"); x.type = "button";
+  x.addEventListener("click", ()=>{ cambF = null; cambSub = null; pintaCalendario(); });
+  cuerpo.append(x);
+  c.append(cuerpo);
 }
 $("calen").addEventListener("toggle", pintaCalendario);
 
