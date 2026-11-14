@@ -17,7 +17,7 @@ CSS_BASE = open('menu/base.css', encoding='utf8').read()
 FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
  '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800'
- '&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">')
+ '&display=swap">')
 
 # Logo NK (docs/Icono@1x.png reescalado a 180x180). Va incrustado para que el HTML
 # siga siendo un archivo unico que funciona sin cargar nada de fuera.
@@ -49,52 +49,101 @@ ICONO = ("data:image/png;base64,"
          "AElFTkSuQmCC")
 
 CSS_APP = """
-html{scroll-padding-top:64px}
-body{padding-top:0}
-.appnav{position:sticky;top:0;z-index:40;background:var(--ground);
-  border-bottom:1px solid var(--line);
-  padding:10px max(14px,env(safe-area-inset-left)) 10px max(14px,env(safe-area-inset-right))}
-.appnav .tiras{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
-  max-width:900px;margin:0 auto;-webkit-overflow-scrolling:touch}
-.appnav .tiras::-webkit-scrollbar{display:none}
-.appnav button{flex:none;font-family:var(--sans);font-size:13px;font-weight:700;
-  padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);
-  color:var(--ink-2);cursor:pointer;white-space:nowrap;transition:all .12s}
-.appnav button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .appnav button[aria-current="true"]{color:#FFFFFF}}
-:root[data-theme="dark"] .appnav button[aria-current="true"]{color:#FFFFFF}
+html{scroll-padding-top:60px}
+body{padding-top:0;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-family:var(--sans);font-size:16px;line-height:1.55}
+.apptop{position:sticky;top:0;z-index:40;height:48px;display:flex;align-items:center;gap:10px;
+  background:var(--ground);border-bottom:1px solid var(--line);
+  padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
+.apptop img{width:26px;height:26px;border-radius:8px;flex:none}
+.apptop b{font-family:var(--sans);font-size:17px;font-weight:800;letter-spacing:-.01em}
+.appnav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--surface);
+  border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))}
+.appnav .tiras{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;max-width:560px;margin:0 auto}
+.appnav button{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;
+  font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.01em;
+  padding:6px 2px;border:0;border-radius:14px;background:transparent;color:var(--ink-3);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:color .12s,background .12s}
+.appnav button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.appnav button[aria-current="true"]{color:var(--ink);background:var(--accent-soft)}
+.appnav button[aria-current="true"] svg{stroke:var(--accent-ink)}
+.appmas{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.6);display:none;align-items:flex-end}
+.appmas.on{display:flex}
+.appmas div{width:100%;max-width:560px;margin:0 auto calc(70px + env(safe-area-inset-bottom));background:var(--surface);
+  border:1px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:2px;margin-inline:auto}
+.appmas div{width:calc(100% - 24px)}
+.appmas button{font-family:var(--sans);font-size:16px;font-weight:700;text-align:left;padding:15px 14px;border:0;
+  border-radius:12px;background:transparent;color:var(--ink);cursor:pointer}
+.appmas button[aria-current="true"]{background:var(--accent-soft)}
 .app-sec{display:none}
 .app-sec.on{display:block}
 .app-sec .hermanos{display:none}
-.app-sec .masthead{padding-block:28px 18px}
-.sello{max-width:900px;margin:0 auto;padding:22px 20px 40px;font-family:var(--mono);
+.app-sec .masthead{padding-block:14px 0;border-bottom:0;gap:8px}
+.app-sec .masthead h1{display:none}
+.app-sec section{padding-block:24px 0}
+.sello{max-width:900px;margin:0 auto;padding:22px 20px 24px;font-family:var(--sans);
   font-size:11px;color:var(--ink-3);line-height:1.7;border-top:1px solid var(--line)}
 .sello b{color:var(--ink-2);font-weight:600}
 """
 
+# v3.5: retoques que van despues de los estilos de cada pestaña (barra inferior y cabecera fija)
+CSS_PIEL = """
+.r-top{top:48px}
+.barra-sup{top:56px}
+.m-aviso{bottom:calc(86px + env(safe-area-inset-bottom))}
+.r-descanso{bottom:calc(64px + env(safe-area-inset-bottom))}
+.r-aviso{bottom:calc(150px + env(safe-area-inset-bottom))}
+.card{border-radius:var(--r)}
+"""
+
+# Barra inferior (v3.5): cuatro pestañas de uso diario y «Más» para la documentación
+ICONOS = {
+  "menus": '<svg viewBox="0 0 24 24"><path d="M5 3v7a2.5 2.5 0 0 0 5 0V3M7.5 3v18M17 3c-2 1.5-3 4-3 7 0 1.5 1 2.5 3 2.5V21"/></svg>',
+  "entreno": '<svg viewBox="0 0 24 24"><path d="M3 9v6M6.5 6.5v11M17.5 6.5v11M21 9v6M6.5 12h11"/></svg>',
+  "registro": '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
+  "compra": '<svg viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 11h10.6L20.5 7H7"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>',
+  "mas": '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>',
+}
+BARRA = ["menus", "entreno", "registro", "compra"]
+CORTO = {"menus": "Menús", "entreno": "Entreno", "registro": "Registro", "compra": "Compra"}
+
 NAV_JS = """
 (function(){
-  var SEC = %(lista)s;
-  var nav = document.getElementById('appnav');
-  var botones = {};
+  var SEC = %(lista)s, BARRA = %(barra)s, CORTO = %(corto)s, ICO = %(iconos)s;
+  var nav = document.getElementById('appnav'), mas = document.getElementById('appmas'),
+      caja = mas.firstElementChild, titulo = document.getElementById('apptit');
+  var botones = {}, bMas = null;
+  function enBarra(id){ return BARRA.indexOf(id) >= 0; }
   function ir(id, guardar){
     SEC.forEach(function(s){
       var d = document.getElementById('s-'+s[0]);
       if(d) d.classList.toggle('on', s[0]===id);
       if(botones[s[0]]) botones[s[0]].setAttribute('aria-current', s[0]===id ? 'true':'false');
+      if(s[0]===id && titulo) titulo.textContent = s[1];
     });
+    if(bMas) bMas.setAttribute('aria-current', enBarra(id) ? 'false':'true');
+    mas.classList.remove('on');
     if(guardar){ try{ localStorage.setItem('app_sec', id); }catch(e){} }
     window.scrollTo(0,0);
-    if(botones[id] && botones[id].scrollIntoView)
-      botones[id].scrollIntoView({block:'nearest', inline:'center'});
   }
-  SEC.forEach(function(s){
+  function boton(ico, texto){
     var b = document.createElement('button');
-    b.textContent = s[1];
+    b.type = 'button';
+    b.innerHTML = ico;
+    var t = document.createElement('span'); t.textContent = texto; b.append(t);
+    return b;
+  }
+  SEC.slice().sort(function(a, b){ return (enBarra(a[0]) ? BARRA.indexOf(a[0]) : 99) - (enBarra(b[0]) ? BARRA.indexOf(b[0]) : 99); }).forEach(function(s){
+    var b;
+    if(enBarra(s[0])){ b = boton(ICO[s[0]], CORTO[s[0]] || s[1]); nav.append(b); }
+    else { b = document.createElement('button'); b.type = 'button'; b.textContent = s[1]; caja.append(b); }
     b.addEventListener('click', function(){ ir(s[0], true); });
     botones[s[0]] = b;
-    nav.append(b);
   });
+  bMas = boton(ICO.mas, 'Más');
+  bMas.setAttribute('aria-haspopup', 'true');
+  bMas.addEventListener('click', function(){ mas.classList.toggle('on'); });
+  nav.append(bMas);
+  mas.addEventListener('click', function(e){ if(e.target===mas) mas.classList.remove('on'); });
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('[data-ir]');
     if(a){ e.preventDefault(); ir(a.getAttribute('data-ir'), true); }
@@ -134,6 +183,9 @@ def construir():
     estilos, cuerpos, scripts = [], [], []
     for cod, etiqueta, html, js, datos, var in SECCIONES:
         css, cuerpo = partes(html)
+        # v3.5: esquinas redondeadas comunes (--r y --r-s) en vez de 3 y 4 px
+        css = re.sub(r'border-radius:3px(?=[;}])', 'border-radius:var(--r)', css)
+        css = re.sub(r'border-radius:4px(?=[;}])', 'border-radius:var(--r-s)', css)
         estilos.append("/* === %s === */\n%s" % (cod, css))
         cuerpos.append('<div class="app-sec" id="s-%s">\n%s\n</div>' % (cod, cuerpo))
 
@@ -162,7 +214,7 @@ def construir():
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0A0A0C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GD plan">
@@ -176,18 +228,21 @@ def construir():
 {CSS_BASE}
 {CSS_APP}
 {"".join(chr(10)+e for e in estilos)}
+{CSS_PIEL}
 </style>
 </head>
 <body>
-<nav class="appnav"><div class="tiras" id="appnav"></div></nav>
+<header class="apptop"><img src="{ICONO}" alt=""><b id="apptit"></b></header>
 <main>
 {cuerpo_todo}
 </main>
+<div class="appmas" id="appmas"><div></div></div>
+<nav class="appnav"><div class="tiras" id="appnav"></div></nav>
 <div class="sello">
   versión {firma}, {hoy.day} de {MES[hoy.month]} de {hoy.year}
 </div>
 <script>
-{NAV_JS % {"lista": lista}}
+{NAV_JS % {"lista": lista, "barra": json.dumps(BARRA), "corto": json.dumps(CORTO, ensure_ascii=False), "iconos": json.dumps(ICONOS)}}
 {PWA_JS}
 </script>
 {"".join(chr(10)+"<script>"+chr(10)+s+chr(10)+"</script>" for s in scripts)}
