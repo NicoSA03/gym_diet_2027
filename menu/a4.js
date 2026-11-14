@@ -75,6 +75,7 @@ function pintaSesion(){
   }
 
   if(d.tipo==="fuerza"){
+    box.append(rirAyuda(f, marca));
     d.ej.forEach(([tier,nombre])=>{
       const ej = E.ej[nombre], es = estructura(nombre);
       const p0 = f.esquema[tier];
@@ -124,6 +125,36 @@ function pintaSesion(){
     box.append(c);
   }
   if(d.nota) box.append(el("p","ses-nota", d.nota));
+}
+
+// ¿Qué es el RIR? (v3.4): desplegable de consulta, una vez por sesión. Los RIR de cada
+// tipo de ejercicio salen del esquema del bloque; la regla de series, del plan (entreno.py).
+function rirAyuda(f, marca){
+  const d = el("details","rir-ayuda");
+  d.append(el("summary",null,"¿Qué es el RIR?"));
+  const c = el("div","rir-cuerpo");
+  const p = t=>c.append(el("p",null,t));
+  p("RIR son las repeticiones que te quedan en la recámara al acabar una serie.");
+  p("RIR 2: paras cuando aún podrías hacer 2 repeticiones más con buena técnica. RIR 0: no podrías hacer ni una más.");
+  p("Ejemplo: haces 8 repeticiones y sabes que podrías hacer 2 más. Esa serie es de RIR 2.");
+  p("Cómo saber si vas bien: si la última repetición sale rápida, te has quedado lejos del RIR que toca. Sube primero repeticiones y, cuando llegues al tope del rango, el peso. Si pierdes la técnica o se frena del todo, te has pasado.");
+  const h = el("h5",null,"En este bloque ("+fase.replace(/^F/,"B")+")");
+  c.append(h);
+  const ul = el("ul");
+  Object.keys(f.esquema).forEach(t=>{
+    const q = f.esquema[t];
+    const rir = marca ? String(q[2]).replace(/\d+/g, n=>String(+n+1)) : q[2];
+    ul.append(el("li",null,TAG[t]+": "+(marca ? Math.max(1,q[0]-1) : q[0])+" series, "+rir));
+  });
+  c.append(ul);
+  const g = E.generico[E.grupo[fase]];
+  p("En qué serie aplica: el RIR de la lista se mide en la primera serie de trabajo. Elige el peso que te deja en ese RIR y úsalo en todas, aunque la última se quede corta.");
+  if(g) p(g[0]+": "+String(g[1]).replace(/,? ?(el que te deja )?a RIR \d+( real)?( en la primera)?/, "")+" Si un ejercicio se reparte de otra forma, lo indica abajo.");
+  if(marca) p("Esta semana el RIR sube uno, como dice el aviso de arriba.");
+  const des = (E.reglas||[]).find(x=>/^Descarga/.test(x[0]));
+  if(des) p(des[1]);
+  d.append(c);
+  return d;
 }
 
 // «Cómo se hace» (v2.2): animación del ejercicio, plegada. La imagen solo se pide
@@ -538,11 +569,20 @@ function detalleDia(f, r, h, ctx){
   c.append(el("h5",null,DIA_L[k]+" "+cortaF(f)));
   let n = 0;
   const linea = t=>{ c.append(el("p",null,t)); n++; };
+  // Lo apuntado desde el calendario (cal:true) se puede quitar; lo demás no se toca
+  const lineaCal = (t, quita)=>{
+    if(!quita) return linea(t);
+    const fl = el("div","fila"); fl.append(el("p",null,t));
+    const b = el("button","hq-btn","Quitar"); b.type = "button"; b.addEventListener("click", quita);
+    fl.append(b); c.append(fl); n++;
+  };
   (ctx.ses[f]||[]).forEach(s=>{
     const ns = serieN(s);
-    linea("Fuerza: "+(s.nombre || "sesión")+(ns ? ", "+ns+(ns===1 ? " serie" : " series") : "")+(s.origen==="reloj" ? ", reloj" : ""));
+    lineaCal("Fuerza: "+(s.nombre || "sesión")+(ns ? ", "+ns+(ns===1 ? " serie" : " series") : "")+(s.origen==="reloj" ? ", reloj" : ""),
+      s.cal===true ? ()=>quitaApunte("sesiones", s.id, "este entreno") : null);
   });
-  (ctx.car[f]||[]).forEach(x=>linea("Carrera: "+(x.km!=null ? String(x.km).replace(".",",")+" km" : "")+(x.min!=null ? ", "+Math.round(x.min)+" min" : "")+(x.origen==="reloj" ? ", reloj" : "")));
+  (ctx.car[f]||[]).forEach(x=>lineaCal("Carrera: "+(x.km!=null ? String(x.km).replace(".",",")+" km" : "")+(x.min!=null ? ", "+Math.round(x.min)+" min" : "")+(x.origen==="reloj" ? ", reloj" : ""),
+      x.cal===true ? ()=>quitaApunte("carrera", x.id, "esta carrera") : null));
   const dd = r.dias && r.dias[f];
   if(dd && dd.hecho && !(ctx.ses[f]||[]).length && !(ctx.car[f]||[]).length){
     const ih = idxDia(dd.sesion);
@@ -571,8 +611,137 @@ function detalleDia(f, r, h, ctx){
     c.append(fila); n++;
   });
   if(!n) c.append(el("p",null,"Sin registro."));
-  if(f <= h) pintaCambio(c, f, r, h, ctx, dd);
+  if(f <= h){ pintaCambio(c, f, r, h, ctx, dd); pintaApuntar(c, f, r); }
   return c;
+}
+
+// ---- v3.4: apuntar la carrera o el entreno de un día (hoy o pasado) desde el calendario
+// Se guarda en registro_v1 con el mismo formato que Registro (sesiones y carrera), más cal:true.
+function quitaApunte(clave, id, txt){
+  if(!confirm("¿Quitar "+txt+" del registro?")) return;
+  const r = leeReg(); if(!r || !Array.isArray(r[clave])) return;
+  r[clave] = r[clave].filter(x=>!(x && x.cal===true && x.id===id));
+  if(guardaReg(r)) render();
+}
+const numA = s=>{ const x = parseFloat(String(s).replace(",",".")); return isFinite(x) ? x : 0; };
+// Bloque que toca en una fecha: misma cuenta que semanaCiclo; fuera del ciclo, el bloque abierto
+function faseDeFecha(r, f){
+  if(!r || !esFecha(r.inicio)) return fase;
+  const w = Math.round((deIso(lunesDe(f))-deIso(lunesDe(r.inicio)))/6048e5) + 1;
+  const ks = Object.keys(E.fases);
+  if(w < 1) return ks[0];
+  return ks.find(k=>w>=E.fases[k].s0 && w<=E.fases[k].s1) || fase;
+}
+let apF = null, apTipo = null, apCod = null, apEj = [], apDur = "", apAb = {0:true}, apMsg = "", apCar = {tipo:null, km:"", min:""};
+function apNuevaSesion(r, f, cod){
+  apCod = cod;
+  const fe = E.fases[faseDeFecha(r, f)];
+  const d = E.dias[idxDia(cod)];
+  apEj = d.ej.map(([t,n])=>({n:n, t:t, series:Array.from({length:fe.esquema[t][0]}, ()=>({kg:"", reps:""}))}));
+  apAb = {0:true};
+}
+function pintaApuntar(c, f, r){
+  if(apF !== f){ apF = f; apTipo = null; apMsg = ""; }
+  const k = (deIso(f).getDay()+6)%7;
+  const fila = el("div","hq-fila");
+  const bt = (t, tipo)=>{
+    const b = el("button","hq-btn"+(apTipo===tipo ? " prim" : ""),t); b.type = "button";
+    b.addEventListener("click", ()=>{
+      apMsg = "";
+      if(apTipo===tipo){ apTipo = null; }
+      else{
+        apTipo = tipo;
+        if(tipo==="entreno"){
+          const nat = k<5 && E.dias[k].tipo==="fuerza" ? E.dias[k].cod : E.dias.find(x=>x.tipo==="fuerza").cod;
+          apNuevaSesion(r, f, nat); apDur = "";
+        } else apCar = {tipo: k===1 ? "Calidad" : k===3 ? "Tirada larga" : "Rodaje", km:"", min:""};
+      }
+      pintaCalendario();
+    });
+    fila.append(b);
+  };
+  bt("Apuntar carrera", "carrera"); bt("Apuntar entreno", "entreno");
+  c.append(fila);
+  if(apTipo==="carrera") c.append(formApCarrera(f));
+  if(apTipo==="entreno") c.append(formApEntreno(f, r));
+}
+function apAviso(f, txt){ apMsg = txt; pintaCalendario(); }
+function formApCarrera(f){
+  const w = el("div","hq-form");
+  const campo = (t, nodo)=>{ const l = el("label",null,t); l.append(nodo); w.append(l); return nodo; };
+  const tp = campo("Tipo", el("select"));
+  ["Rodaje","Calidad","Tirada larga","Test 5 km"].forEach(x=>{ const o = el("option",null,x); o.value = x; tp.append(o); });
+  tp.value = apCar.tipo;
+  const km = campo("Km", el("input")); km.inputMode = "decimal"; km.placeholder = "8,2"; km.value = apCar.km;
+  const mi = campo("Minutos", el("input")); mi.inputMode = "decimal"; mi.placeholder = "52"; mi.value = apCar.min;
+  tp.addEventListener("change", ()=>{ apCar.tipo = tp.value; });
+  km.addEventListener("input", ()=>{ apCar.km = km.value; });
+  mi.addEventListener("input", ()=>{ apCar.min = mi.value; });
+  const ok = el("button","hq-btn prim","Guardar carrera"); ok.type = "button"; ok.style.gridColumn = "1/-1";
+  ok.addEventListener("click", ()=>{
+    const kk = numA(km.value), mm = numA(mi.value);
+    if(!(kk>0) || !(mm>0)) return apAviso(f, "Pon los km y los minutos.");
+    if(registroIlegible()) return apAviso(f, "No se puede leer el registro.");
+    const r = leeReg() || regVacio();
+    r.carrera = Array.isArray(r.carrera) ? r.carrera : [];
+    r.carrera.push({id:Date.now(), f:f, tipo:tp.value, km:kk, min:mm, cal:true});
+    r.carrera.sort((x,y)=>x.f<y.f ? -1 : x.f>y.f ? 1 : 0);
+    if(!guardaReg(r)) return apAviso(f, "No se pudo guardar.");
+    apTipo = null; apMsg = ""; render();
+  });
+  w.append(ok);
+  if(apMsg) w.append(el("p","nota",apMsg));
+  return w;
+}
+function formApEntreno(f, r){
+  const w = el("div","hq-form");
+  const l1 = el("label","full","Sesión del plan");
+  const sel = el("select");
+  E.dias.filter(x=>x.tipo==="fuerza").forEach(x=>{ const o = el("option",null,x.dia+": "+x.n); o.value = x.cod; sel.append(o); });
+  sel.value = apCod; l1.append(sel); w.append(l1);
+  sel.addEventListener("change", ()=>{ apNuevaSesion(r, f, sel.value); pintaCalendario(); });
+  const l2 = el("label","full","Duración en minutos (opcional)");
+  const du = el("input"); du.inputMode = "numeric"; du.placeholder = "60"; du.value = apDur; l2.append(du); w.append(l2);
+  du.addEventListener("input", ()=>{ apDur = du.value; });
+  apEj.forEach((e, i)=>{
+    const det = el("details","ap-ej full"); det.open = !!apAb[i];
+    det.addEventListener("toggle", ()=>{ apAb[i] = det.open; });
+    det.append(el("summary",null,e.n+", "+e.series.length+(e.series.length===1 ? " serie" : " series")));
+    e.series.forEach((s, j)=>{
+      const fl = el("div","ap-fila");
+      fl.append(el("span",null,"S"+(j+1)));
+      const kg = el("input"); kg.inputMode = "decimal"; kg.placeholder = "kg"; kg.value = s.kg; kg.setAttribute("aria-label","kg");
+      const rp = el("input"); rp.inputMode = "numeric"; rp.placeholder = "reps"; rp.value = s.reps; rp.setAttribute("aria-label","repeticiones");
+      kg.addEventListener("input", ()=>{ s.kg = kg.value; });
+      rp.addEventListener("input", ()=>{ s.reps = rp.value; });
+      fl.append(kg, rp); det.append(fl);
+    });
+    const acc = el("div","hq-fila");
+    const mas = el("button","hq-btn","+ Serie"); mas.type = "button";
+    mas.addEventListener("click", ()=>{ e.series.push({kg:"", reps:""}); apAb[i] = true; pintaCalendario(); });
+    const men = el("button","hq-btn","Quitar serie"); men.type = "button";
+    men.addEventListener("click", ()=>{ if(e.series.length > 1){ e.series.pop(); apAb[i] = true; pintaCalendario(); } });
+    acc.append(mas, men); det.append(acc);
+    w.append(det);
+  });
+  const ok = el("button","hq-btn prim","Guardar entreno"); ok.type = "button"; ok.style.gridColumn = "1/-1";
+  ok.addEventListener("click", ()=>{
+    const ej = apEj.map(e=>({n:e.n, t:e.t, notas:"",
+      series: e.series.filter(s=>numA(s.reps)>0).map(s=>({kg:numA(s.kg), reps:numA(s.reps), tipo:"N"}))})).filter(e=>e.series.length);
+    if(!ej.length) return apAviso(f, "Apunta las repeticiones de al menos una serie.");
+    if(registroIlegible()) return apAviso(f, "No se puede leer el registro.");
+    const r2 = leeReg() || regVacio();
+    const d = E.dias[idxDia(apCod)], mn = numA(apDur);
+    r2.sesiones = Array.isArray(r2.sesiones) ? r2.sesiones : [];
+    r2.sesiones.push({id:Date.now(), fecha:f, fase:faseDeFecha(r2, f), dia:d.cod, nombre:d.dia+": "+d.n,
+      dur: mn>0 ? Math.round(mn*60) : 0, ej:ej, abd:null, cal:true});
+    r2.sesiones.sort((x,y)=>x.fecha<y.fecha ? -1 : x.fecha>y.fecha ? 1 : x.id-y.id);
+    if(!guardaReg(r2)) return apAviso(f, "No se pudo guardar.");
+    apTipo = null; apMsg = ""; render();
+  });
+  w.append(ok);
+  if(apMsg) w.append(el("p","nota",apMsg));
+  return w;
 }
 
 // ---- corregir un día pasado (o el de hoy) desde el calendario

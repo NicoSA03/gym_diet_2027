@@ -685,6 +685,7 @@ Cosas que conviene saber:
 | v3.1 | Lunes: remo sentado en máquina (BH Fitness L290) en vez de remo con barra y peso muerto rumano con mancuernas en vez de con barra. Viernes: sentadilla jaca en vez de sentadilla frontal. Mismas series, repeticiones y RIR. Los ejercicios antiguos quedan como sustitutos y sus registros siguen en Progreso |
 | v3.2 | Corregir un día pasado y apuntar una actividad olvidada: lógica en `menu/plazos.js` y `menu/plazos.py` (`corregirDia` y `revisarAjustes`), con 18 casos nuevos en `menu/ver_plazos.py`. La comida de los días pasados no cambia y nada de lo guardado se pierde. En la app: en El entreno, calendario, al tocar un día de hoy hacia atrás sale «Cambiar» (lo que toca, otro entreno del plan, otra actividad o descanso), «Quitar» en los días corregidos y, si un ajuste de esa semana deja de hacer falta, un aviso con «Deshacer». Lo marcado sin series se ve como «marcada a mano» (`menu/a4.js`) |
 | v3.3 | Vista «Reloj»: el objetivo se elige siempre en un desplegable (mejorar el 5 km, perder grasa, ganar músculo o mantenerte) y se puede cambiar cuando quieras; lo leído del reloj se guarda en el móvil y sigue ahí al recargar, con un botón «Olvidar lo leído» |
+| v3.4 | En El entreno, un desplegable «¿Qué es el RIR?» explica qué es y en qué series aplica en el bloque que estás viendo. En el calendario, un día de hoy o pasado tiene los botones «Apuntar carrera» (tipo, km y minutos) y «Apuntar entreno» (la sesión del plan, con kilos y repeticiones de cada serie). Se guardan en el Registro del móvil (`carrera` y `sesiones` de `registro_v1`), igual que lo que apuntas en Registro, con la marca `cal:true`; así salen en Historial y Progreso. Lo apuntado desde el calendario se puede quitar con «Quitar»; lo demás no se toca |
 
 
 ## 12. Conectar el reloj (v3.0)
@@ -736,4 +737,4 @@ Junto al aviso devuelve los días mínimos y lo que sí se alcanza en el tiempo 
 
 **Verificación.** `python3 menu/ver_conectividad.py` comprueba nueve casos de viabilidad, nueve de datos mal metidos o en el límite, qué métricas se piden y, si Node está instalado, lee un archivo de prueba de cada formato y comprueba que el JS y el Python dan lo mismo. Debe acabar en «TODO OK: conectividad». De momento no forma parte de `actualizar.py`.
 
-*Versión del sistema: v3.3, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
+*Versión del sistema: v3.4, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
