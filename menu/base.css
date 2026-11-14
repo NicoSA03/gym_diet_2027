@@ -1,20 +1,20 @@
 :root{
-  --ground:#000000; --surface:#0E0E0E; --surface-2:#181818;
-  --ink:#F4F4F4; --ink-2:#BDBDBD; --ink-3:#8C8C8C;
-  --line:#262626; --line-2:#3D3D3D;
+  --ground:#0A0A0C; --surface:#151518; --surface-2:#1F1F24;
+  --ink:#F5F5F7; --ink-2:#C6C6CE; --ink-3:#8F8F9A;
+  --line:#27272D; --line-2:#3C3C44; --r:14px; --r-s:10px;
   --accent:#E0323C; --accent-ink:#FF5A5F; --accent-soft:#2A0C0E;
   --clay:#FF8A3D; --clay-soft:#2E1A0C;
   --amber:#FFC928; --amber-soft:#332800;
   --shadow:0 1px 2px rgba(0,0,0,.6), 0 8px 24px -16px rgba(0,0,0,.9);
   --sans:"Archivo","Helvetica Neue",Arial,sans-serif;
-  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --serif:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"Archivo","Helvetica Neue",Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --ground:#000000; --surface:#0E0E0E; --surface-2:#181818;
-    --ink:#F4F4F4; --ink-2:#BDBDBD; --ink-3:#8C8C8C;
-    --line:#262626; --line-2:#3D3D3D;
+    --ground:#0A0A0C; --surface:#151518; --surface-2:#1F1F24;
+    --ink:#F5F5F7; --ink-2:#C6C6CE; --ink-3:#8F8F9A;
+    --line:#27272D; --line-2:#3C3C44; --r:14px; --r-s:10px;
     --accent:#E0323C; --accent-ink:#FF5A5F; --accent-soft:#2A0C0E;
     --clay:#FF8A3D; --clay-soft:#2E1A0C;
     --amber:#FFC928; --amber-soft:#332800;
@@ -22,9 +22,9 @@
   }
 }
 :root[data-theme="dark"]{
-  --ground:#000000; --surface:#0E0E0E; --surface-2:#181818;
-  --ink:#F4F4F4; --ink-2:#BDBDBD; --ink-3:#8C8C8C;
-  --line:#262626; --line-2:#3D3D3D;
+  --ground:#0A0A0C; --surface:#151518; --surface-2:#1F1F24;
+  --ink:#F5F5F7; --ink-2:#C6C6CE; --ink-3:#8F8F9A;
+  --line:#27272D; --line-2:#3C3C44; --r:14px; --r-s:10px;
   --accent:#E0323C; --accent-ink:#FF5A5F; --accent-soft:#2A0C0E;
   --clay:#FF8A3D; --clay-soft:#2E1A0C;
   --amber:#FFC928; --amber-soft:#332800;
@@ -70,7 +70,7 @@ section{padding-block:42px 0}
 :root[data-theme="dark"] .chip[aria-selected="true"]{color:#FFFFFF}
 .chip.sm{font-size:12px;padding:5px 10px}
 
-.card{background:var(--surface);border:1px solid var(--line);border-radius:3px;
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
   overflow:hidden;box-shadow:var(--shadow)}
 .card-top{padding:18px 22px 16px;border-bottom:1px solid var(--line);
   display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap}
@@ -92,14 +92,14 @@ section{padding-block:42px 0}
 }
 
 .rules{display:flex;flex-direction:column;gap:1px;background:var(--line);
-  border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .rule{background:var(--surface);padding:15px 18px;display:grid;grid-template-columns:28px 1fr;gap:13px}
 .rule .i{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-ink);
   font-variant-numeric:tabular-nums}
 .rule p{font-size:15.5px;color:var(--ink-2)}
 .rule p b{font-family:var(--sans);font-weight:700;color:var(--ink)}
 
-.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 table{border-collapse:collapse;width:100%;min-width:520px;font-family:var(--sans);font-size:14.5px}
 caption{text-align:left;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink-3);padding:14px 16px 10px}
