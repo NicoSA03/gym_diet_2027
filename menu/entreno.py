@@ -296,9 +296,7 @@ TABATA_REGLA = (
 # ---------------------------------------------------------------- semana
 DIAS = [
 dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerza", dur="65-80 min",
-  cal=["Bici o remo suave 5 min",
-       "Movilidad de cadera y tobillo 3 min",
-       "2 × 5 saltos al cajón bajo: toda la pliometría de la semana empieza aquí"],
+  cal_min=10,
   ej=[("T1","Sentadilla trasera"),("T1","Press banca"),
       ("T2","Peso muerto rumano con mancuernas"),("T2","Remo sentado en máquina"),
       ("T3","Flexión clásica"),("T3","Curl de bíceps con barra Z"),
@@ -307,16 +305,12 @@ dict(cod="L", dia="Lunes", n="Fuerza A", sub="Empuje y cuádriceps", tipo="fuerz
   nota="Talones y encogimientos van en superserie: los dos de pie y con las mismas mancuernas, así no suman tiempo."),
 
 dict(cod="M", dia="Martes", n="Carrera de calidad", sub="VO2máx y umbral", tipo="carrera", dur="50-60 min",
-  cal=["Trote muy suave 10 min",
-       "4 × 20 m de progresión",
-       "Movilidad de tobillo y cadera 2 min"],
+  cal_min=15,
   ej=[], tabata=None,
   nota="Martes y jueves entras a la universidad a las 12:30, así que tienes la mañana entera. Es el mejor hueco de la semana para las series."),
 
 dict(cod="X", dia="Miércoles", n="Fuerza B", sub="Tirón y cadena posterior", tipo="fuerza", dur="65-75 min",
-  cal=["Remo suave 5 min",
-       "Movilidad de cadera y dorsal 3 min",
-       "2 × 10 pogos (saltitos con el tobillo rígido)"],
+  cal_min=10,
   ej=[("T1","Peso muerto convencional"),("T1","Dominadas lastradas"),
       ("T2","Zancada búlgara"),("T2","Press militar de pie"),
       ("T3","Fondos en paralelas"),("T3","Curl martillo"),("TF","Elevación de talones")],
@@ -324,14 +318,12 @@ dict(cod="X", dia="Miércoles", n="Fuerza B", sub="Tirón y cadena posterior", t
   nota="Peso muerto a las siete de la mañana pide diez minutos de calentamiento de verdad. No los recortes. Fondos y curl martillo, en superserie."),
 
 dict(cod="J", dia="Jueves", n="Tirada larga", sub="Base aeróbica en Z2", tipo="carrera", dur="45-80 min",
-  cal=["Los tres primeros kilómetros SON el calentamiento: sal más lento de lo que te pide el cuerpo"],
+  cal_min=10,
   ej=[], tabata=None,
   nota="Toda en Z2: tienes que poder hablar frases completas. Si no puedes, vas demasiado rápido, y una tirada larga rápida no entrena nada y te deja sin el viernes."),
 
 dict(cod="V", dia="Fuerza C", n="Fuerza C", sub="Funcional y densidad", tipo="fuerza", dur="65-75 min",
-  cal=["Cuerda o bici 5 min",
-       "Movilidad global 3 min",
-       "3 × 3 saltos horizontales"],
+  cal_min=10,
   ej=[("T1","Sentadilla jaca"),("T1","Press inclinado con mancuernas"),
       ("T2","Hip thrust"),("T2","Remo con mancuerna a una mano"),
       ("T3","Elevaciones laterales"),("T3","Face pull"),("T3","Crunch en polea alta")],

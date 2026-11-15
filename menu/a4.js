@@ -65,13 +65,12 @@ function pintaSesion(){
   const marca = marcaVigente();
   if(marca) box.append(el("p","ses-marca", (marca==="reentrada" ? "Reentrada" : "Repetir cargas")+": no subas peso, una serie menos, RIR +1."));
 
-  if(d.cal.length){
-    const c = el("div","cal-box");
-    c.append(el("h5",null, d.cod==="J" ? "Antes de salir" : "Calentamiento"));
-    const ul = el("ul");
-    d.cal.forEach(x=>ul.append(el("li",null,x)));
-    c.append(ul);
-    box.append(c);
+  // v3.8: una sola línea, como un ejercicio: «Calentamiento» y sus minutos (los ejercicios, tarea 21)
+  if(d.calMin > 0){
+    const row = el("div","ejer"), fila = el("div","fila");
+    fila.append(el("span","t tf","C"), el("h4",null,"Calentamiento"), el("div","pres", d.calMin+" min"));
+    row.append(fila);
+    box.append(row);
   }
 
   if(d.tipo==="fuerza"){

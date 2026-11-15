@@ -18,7 +18,7 @@ PAY = {
                    km=v["km"], des=v["des"], largo=list(v["largo"]))
            for k, v in FASES.items()},
  "dias": [dict(cod=d["cod"], dia=d["dia"], n=d["n"], sub=d["sub"], tipo=d["tipo"],
-               dur=d["dur"], cal=d["cal"], ej=[list(x) for x in d["ej"]],
+               dur=d["dur"], calMin=d["cal_min"], ej=[list(x) for x in d["ej"]],
                tabata=d["tabata"], nota=d["nota"]) for d in DIAS],
  "ej": {k: dict(m=v["m"], p=v["p"], cue=v["cue"], nota=v["nota"], sus=v["sus"],
                gif=EJS.get(k, {}).get("gif", ""))

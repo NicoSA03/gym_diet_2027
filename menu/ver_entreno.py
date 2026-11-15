@@ -19,6 +19,8 @@ chk(cal[-1]['s1']==SEMANAS, f"el ciclo acaba en la semana {cal[-1]['s1']}")
 for c in cal:
     print(f"       {c['cod']} {c['n']:24s} {c['sem']:2d} sem, semanas {c['s0']:2d}-{c['s1']:2d}, dieta {c['dieta']}")
 
+chk(all(isinstance(d.get("cal_min"), int) and 5 <= d["cal_min"] <= 20 for d in DIAS), "cada día lleva su calentamiento en minutos (de 5 a 20)")
+
 print("\n== 2. Volumen semanal por grupo dentro de rango útil ==")
 GRANDES={"Cuádriceps","Isquios","Glúteo","Pectoral","Espalda","Hombro"}
 for fc,f in FASES.items():
