@@ -137,6 +137,21 @@
 .r-hist h5{font-family:var(--sans);font-size:14.5px;font-weight:700;color:var(--accent-ink)}
 .r-hist p{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
 .r-rec{font-family:var(--sans);font-size:14px;padding:8px 12px;border-radius:8px;background:var(--amber-soft);color:var(--ink)}
+/* --- usuario (v3.7) --- */
+.u-vista{margin-top:14px}
+.u-cab{display:flex;align-items:center;gap:14px}
+.u-cab div:last-child{display:flex;flex-direction:column;min-width:0}
+.u-cab b{font-family:var(--sans);font-size:18px;font-weight:800;overflow-wrap:anywhere}
+.u-cab span{font-size:13px;color:var(--ink-3);overflow-wrap:anywhere}
+.u-ini{flex:none;width:52px;height:52px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);
+  display:grid;place-items:center;font-family:var(--sans);font-size:22px;font-weight:800}
+.u-fila{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:52px;padding:0 4px;
+  border:0;border-top:1px solid var(--line);background:transparent;color:var(--ink);font-family:var(--sans);
+  font-size:16px;font-weight:600;text-align:left;cursor:pointer}
+.u-fila i{font-style:normal;font-size:22px;color:var(--ink-3)}
+.r-ult div{align-items:flex-start}
+.r-ult b{text-align:right;font-size:13px;overflow-wrap:anywhere}
+.r-form .r-dos{align-items:stretch}
 @media (max-width:380px){.r-fila{grid-template-columns:36px minmax(0,1fr) 56px 56px 40px;gap:6px}}
 </style>
 
@@ -144,15 +159,16 @@
 <header class="masthead">
   <h1>Tu <em>registro</em></h1>
 </header>
-<p class="r-inicio">
+<p class="r-inicio" id="r-inicio-p">
   <label for="r-ini">Fecha de inicio:</label>
   <input type="date" id="r-ini">
   <span id="r-sem"></span>
 </p>
 
+<div id="r-perfil" class="r-vista u-vista" hidden></div>
 <div class="chips r-tabs" id="r-tabs" role="tablist" aria-label="Registro"></div>
 <div class="r-vista" id="r-vista"></div>
-<footer>
+<footer id="r-pie">
   1RM estimado con la media de Epley y Brzycki (solo Epley por encima de 10 repeticiones). En dominadas y flexiones cuenta tu peso corporal más el lastre. Las series de calentamiento (C) no cuentan para volumen ni récords.
 </footer>
 </div>
