@@ -244,7 +244,7 @@ function pintaResumen(){
   const r = registro(), lista = (r && r.peso) || [];
   const delDia = lista.find(x=>x.f===fecha);
   const inp = document.getElementById("m-peso");
-  // v3.6: la caja queda vacía tras guardar; el peso del día se ve como marca de fondo
+  // v3.7: la caja queda vacía tras guardar; el peso del día se ve como marca de fondo
   inp.placeholder = delDia ? String(delDia.kg).replace(".",",") : "kg";
   if(document.activeElement !== inp) inp.value = "";
   const ult = lista.filter(x=>x.f<=fecha && x.f>sumaDias(fecha,-7)).map(x=>x.kg);

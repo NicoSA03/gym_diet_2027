@@ -87,7 +87,7 @@ CSS_PIEL = """
 .card{border-radius:var(--r)}
 """
 
-# Barra inferior (v3.6): cuatro pestañas de uso diario y Usuario (pestaña virtual sobre Registro)
+# Barra inferior (v3.7): cuatro pestañas de uso diario y Usuario (pestaña virtual sobre Registro)
 ICONOS = {
   "menus": '<svg viewBox="0 0 24 24"><path d="M5 3v7a2.5 2.5 0 0 0 5 0V3M7.5 3v18M17 3c-2 1.5-3 4-3 7 0 1.5 1 2.5 3 2.5V21"/></svg>',
   "entreno": '<svg viewBox="0 0 24 24"><path d="M3 9v6M6.5 6.5v11M17.5 6.5v11M21 9v6M6.5 12h11"/></svg>',

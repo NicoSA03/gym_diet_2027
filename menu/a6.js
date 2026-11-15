@@ -121,7 +121,7 @@ function txtSerie(n, s){
 
 // ---------------------------------------------------------------- navegación
 const VISTAS = [["entrenar","Entrenar"],["cuerpo","Peso y carrera"],["progreso","Progreso"],["historial","Historial"],["reloj","Reloj"]];
-// v3.6: una sola instancia sirve a dos pestañas de la barra: «registro» (entrenar, peso y carrera)
+// v3.7: una sola instancia sirve a dos pestañas de la barra: «registro» (entrenar, peso y carrera)
 // y «usuario» (perfil, progreso, historial y reloj). La navegación avisa con el evento gd:modo.
 const VISTAS_MODO = {registro:["entrenar","cuerpo"], usuario:["progreso","historial","reloj"]};
 const VISTA_KEY = {registro:"reg_vista", usuario:"usr_vista"};
@@ -723,7 +723,7 @@ function vProgreso(box){
     [[nf(rec)+" kg","Récord 1RM"],[mejor?nf(mejor.cg)+" × "+mejor.reps:"-","Mejor serie"],[String(pts.length),"Sesiones"]].forEach(([v,k])=>{ const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d); });
     c.append(st);
     if(corporal(selEj)) c.append(hueco("En este ejercicio la carga es tu peso corporal del día más el lastre."));
-    // v3.6: pesos de las últimas sesiones del ejercicio
+    // v3.7: pesos de las últimas sesiones del ejercicio
     c.append(el("h4",null,"Últimas sesiones"));
     const lu = el("div","r-lista r-ult"), rev = ult.slice().reverse();
     (verTodas ? rev : rev.slice(0,8)).forEach(([f,t])=>{ const r=el("div"); r.append(el("span",null,corta(f)), el("b",null,t)); lu.append(r); });

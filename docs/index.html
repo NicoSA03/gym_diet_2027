@@ -800,7 +800,7 @@ body{padding-top:0;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-
 .r-hist h5{font-family:var(--sans);font-size:14.5px;font-weight:700;color:var(--accent-ink)}
 .r-hist p{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
 .r-rec{font-family:var(--sans);font-size:14px;padding:8px 12px;border-radius:8px;background:var(--amber-soft);color:var(--ink)}
-/* --- usuario (v3.6) --- */
+/* --- usuario (v3.7) --- */
 .u-vista{margin-top:14px}
 .u-cab{display:flex;align-items:center;gap:14px}
 .u-cab div:last-child{display:flex;flex-direction:column;min-width:0}
@@ -1444,7 +1444,7 @@ body{padding-top:0;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-
 </main>
 <nav class="appnav"><div class="tiras" id="appnav"></div></nav>
 <div class="sello">
-  versión dd49fe17, 15 de noviembre de 2026
+  versión 9bf391b0, 15 de noviembre de 2026
 </div>
 <script>
 
@@ -2587,7 +2587,7 @@ function pintaResumen(){
   const r = registro(), lista = (r && r.peso) || [];
   const delDia = lista.find(x=>x.f===fecha);
   const inp = $("m-peso");
-  // v3.6: la caja queda vacía tras guardar; el peso del día se ve como marca de fondo
+  // v3.7: la caja queda vacía tras guardar; el peso del día se ve como marca de fondo
   inp.placeholder = delDia ? String(delDia.kg).replace(".",",") : "kg";
   if(document.activeElement !== inp) inp.value = "";
   const ult = lista.filter(x=>x.f<=fecha && x.f>sumaDias(fecha,-7)).map(x=>x.kg);
@@ -5422,7 +5422,7 @@ function txtSerie(n, s){
 
 // ---------------------------------------------------------------- navegación
 const VISTAS = [["entrenar","Entrenar"],["cuerpo","Peso y carrera"],["progreso","Progreso"],["historial","Historial"],["reloj","Reloj"]];
-// v3.6: una sola instancia sirve a dos pestañas de la barra: «registro» (entrenar, peso y carrera)
+// v3.7: una sola instancia sirve a dos pestañas de la barra: «registro» (entrenar, peso y carrera)
 // y «usuario» (perfil, progreso, historial y reloj). La navegación avisa con el evento gd:modo.
 const VISTAS_MODO = {registro:["entrenar","cuerpo"], usuario:["progreso","historial","reloj"]};
 const VISTA_KEY = {registro:"reg_vista", usuario:"usr_vista"};
@@ -6024,7 +6024,7 @@ function vProgreso(box){
     [[nf(rec)+" kg","Récord 1RM"],[mejor?nf(mejor.cg)+" × "+mejor.reps:"-","Mejor serie"],[String(pts.length),"Sesiones"]].forEach(([v,k])=>{ const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d); });
     c.append(st);
     if(corporal(selEj)) c.append(hueco("En este ejercicio la carga es tu peso corporal del día más el lastre."));
-    // v3.6: pesos de las últimas sesiones del ejercicio
+    // v3.7: pesos de las últimas sesiones del ejercicio
     c.append(el("h4",null,"Últimas sesiones"));
     const lu = el("div","r-lista r-ult"), rev = ult.slice().reverse();
     (verTodas ? rev : rev.slice(0,8)).forEach(([f,t])=>{ const r=el("div"); r.append(el("span",null,corta(f)), el("b",null,t)); lu.append(r); });
