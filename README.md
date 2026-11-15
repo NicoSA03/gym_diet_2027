@@ -5,7 +5,8 @@ Todo el sistema cabe en **un único archivo, `planificacion_dieta_gym.html`**, q
 | Pestaña | Para qué |
 |---|---|
 | El entreno | La sesión de hoy (abre en el día y el bloque que tocan según la fecha de inicio del Registro): series, repeticiones, esfuerzo, abdominales, carrera y variantes |
-| Registro | Apuntar series como en Hevy, peso corporal, carrera, gráficas de progreso e historial |
+| Registro | Apuntar series como en Hevy, peso corporal y carrera |
+| Usuario | Tu perfil, progreso, historial, reloj y las guías (La teoría y Cómo funciona), desde la barra inferior |
 | La teoría | El porqué de todo, el desglose de cada ejercicio y el seguimiento semanal |
 | Cómo funciona | La dieta: calorías por bloque y tipo de día, y qué hacer cuando la vida se cruza |
 | Menús | El día de hoy con sus comidas, la calculadora que ajusta las raciones y tu diario (sección 5) |
@@ -687,6 +688,7 @@ Cosas que conviene saber:
 | v3.3 | Vista «Reloj»: el objetivo se elige siempre en un desplegable (mejorar el 5 km, perder grasa, ganar músculo o mantenerte) y se puede cambiar cuando quieras; lo leído del reloj se guarda en el móvil y sigue ahí al recargar, con un botón «Olvidar lo leído» |
 | v3.4 | En El entreno, un desplegable «¿Qué es el RIR?» explica qué es y en qué series aplica en el bloque que estás viendo. En el calendario, un día de hoy o pasado tiene los botones «Apuntar carrera» (tipo, km y minutos) y «Apuntar entreno» (la sesión del plan, con kilos y repeticiones de cada serie). Se guardan en el Registro del móvil (`carrera` y `sesiones` de `registro_v1`), igual que lo que apuntas en Registro, con la marca `cal:true`; así salen en Historial y Progreso. Lo apuntado desde el calendario se puede quitar con «Quitar»; lo demás no se toca |
 | v3.5 | Frontend nuevo (base): barra inferior fija con Menús, Entreno, Registro, Compra y «Más» (La teoría y Cómo funciona), cabecera fija con el nombre de la pestaña, tarjetas redondeadas y una sola tipografía. Solo cambia el aspecto y la navegación (`menu/standalone.py`, `menu/base.css`): el contenido de cada pestaña, los cálculos y lo guardado en el móvil no cambian. Es la base que se irá puliendo hasta la app definitiva |
+| v3.7 | Pestaña Usuario en la barra (sustituye a «Más»): perfil con nombre y correo, cifras, Progreso, Historial y Reloj salen de Registro, y las guías quedan abajo. La fecha de inicio también pasa a Usuario. En Progreso, «Últimas sesiones» con los pesos de cada ejercicio. Zoom bloqueado. Tras guardar el peso, la caja queda vacía. Claves nuevas del móvil: `usuario_v1` (nombre y correo) y `usr_vista`; el correo no sale del móvil |
 
 
 ## 12. Conectar el reloj (v3.0)
@@ -738,4 +740,45 @@ Junto al aviso devuelve los días mínimos y lo que sí se alcanza en el tiempo 
 
 **Verificación.** `python3 menu/ver_conectividad.py` comprueba nueve casos de viabilidad, nueve de datos mal metidos o en el límite, qué métricas se piden y, si Node está instalado, lee un archivo de prueba de cada formato y comprueba que el JS y el Python dan lo mismo. Debe acabar en «TODO OK: conectividad». De momento no forma parte de `actualizar.py`.
 
-*Versión del sistema: v3.5, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*
+## 13. Cuentas con correo (tarea 19, pendiente)
+
+Hoy no hay cuentas: la app es un archivo estático en GitHub Pages y todo se guarda en el móvil. El perfil de la pestaña Usuario (`usuario_v1`: nombre y correo) no sale del móvil. Esto es lo que hace falta para tener una cuenta real cuando se decida. Va unido al almacén de datos multiusuario (tarea 13).
+
+**Qué hay que decidir antes**
+
+| Decisión | Opciones | Propuesta |
+|---|---|---|
+| Quién guarda las cuentas y los datos | Un servicio gestionado (Supabase, Firebase) o un servidor propio | Servicio gestionado con los datos en la Unión Europea: no hay servidor que mantener |
+| Cómo se entra | Correo con enlace de un solo uso, correo con contraseña o cuenta de Google | Enlace de un solo uso al correo: no hay contraseñas que guardar |
+| Qué se sube | Todo lo guardado o solo una parte | Todo, clave por clave, tal como está en el móvil |
+
+**Pasos**
+
+1. Crear el proyecto en el servicio elegido, en una región de la Unión Europea, y activar la entrada por correo.
+2. Crear una tabla `datos_usuario` con cuatro columnas: `usuario` (identificador de la cuenta), `clave` (nombre de la clave del móvil), `valor` (JSON) y `actualizado` (fecha). Activar la seguridad por filas para que cada cuenta solo lea y escriba sus filas. Sin esa regla no se publica.
+3. Añadir `menu/cuenta.js` (un módulo aparte, sin bibliotecas: llamadas `fetch` a la API del servicio) con cuatro funciones: entrar, salir, subir y bajar. Incluirlo desde `menu/standalone.py` en la pestaña Usuario.
+4. Sincronizar estas claves: `registro_v1`, `diario_v1`, `menu_extra_v1`, `mis_productos_v1`, `mis_platos_v1`, `perfil_manual_v1`, `reloj_v1` y `usuario_v1`. Antes de empezar, repasar con `grep -n "localStorage" menu/*.js` que no falte ninguna clave nueva. Las de pantalla (`app_sec`, `reg_vista`, `usr_vista`, `e_fase`, `t_fase`) se quedan en el móvil.
+5. Regla al juntar móvil y nube: manda el móvil mientras no haya conexión; al conectar, por cada clave gana la más reciente, y antes de pisar nada se guarda una copia de la anterior (`<clave>_copia`). Nunca se borra lo que hay en el móvil al entrar por primera vez: se sube.
+6. En la pestaña Usuario, cambiar «Añadir nombre y correo» por «Entrar con tu correo», enseñar el estado (sin cuenta, sincronizado, pendiente de subir) y un botón «Salir».
+7. Añadir a `actualizar.py` una verificación de la regla del paso 5 con casos de ejemplo (gemelo en Python, como `ver_plazos.py`).
+
+**Seguridad**
+
+- En el repositorio solo puede ir la clave pública del servicio. La clave de administración nunca se sube.
+- Limitar en el servicio los dominios desde los que se puede entrar (el de GitHub Pages).
+
+**Legal (antes de abrirla a otras personas)**
+
+- Peso, pulso, sueño y entrenos son datos de salud: hace falta consentimiento expreso al crear la cuenta, política de privacidad y aviso legal visibles en la app.
+- Contrato de encargado del tratamiento con el servicio elegido y datos alojados en la Unión Europea.
+- La persona debe poder descargar y borrar sus datos desde la app.
+- Conviene que lo revise un profesional antes de admitir a terceros.
+
+**Cómo se sabe que está bien**
+
+- Entrar en un segundo móvil con el mismo correo y ver el mismo Historial.
+- Apuntar algo sin conexión, recuperar la conexión y verlo en el otro móvil.
+- Con otra cuenta no se ve nada de la primera.
+- Salir de la cuenta no borra lo guardado en el móvil.
+
+*Versión del sistema: v3.7, noviembre de 2026. Ciclo de 39 semanas sin fechas fijas; peso y tiempos de partida en `datos/perfil.json`.*

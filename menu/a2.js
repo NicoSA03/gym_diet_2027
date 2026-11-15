@@ -244,7 +244,9 @@ function pintaResumen(){
   const r = registro(), lista = (r && r.peso) || [];
   const delDia = lista.find(x=>x.f===fecha);
   const inp = document.getElementById("m-peso");
-  if(document.activeElement !== inp) inp.value = delDia ? String(delDia.kg).replace(".",",") : "";
+  // v3.6: la caja queda vacía tras guardar; el peso del día se ve como marca de fondo
+  inp.placeholder = delDia ? String(delDia.kg).replace(".",",") : "kg";
+  if(document.activeElement !== inp) inp.value = "";
   const ult = lista.filter(x=>x.f<=fecha && x.f>sumaDias(fecha,-7)).map(x=>x.kg);
   document.getElementById("m-peso-media").textContent = ult.length ? "media 7 días: "+(ult.reduce((a,b)=>a+b,0)/ult.length).toFixed(1).replace(".",",")+" kg" : "";
 }
@@ -1034,7 +1036,7 @@ document.getElementById("m-tipo").addEventListener("change", function(){
 document.getElementById("m-peso-ok").addEventListener("click", ()=>{
   const v = parseFloat(document.getElementById("m-peso").value.replace(",","."));
   if(!(v>30 && v<250)){ aviso("Ese peso no parece correcto"); return; }
-  guardaPeso(fecha, Math.round(v*10)/10); aviso("Peso guardado"); render();
+  guardaPeso(fecha, Math.round(v*10)/10); document.getElementById("m-peso").value = ""; document.getElementById("m-peso").blur(); aviso("Peso guardado"); render();
 });
 window.addEventListener("gd:peso", ()=>{ regC = null; ajMemo = {}; render(); });
 

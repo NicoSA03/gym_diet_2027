@@ -49,7 +49,7 @@ ICONO = ("data:image/png;base64,"
          "AElFTkSuQmCC")
 
 CSS_APP = """
-html{scroll-padding-top:60px}
+html{scroll-padding-top:60px;touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
 body{padding-top:0;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-family:var(--sans);font-size:16px;line-height:1.55}
 .apptop{position:sticky;top:0;z-index:40;height:48px;display:flex;align-items:center;gap:10px;
   background:var(--ground);border-bottom:1px solid var(--line);
@@ -66,14 +66,6 @@ body{padding-top:0;padding-bottom:calc(72px + env(safe-area-inset-bottom));font-
 .appnav button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .appnav button[aria-current="true"]{color:var(--ink);background:var(--accent-soft)}
 .appnav button[aria-current="true"] svg{stroke:var(--accent-ink)}
-.appmas{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.6);display:none;align-items:flex-end}
-.appmas.on{display:flex}
-.appmas div{width:100%;max-width:560px;margin:0 auto calc(70px + env(safe-area-inset-bottom));background:var(--surface);
-  border:1px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:2px;margin-inline:auto}
-.appmas div{width:calc(100% - 24px)}
-.appmas button{font-family:var(--sans);font-size:16px;font-weight:700;text-align:left;padding:15px 14px;border:0;
-  border-radius:12px;background:transparent;color:var(--ink);cursor:pointer}
-.appmas button[aria-current="true"]{background:var(--accent-soft)}
 .app-sec{display:none}
 .app-sec.on{display:block}
 .app-sec .hermanos{display:none}
@@ -95,34 +87,34 @@ CSS_PIEL = """
 .card{border-radius:var(--r)}
 """
 
-# Barra inferior (v3.5): cuatro pestañas de uso diario y «Más» para la documentación
+# Barra inferior (v3.6): cuatro pestañas de uso diario y Usuario (pestaña virtual sobre Registro)
 ICONOS = {
   "menus": '<svg viewBox="0 0 24 24"><path d="M5 3v7a2.5 2.5 0 0 0 5 0V3M7.5 3v18M17 3c-2 1.5-3 4-3 7 0 1.5 1 2.5 3 2.5V21"/></svg>',
   "entreno": '<svg viewBox="0 0 24 24"><path d="M3 9v6M6.5 6.5v11M17.5 6.5v11M21 9v6M6.5 12h11"/></svg>',
   "registro": '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
   "compra": '<svg viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 11h10.6L20.5 7H7"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>',
-  "mas": '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>',
+  "usuario": '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.6-4 3.6-6 7.5-6s6.9 2 7.5 6"/></svg>',
 }
-BARRA = ["menus", "entreno", "registro", "compra"]
-CORTO = {"menus": "Menús", "entreno": "Entreno", "registro": "Registro", "compra": "Compra"}
+BARRA = ["menus", "entreno", "registro", "compra", "usuario"]
+CORTO = {"menus": "Menús", "entreno": "Entreno", "registro": "Registro", "compra": "Compra", "usuario": "Usuario"}
 
 NAV_JS = """
 (function(){
   var SEC = %(lista)s, BARRA = %(barra)s, CORTO = %(corto)s, ICO = %(iconos)s;
-  var nav = document.getElementById('appnav'), mas = document.getElementById('appmas'),
-      caja = mas.firstElementChild, titulo = document.getElementById('apptit');
-  var botones = {}, bMas = null;
-  function enBarra(id){ return BARRA.indexOf(id) >= 0; }
+  var nav = document.getElementById('appnav'), titulo = document.getElementById('apptit');
+  var botones = {};
+  // «usuario» no es una sección propia: enseña s-registro en modo usuario (una sola copia del registro)
   function ir(id, guardar){
+    var real = id==='usuario' ? 'registro' : id;
+    var marca = (id==='teoria' || id==='info') ? 'usuario' : id;
     SEC.forEach(function(s){
       var d = document.getElementById('s-'+s[0]);
-      if(d) d.classList.toggle('on', s[0]===id);
-      if(botones[s[0]]) botones[s[0]].setAttribute('aria-current', s[0]===id ? 'true':'false');
-      if(s[0]===id && titulo) titulo.textContent = s[1];
+      if(d) d.classList.toggle('on', s[0]===real);
+      if(s[0]===real && titulo) titulo.textContent = id==='usuario' ? 'Usuario' : s[1];
     });
-    if(bMas) bMas.setAttribute('aria-current', enBarra(id) ? 'false':'true');
-    mas.classList.remove('on');
+    BARRA.forEach(function(k){ if(botones[k]) botones[k].setAttribute('aria-current', k===marca ? 'true':'false'); });
     if(guardar){ try{ localStorage.setItem('app_sec', id); }catch(e){} }
+    if(id==='usuario' || id==='registro') document.dispatchEvent(new CustomEvent('gd:modo', {detail: id}));
     window.scrollTo(0,0);
   }
   function boton(ico, texto){
@@ -132,25 +124,27 @@ NAV_JS = """
     var t = document.createElement('span'); t.textContent = texto; b.append(t);
     return b;
   }
-  SEC.slice().sort(function(a, b){ return (enBarra(a[0]) ? BARRA.indexOf(a[0]) : 99) - (enBarra(b[0]) ? BARRA.indexOf(b[0]) : 99); }).forEach(function(s){
-    var b;
-    if(enBarra(s[0])){ b = boton(ICO[s[0]], CORTO[s[0]] || s[1]); nav.append(b); }
-    else { b = document.createElement('button'); b.type = 'button'; b.textContent = s[1]; caja.append(b); }
-    b.addEventListener('click', function(){ ir(s[0], true); });
-    botones[s[0]] = b;
+  BARRA.forEach(function(k){
+    var b = boton(ICO[k], CORTO[k]);
+    nav.append(b);
+    b.addEventListener('click', function(){ ir(k, true); });
+    botones[k] = b;
   });
-  bMas = boton(ICO.mas, 'Más');
-  bMas.setAttribute('aria-haspopup', 'true');
-  bMas.addEventListener('click', function(){ mas.classList.toggle('on'); });
-  nav.append(bMas);
-  mas.addEventListener('click', function(e){ if(e.target===mas) mas.classList.remove('on'); });
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('[data-ir]');
     if(a){ e.preventDefault(); ir(a.getAttribute('data-ir'), true); }
   });
+  // sin zoom: gestos de pellizco (iOS) y doble toque fuera de botones y campos
+  ['gesturestart','gesturechange','gestureend'].forEach(function(n){ document.addEventListener(n, function(e){ e.preventDefault(); }); });
+  var ultimo = 0;
+  document.addEventListener('touchend', function(e){
+    var t = Date.now(), x = e.target.closest ? e.target.closest('button,input,select,textarea,a,label,summary,[data-ir]') : null;
+    if(!x && t-ultimo < 350) e.preventDefault();
+    ultimo = t;
+  }, {passive:false});
   var ini = SEC[0][0];
   try{ var g = localStorage.getItem('app_sec');
-       if(g && SEC.some(function(s){return s[0]===g;})) ini = g; }catch(e){}
+       if(g && (g==='usuario' || SEC.some(function(s){return s[0]===g;}))) ini = g; }catch(e){}
   ir(ini, false);
 })();
 """
@@ -213,7 +207,7 @@ def construir():
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0A0A0C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -236,7 +230,6 @@ def construir():
 <main>
 {cuerpo_todo}
 </main>
-<div class="appmas" id="appmas"><div></div></div>
 <nav class="appnav"><div class="tiras" id="appnav"></div></nav>
 <div class="sello">
   versión {firma}, {hoy.day} de {MES[hoy.month]} de {hoy.year}

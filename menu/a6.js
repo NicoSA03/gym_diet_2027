@@ -121,18 +121,82 @@ function txtSerie(n, s){
 
 // ---------------------------------------------------------------- navegación
 const VISTAS = [["entrenar","Entrenar"],["cuerpo","Peso y carrera"],["progreso","Progreso"],["historial","Historial"],["reloj","Reloj"]];
-let vista = "entrenar";
-try{ const v=localStorage.getItem("reg_vista"); if(v && VISTAS.some(x=>x[0]===v)) vista=v; }catch(e){}
-if(D.activa) vista = "entrenar";
+// v3.6: una sola instancia sirve a dos pestañas de la barra: «registro» (entrenar, peso y carrera)
+// y «usuario» (perfil, progreso, historial y reloj). La navegación avisa con el evento gd:modo.
+const VISTAS_MODO = {registro:["entrenar","cuerpo"], usuario:["progreso","historial","reloj"]};
+const VISTA_KEY = {registro:"reg_vista", usuario:"usr_vista"};
+const USR_KEY = "usuario_v1";
+let modo = "registro", vista = "entrenar";
+try{ if(localStorage.getItem("app_sec")==="usuario") modo = "usuario"; }catch(e){}
+function cargaVista(){
+  const ok = VISTAS_MODO[modo]; let v = null;
+  try{ v = localStorage.getItem(VISTA_KEY[modo]); }catch(e){}
+  vista = ok.includes(v) ? v : ok[0];
+  if(modo==="registro" && D.activa) vista = "entrenar";
+}
+cargaVista();
+const usrLee = ()=>{ try{ const u = JSON.parse(localStorage.getItem(USR_KEY)); return u && typeof u==="object" ? {nombre:String(u.nombre||""), correo:String(u.correo||"")} : {nombre:"", correo:""}; }catch(e){ return {nombre:"", correo:""}; } };
+let editaPerfil = false, verTodas = false;
 
 function pintaTabs(){
   const b = document.getElementById("r-tabs"); b.replaceChildren();
-  VISTAS.forEach(([k,t])=>{
+  VISTAS.filter(x=>VISTAS_MODO[modo].includes(x[0])).forEach(([k,t])=>{
     const c = el("button","chip",t);
     c.setAttribute("role","tab"); c.setAttribute("aria-selected", k===vista?"true":"false");
-    c.addEventListener("click", ()=>{ vista=k; try{ localStorage.setItem("reg_vista",k); }catch(e){} render(); });
+    c.addEventListener("click", ()=>{ vista=k; try{ localStorage.setItem(VISTA_KEY[modo],k); }catch(e){} render(); });
     b.append(c);
   });
+}
+// Tarjeta de perfil de la pestaña Usuario: nombre y correo solo se guardan en este móvil
+function pintaPerfil(){
+  const box = document.getElementById("r-perfil"); box.replaceChildren();
+  box.hidden = modo!=="usuario";
+  if(modo!=="usuario") return;
+  const u = usrLee(), c = el("div","r-card u-perfil");
+  const cab = el("div","u-cab");
+  const ini = (u.nombre.trim() || u.correo.trim() || "").charAt(0).toUpperCase();
+  const dt = el("div"); dt.append(el("b",null,u.nombre.trim() || "Tu perfil"), el("span",null,u.correo.trim() || "Sin correo"));
+  cab.append(el("div","u-ini",ini || "?"), dt);
+  c.append(cab);
+  if(editaPerfil){
+    const w = el("div","r-form");
+    const ln = el("label","ancho","Nombre"), n = el("input"); n.value = u.nombre; n.maxLength = 40; n.autocomplete = "name"; ln.append(n);
+    const lc = el("label","ancho","Correo"), m = el("input"); m.type = "email"; m.inputMode = "email"; m.value = u.correo; m.maxLength = 80; m.autocomplete = "email"; lc.append(m);
+    const ok = el("button","r-btn","Guardar"), no = el("button","r-btn sec","Cancelar");
+    ok.addEventListener("click", ()=>{
+      const nv = n.value.trim(), mv = m.value.trim();
+      if(mv && !/^\S+@\S+\.\S+$/.test(mv)){ aviso("Ese correo no parece correcto."); return; }
+      try{ if(nv || mv) localStorage.setItem(USR_KEY, JSON.stringify({nombre:nv, correo:mv})); else localStorage.removeItem(USR_KEY); }
+      catch(e){ aviso("No se ha podido guardar."); return; }
+      editaPerfil = false; render(); aviso("Perfil guardado");
+    });
+    no.addEventListener("click", ()=>{ editaPerfil = false; render(); });
+    const dos = el("div","r-dos ancho"); dos.append(ok, no);
+    w.append(ln, lc, dos); c.append(w);
+  } else {
+    const b = el("button","r-btn sec", (u.nombre||u.correo) ? "Editar" : "Añadir nombre y correo");
+    b.addEventListener("click", ()=>{ editaPerfil = true; render(); });
+    c.append(b);
+  }
+  c.append(el("p","nota","Se guarda solo en este móvil. La cuenta con correo llegará más adelante."));
+  box.append(c);
+  const km = D.carrera.reduce((a,x)=>a+(x.km||0),0);
+  const ult = D.peso.length ? D.peso[D.peso.length-1].kg : null;
+  const st = el("div","r-stats");
+  [[String(D.sesiones.length),"Entrenos"],[nf(km)+" km","Corridos"],[ult===null?"-":nf(ult)+" kg","Último peso"]].forEach(([v,k])=>{
+    const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d);
+  });
+  box.append(st);
+}
+function guias(box){
+  const c = el("div","r-card u-guias");
+  c.append(el("h3",null,"Guías"));
+  [["teoria","La teoría"],["info","Cómo funciona"]].forEach(([id,t])=>{
+    const b = el("button","u-fila"); b.type = "button"; b.setAttribute("data-ir", id);
+    b.append(el("span",null,t), el("i",null,"›"));
+    c.append(b);
+  });
+  box.append(c);
 }
 // ---------------------------------------------------------------- fecha de inicio
 function pintaInicio(){
@@ -141,9 +205,9 @@ function pintaInicio(){
   const w = semanaDe(hoy());
   s.classList.remove("fin");
   if(w === null){ s.textContent = ""; }
-  else if(w < 1){ s.textContent = ", empiezas en " + (1-w) + (1-w===1 ? " semana" : " semanas"); }
-  else if(w > R.semanas){ s.textContent = ", ciclo terminado, elige bloque"; s.classList.add("fin"); }
-  else { s.textContent = ", semana " + w + " de " + R.semanas + ", " + faseDe(hoy()); }
+  else if(w < 1){ s.textContent = "Empiezas en " + (1-w) + (1-w===1 ? " semana" : " semanas"); }
+  else if(w > R.semanas){ s.textContent = "Ciclo terminado, elige bloque"; s.classList.add("fin"); }
+  else { s.textContent = "Semana " + w + " de " + R.semanas + ", " + String(faseDe(hoy())).replace(/^F/,"B"); }
 }
 document.getElementById("r-ini").addEventListener("change", function(){
   D.inicio = this.value || null;
@@ -152,10 +216,18 @@ document.getElementById("r-ini").addEventListener("change", function(){
 });
 
 function render(){
-  pintaTabs(); paraReloj(); pintaInicio();
+  pintaTabs(); paraReloj(); pintaInicio(); pintaPerfil();
+  document.getElementById("r-inicio-p").hidden = modo!=="usuario";
+  document.getElementById("r-pie").hidden = !(modo==="usuario" && vista==="progreso");
   const box = document.getElementById("r-vista"); box.replaceChildren();
   ({entrenar:vEntrenar, cuerpo:vCuerpo, progreso:vProgreso, historial:vHistorial, reloj:vReloj})[vista](box);
+  if(modo==="usuario") guias(box);
 }
+document.addEventListener("gd:modo", e=>{
+  const m = e.detail==="usuario" ? "usuario" : "registro";
+  if(m===modo) return;
+  modo = m; editaPerfil = false; cargaVista(); render();
+});
 
 // ---------------------------------------------------------------- entrenar
 let selFase = null, selDia = null, resumen = null;
@@ -416,7 +488,7 @@ function vCuerpo(box){
     if(!(kg>30 && kg<250)){ aviso("Ese peso no parece correcto."); return; }
     const fe = fi.value || h;
     D.peso = D.peso.filter(x=>x.f!==fe); D.peso.push({f:fe, kg});
-    D.peso.sort((x,y)=>x.f<y.f?-1:1); guarda(); aviso("Peso guardado"); render();
+    D.peso.sort((x,y)=>x.f<y.f?-1:1); ki.value = ""; guarda(); aviso("Peso guardado"); render();
   });
   w.append(lf, lk, b); c.append(w);
 
@@ -628,11 +700,11 @@ function vProgreso(box){
     if(!conDatos.includes(selEj)) selEj = conDatos[0];
     const sel = el("select","r-sel");
     conDatos.forEach(n=>{ const o=el("option",null,n); o.value=n; if(n===selEj) o.selected=true; sel.append(o); });
-    sel.addEventListener("change", ()=>{ selEj=sel.value; render(); });
+    sel.addEventListener("change", ()=>{ selEj=sel.value; verTodas=false; render(); });
     const ch = el("div","chips");
     METRICAS.forEach(([k,t])=>{ const b=el("button","chip sm",t); b.setAttribute("aria-selected",k===selMet?"true":"false"); b.addEventListener("click",()=>{ selMet=k; render(); }); ch.append(b); });
     c.append(sel, ch);
-    const pts = []; let rec = 0, mejor = null;
+    const pts = [], ult = []; let rec = 0, mejor = null;
     D.sesiones.forEach(ses=>(ses.ej||[]).filter(e=>e.n===selEj).forEach(e=>{
       const ss = e.series.filter(cuenta); if(!ss.length) return;
       let v = 0;
@@ -644,12 +716,23 @@ function vProgreso(box){
         if(r1>rec){ rec = r1; mejor = {cg, reps:s.reps}; }
       });
       pts.push({x:deIso(ses.fecha).getTime(), y:v});
+      ult.push([ses.fecha, ss.map(s=>corporal(selEj) ? txtSerie(selEj,s) : nf(s.kg)+" × "+s.reps).join(", ")]);
     }));
     c.append(el("div")); c.lastChild.innerHTML = svgLinea(pts, [], "kg");
     const st = el("div","r-stats");
     [[nf(rec)+" kg","Récord 1RM"],[mejor?nf(mejor.cg)+" × "+mejor.reps:"-","Mejor serie"],[String(pts.length),"Sesiones"]].forEach(([v,k])=>{ const d=el("div"); d.append(el("span","v",v), el("span","k",k)); st.append(d); });
     c.append(st);
     if(corporal(selEj)) c.append(hueco("En este ejercicio la carga es tu peso corporal del día más el lastre."));
+    // v3.6: pesos de las últimas sesiones del ejercicio
+    c.append(el("h4",null,"Últimas sesiones"));
+    const lu = el("div","r-lista r-ult"), rev = ult.slice().reverse();
+    (verTodas ? rev : rev.slice(0,8)).forEach(([f,t])=>{ const r=el("div"); r.append(el("span",null,corta(f)), el("b",null,t)); lu.append(r); });
+    c.append(lu);
+    if(rev.length>8 && !verTodas){
+      const vt = el("button","r-btn sec","Ver todas ("+rev.length+")");
+      vt.addEventListener("click", ()=>{ verTodas=true; render(); });
+      c.append(vt);
+    }
   }
   box.append(c);
 
