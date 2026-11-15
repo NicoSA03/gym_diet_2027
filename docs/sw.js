@@ -1,5 +1,5 @@
-// Service worker de «Junio 2027», versión d043a369 (lo genera menu/pwa.py)
-const V = "junio2027-d043a369";
+// Service worker de «Junio 2027», versión 0f7f25b0 (lo genera menu/pwa.py)
+const V = "junio2027-0f7f25b0";
 const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./catalogo.json",
               "./vendor/quagga.min.js"];
 

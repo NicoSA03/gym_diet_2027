@@ -94,10 +94,19 @@ let regC = null, ajMemo = {};
 function regCache(){ if(regC===null) regC = registro() || false; return regC || null; }
 function kcTipo(fase, tipo){ const o = M.obj[fase+"|"+tipo]; return o ? M.tipos[tipo].tomas.reduce((a,b)=>a+(o[b]?o[b][0]:0), 0) : 0; }
 // kcal extra de los avisos de peso aplicados y no deshechos, desde el día en que se aplicaron
+// Semana dentro del bloque (1 = la primera) si el bloque del día sale de la fecha de inicio; si no, null
+function semBloque(f){
+  const r = regCache(), b = faseDia(f);
+  if(!r || !r.inicio || !M.fases[b] || b !== faseDe(f)) return null;
+  const sem = Math.round((deIso(lunes(f)) - deIso(lunes(r.inicio)))/6048e5) + 1;
+  return sem >= M.fases[b].s0 && sem <= M.fases[b].s1 ? sem - M.fases[b].s0 + 1 : null;
+}
+// v3.6: además, las kcal de entrada suave de la primera semana del bloque (PLAZOS.kcalEntrada)
 function extraKcal(f){
-  const r = regCache(); if(!r || !Array.isArray(r.ajustes)) return 0;
   const b = faseDia(f);
-  return r.ajustes.reduce((s,a)=>(a && !a.deshecho && a.que==="kcal" && a.bloque===b && typeof a.f==="string" && a.f<=f && a.antes && a.despues) ? s+(a.despues.kcal-a.antes.kcal) : s, 0);
+  let ent = 0; try{ ent = PLAZOS.kcalEntrada(b, semBloque(f)) || 0; }catch(e){}
+  const r = regCache(); if(!r || !Array.isArray(r.ajustes)) return ent;
+  return ent + r.ajustes.reduce((s,a)=>(a && !a.deshecho && a.que==="kcal" && a.bloque===b && typeof a.f==="string" && a.f<=f && a.antes && a.despues) ? s+(a.despues.kcal-a.antes.kcal) : s, 0);
 }
 function escalaExtra(f){ const base = kcTipo(faseDia(f), tipoDia(f)), ex = extraKcal(f); return base>0 && ex ? (base+ex)/base : 1; }
 function objToma(f, b){
@@ -1075,7 +1084,7 @@ function pintaAjustes(){
   }]]));
   const bl = faseDia(fecha), clave = "peso|"+bl+"|"+lunes(fecha);
   let p = null;
-  try{ p = PLAZOS.propuestaPeso(r, fecha, bl); }catch(e){}
+  try{ p = PLAZOS.propuestaPeso(r, fecha, bl, semBloque(fecha)); }catch(e){}
   if(!p || (r.descartes && r.descartes[clave])) return;
   box.append(tarjetaProp(p.texto, false, [
     ["Aplicar", ()=>{

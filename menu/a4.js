@@ -448,8 +448,17 @@ function semanaCiclo(lun, r){
   return k ? k.replace(/^F/,"B")+", sem "+w : null;
 }
 // Kcal extra de los avisos de peso aplicados y no deshechos, desde el día en que se aplicaron
+// v3.6: más la entrada suave de la primera semana del bloque, igual que en a2.js
 function extraDesde(r, bloque, f){
-  return (Array.isArray(r.ajustes) ? r.ajustes : []).reduce((s,a)=>
+  let ent = 0;
+  try{
+    const fa = E.fases[String(bloque).replace(/^B/,"F")];
+    if(fa && esFecha(r.inicio)){
+      const w = Math.round((deIso(lunesDe(f))-deIso(lunesDe(r.inicio)))/6048e5) + 1;
+      if(w>=fa.s0 && w<=fa.s1) ent = PLAZOS.kcalEntrada(bloque, w-fa.s0+1) || 0;
+    }
+  }catch(e){}
+  return ent + (Array.isArray(r.ajustes) ? r.ajustes : []).reduce((s,a)=>
     (a && !a.deshecho && a.que==="kcal" && a.bloque===bloque && typeof a.f==="string" && a.f<=f && a.antes && a.despues) ? s+(a.despues.kcal-a.antes.kcal) : s, 0);
 }
 function kcTipo(fase, tipo){ const o = MO.obj[fase+"|"+tipo], t = MO.tipos[tipo]; return o && t ? t.tomas.reduce((a,b)=>a+(o[b]?o[b][0]:0), 0) : 0; }

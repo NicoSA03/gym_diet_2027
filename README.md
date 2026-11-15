@@ -108,7 +108,9 @@ Usa la **media de 7 días**, nunca el dato de un día suelto. Este número se mu
 | Construcción (B1, B3) | +0,2 kg/sem | por debajo de +0,05 | +100 kcal a ese bloque |
 | Construcción (B1, B3) | +0,2 kg/sem | por encima de +0,35 | −100 kcal |
 | Definición (B4) | −0,3 kg/sem | más lento de −0,15 | −100 kcal |
-| Definición (B4) | −0,3 kg/sem | más rápido de −0,5 | +100 kcal |
+| Definición (B4) | −0,3 kg/sem | más rápido de −0,4 | +100 kcal |
+
+**Para que la definición no sea agresiva** (v3.6, constantes arriba de `menu/plazos.js` y `menu/plazos.py`): los avisos de peso recortan como mucho 200 kcal por debajo del plan en B4 (`SUELO_DEF`); llegado ahí, el aviso dice que mantengas y no propone más recortes. El freno por bajar rápido salta a 0,4 kg por semana (`FRENO_DEF`). La primera semana de B4 lleva 250 kcal más (`ENTRADA`, función `kcalEntrada`) para no bajar 550 kcal de golpe al salir de B3. Y en las dos primeras semanas de cualquier bloque la app no opina del peso (`SEMANAS_MIN`), porque los pesajes que compararía son del bloque anterior.
 
 Las calorías están en `menu/modelo.py`, en `FASES`. El tercer número de cada línea son las kcal medias del bloque:
 
@@ -687,6 +689,7 @@ Cosas que conviene saber:
 | v3.3 | Vista «Reloj»: el objetivo se elige siempre en un desplegable (mejorar el 5 km, perder grasa, ganar músculo o mantenerte) y se puede cambiar cuando quieras; lo leído del reloj se guarda en el móvil y sigue ahí al recargar, con un botón «Olvidar lo leído» |
 | v3.4 | En El entreno, un desplegable «¿Qué es el RIR?» explica qué es y en qué series aplica en el bloque que estás viendo. En el calendario, un día de hoy o pasado tiene los botones «Apuntar carrera» (tipo, km y minutos) y «Apuntar entreno» (la sesión del plan, con kilos y repeticiones de cada serie). Se guardan en el Registro del móvil (`carrera` y `sesiones` de `registro_v1`), igual que lo que apuntas en Registro, con la marca `cal:true`; así salen en Historial y Progreso. Lo apuntado desde el calendario se puede quitar con «Quitar»; lo demás no se toca |
 | v3.5 | Frontend nuevo (base): barra inferior fija con Menús, Entreno, Registro, Compra y «Más» (La teoría y Cómo funciona), cabecera fija con el nombre de la pestaña, tarjetas redondeadas y una sola tipografía. Solo cambia el aspecto y la navegación (`menu/standalone.py`, `menu/base.css`): el contenido de cada pestaña, los cálculos y lo guardado en el móvil no cambian. Es la base que se irá puliendo hasta la app definitiva |
+| v3.6 | Definición (B4) sin agresividad: suelo de 200 kcal a los recortes por peso, freno al bajar más de 0,4 kg por semana, primera semana de B4 con 250 kcal más y sin avisos de peso en las dos primeras semanas de cada bloque. Lógica en `menu/plazos.js` y `menu/plazos.py`; Menús y el calendario suman la entrada suave |
 
 
 ## 12. Conectar el reloj (v3.0)

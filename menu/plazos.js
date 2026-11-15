@@ -27,6 +27,11 @@ const PLAZOS = (function(){
   const DIAS_SIN_ENTRENAR = 10; // a partir de aquí, semana de reentrada
   const PESAJES_MIN = 10;       // pesajes en 21 días (y 3 por semana) para opinar del peso
   const PASO_KCAL = 100;
+  // Para que la definición no se vuelva agresiva (v3.6):
+  const SUELO_DEF = 200;        // como mucho, kcal recortadas por debajo del plan con los avisos de peso
+  const FRENO_DEF = -0.4;       // kg por semana: si bajas más rápido, propone comer más
+  const ENTRADA = {B4:250};     // kcal de más la primera semana del bloque, para no bajar de golpe
+  const SEMANAS_MIN = 3;        // semanas dentro del bloque antes de opinar del peso
 
   // MET por tipo e intensidad [suave, media, alta]
   const MET = {caminar:[3,4,5], carrera:[7,9,11.5], bici:[5,7,10], fuerza:[3.5,5,6],
@@ -397,11 +402,22 @@ const PLAZOS = (function(){
       .reduce((s, a) => s + (a.despues.kcal - a.antes.kcal), 0);
   }
 
-  // propuestaPeso(registro, hoy, bloque) -> null | {tipo, kcal, texto, aplicar(r), deshacer(r)}
+  // kcalEntrada(bloque, semanaBloque) -> kcal que se suman al objetivo esa semana del bloque
+  //   (semanaBloque empieza en 1). Hoy solo la primera semana de B4.
+  function kcalEntrada(bloque, semanaBloque){
+    return semanaBloque === 1 && ENTRADA[bloque] ? ENTRADA[bloque] : 0;
+  }
+
+  // propuestaPeso(registro, hoy, bloque, semanaBloque?) -> null | {tipo, kcal, texto, aplicar(r), deshacer(r)}
+  //   semanaBloque (opcional, empieza en 1): en las dos primeras semanas de un bloque no
+  //   opina, porque los pesajes que compararía son del bloque anterior.
+  //   En definición hay suelo: si el recorte acumulado pasaría de SUELO_DEF, devuelve un
+  //   aviso con kcal 0 y tope:true («mantén»); aplicarlo solo lo apunta para no repetirlo.
   //   bloque: código de la dieta, "B0" a "B5". La regla tiene que cumplirse dos semanas
   //   seguidas: media de cada semana frente a la anterior en los últimos 21 días.
   //   Hacen falta 10 pesajes en esos 21 días y 3 por semana.
-  function propuestaPeso(registro, hoy, bloque){
+  function propuestaPeso(registro, hoy, bloque, semanaBloque){
+    if(semanaBloque !== undefined && semanaBloque !== null && semanaBloque < SEMANAS_MIN) return null;
     const r = registro || {}, h = aDias(hoy);
     const en = (a, b) => (r.peso || []).filter(p => { const d = aDias(p.f); return d > h - b && d <= h - a; }).map(p => p.kg);
     const sem = [en(0, 7), en(7, 14), en(14, 21)];
@@ -416,22 +432,30 @@ const PLAZOS = (function(){
       else if(d1 > 0.35 && d2 > 0.35){ paso = -PASO_KCAL; que = "estás subiendo más rápido de lo previsto"; }
     } else if(DEFINICION[bloque]){
       if(d1 > -0.15 && d2 > -0.15){ paso = -PASO_KCAL; que = "no estás bajando de peso"; }
-      else if(d1 < -0.5 && d2 < -0.5){ paso = PASO_KCAL; que = "estás bajando demasiado rápido"; }
+      else if(d1 < FRENO_DEF && d2 < FRENO_DEF){ paso = PASO_KCAL; que = "estás bajando demasiado rápido"; }
     }
     if(!paso) return null;
     // si ya aplicaste un ajuste en estas dos semanas, espera a ver su efecto
     const reciente = ajustesDe(r).some(a => !a.deshecho && a.que === "kcal" && a.bloque === bloque && aDias(a.f) > h - 14);
     if(reciente) return null;
-    const dr = r2(delta);
+    const dr = r2(delta), ritmo = " (" + (dr > 0 ? "+" : "") + dr.toFixed(2).replace(".", ",") + " kg/sem)";
+    if(DEFINICION[bloque] && paso < 0 && kcalExtra(r, bloque) + paso < -SUELO_DEF){
+      return {
+        tipo:"peso", kcal:0, tope:true,
+        texto:"En las últimas dos semanas " + que + ritmo + ", pero ya has recortado " + SUELO_DEF + " kcal en este bloque y ese es el tope. Mantén las kcal y no recortes más.",
+        aplicar: reg => { const k = kcalExtra(reg, bloque); return conAjuste(reg, {f:hoy, que:"kcal", bloque, antes:{kcal:k}, despues:{kcal:k}, deshecho:false}); },
+        deshacer: reg => deshacerUltimo(reg, hoy, "kcal")
+      };
+    }
     return {
       tipo:"peso", kcal:paso,
-      texto:"En las últimas dos semanas " + que + " (" + (dr > 0 ? "+" : "") + dr.toFixed(2).replace(".", ",") + " kg/sem). Prueba " + (paso > 0 ? "+" : "") + paso + " kcal al día.",
+      texto:"En las últimas dos semanas " + que + ritmo + ". Prueba " + (paso > 0 ? "+" : "") + paso + " kcal al día.",
       aplicar: reg => { const k = kcalExtra(reg, bloque); return conAjuste(reg, {f:hoy, que:"kcal", bloque, antes:{kcal:k}, despues:{kcal:k + paso}, deshecho:false}); },
       deshacer: reg => deshacerUltimo(reg, hoy, "kcal")
     };
   }
 
   return {kcalActividad, dietaDelDia, adherencia, propuestaDia, propuestaSemana, propuestaPeso,
-          deshacerAjuste, kcalExtra, corregirDia, revisarAjustes, PLAN};
+          deshacerAjuste, kcalExtra, kcalEntrada, corregirDia, revisarAjustes, PLAN};
 })();
 if (typeof module !== "undefined") module.exports = PLAZOS;

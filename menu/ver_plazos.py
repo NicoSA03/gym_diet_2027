@@ -179,6 +179,18 @@ p_def = caso("B4 estancado", "propuestaPeso", reg(peso=pesos(BASE)), HOY, "B4")
 p_def_sube = caso("B4 subiendo 0,125 por semana", "propuestaPeso", reg(peso=pesos([80.0] * 7 + [80.125] * 7 + [80.25] * 7)), HOY, "B4")
 p_def_bien = caso("B4 bajando a su ritmo", "propuestaPeso", reg(peso=pesos([80.0] * 7 + [79.7] * 7 + [79.4] * 7)), HOY, "B4")
 p_def_rapido = caso("B4 bajando demasiado", "propuestaPeso", reg(peso=pesos([80.0] * 7 + [79.4] * 7 + [78.8] * 7)), HOY, "B4")
+# v3.6: definición sin agresividad
+p_def_045 = caso("B4 bajando 0,45 por semana", "propuestaPeso", reg(peso=pesos([80.0] * 7 + [79.55] * 7 + [79.1] * 7)), HOY, "B4")
+p_def_035 = caso("B4 bajando 0,35 por semana", "propuestaPeso", reg(peso=pesos([80.0] * 7 + [79.65] * 7 + [79.3] * 7)), HOY, "B4")
+AJ_100 = [{"f": "2026-08-01", "que": "kcal", "bloque": "B4", "antes": {"kcal": 0}, "despues": {"kcal": -100}, "deshecho": False}]
+AJ_200 = AJ_100 + [{"f": "2026-08-20", "que": "kcal", "bloque": "B4", "antes": {"kcal": -100}, "despues": {"kcal": -200}, "deshecho": False}]
+p_def_2o = caso("B4 estancado con 100 ya recortadas", "propuestaPeso", reg(peso=pesos(BASE), ajustes=AJ_100), HOY, "B4")
+p_def_tope = caso("B4 estancado con 200 ya recortadas", "propuestaPeso", reg(peso=pesos(BASE), ajustes=AJ_200), HOY, "B4")
+p_sem1 = caso("B4 estancado en su semana 2", "propuestaPeso", reg(peso=pesos(BASE)), HOY, "B4", 2)
+p_sem3 = caso("B4 estancado en su semana 3", "propuestaPeso", reg(peso=pesos(BASE)), HOY, "B4", 3)
+e_b4_1 = caso("entrada B4 semana 1", "kcalEntrada", "B4", 1)
+e_b4_2 = caso("entrada B4 semana 2", "kcalEntrada", "B4", 2)
+e_b1_1 = caso("entrada B1 semana 1", "kcalEntrada", "B1", 1)
 p_sin_regla = [caso("%s sin regla de peso" % b, "propuestaPeso", reg(peso=pesos(BASE)), HOY, b) for b in ("B0", "B2", "B5")]
 p_desigual = caso("pesajes sin datos de una semana", "propuestaPeso", reg(peso=pesos(BASE)[:2] + pesos(BASE)[7:]), HOY, "B1")
 
@@ -224,7 +236,7 @@ g_rev_otra = caso("revisar: otra semana no tiene ajustes", "revisarAjustes", G_A
 
 FNS = {"adherencia": P.adherencia, "propuestaSemana": P.propuesta_semana, "propuestaDia": P.propuesta_dia,
        "propuestaPeso": P.propuesta_peso, "dietaDelDia": P.dieta_del_dia, "kcalActividad": P.kcal_actividad,
-       "deshacerAjuste": P.deshacer_ajuste,
+       "deshacerAjuste": P.deshacer_ajuste, "kcalEntrada": P.kcal_entrada,
        "corregirDia": P.corregir_dia, "revisarAjustes": P.revisar_ajustes}
 
 
@@ -403,6 +415,18 @@ ok("2026-10-07" not in R[u_recup]["dias"] and R[u_recup]["ajustes"][0]["deshecho
 ok(R[u_fuera] == AP_ALARGAR and R[u_neg] == AP_ALARGAR, "deshacerAjuste con un índice que no existe: no cambia nada")
 otra_vez = P.deshacer_ajuste(R[u_alargar], 0)
 ok(otra_vez == R[u_alargar], "deshacerAjuste dos veces: la segunda no cambia nada")
+
+# v3.6: definición sin agresividad
+ok(R[p_def_045] and R[p_def_045]["kcal"] == 100, "B4 bajando 0,45 kg por semana: +100 kcal (freno en 0,4)")
+ok(R[p_def_035] is None, "B4 bajando 0,35 kg por semana: nada que proponer")
+ok(R[p_def_2o] and R[p_def_2o]["kcal"] == -100 and P.kcal_extra(R[p_def_2o]["aplicado"], "B4") == -200, "B4: el segundo recorte llega a -200")
+p = R[p_def_tope]
+ok(p and p["kcal"] == 0 and p.get("tope") is True and "tope" in p["texto"], "B4 con 200 recortadas: aviso de tope, sin más recortes")
+if p:
+    ok(P.kcal_extra(p["aplicado"], "B4") == -200 and len(p["aplicado"]["ajustes"]) == 3, "tope: aplicar apunta el aviso y no cambia las kcal")
+    ok(P.propuesta_peso(p["aplicado"], HOY, "B4") is None, "tope: una vez apuntado no se repite en dos semanas")
+ok(R[p_sem1] is None and R[p_sem3] and R[p_sem3]["kcal"] == -100, "peso: no opina en las dos primeras semanas del bloque")
+ok(R[e_b4_1] == 250 and R[e_b4_2] == 0 and R[e_b1_1] == 0, "entrada suave: +250 kcal solo la primera semana de B4")
 
 # corregir un día pasado
 d = R[g_hecho]["dias"]["2026-10-07"]

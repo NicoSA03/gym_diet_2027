@@ -20,6 +20,11 @@ import unicodedata
 DIAS_SIN_ENTRENAR = 10  # a partir de aquí, semana de reentrada
 PESAJES_MIN = 10        # pesajes en 21 días (y 3 por semana) para opinar del peso
 PASO_KCAL = 100
+# Para que la definición no se vuelva agresiva (v3.6)
+SUELO_DEF = 200         # como mucho, kcal recortadas por debajo del plan con los avisos de peso
+FRENO_DEF = -0.4        # kg por semana: si bajas más rápido, propone comer más
+ENTRADA = {"B4": 250}   # kcal de más la primera semana del bloque, para no bajar de golpe
+SEMANAS_MIN = 3         # semanas dentro del bloque antes de opinar del peso
 
 # MET por tipo e intensidad (suave, media, alta)
 MET = {"caminar": [3, 4, 5], "carrera": [7, 9, 11.5], "bici": [5, 7, 10], "fuerza": [3.5, 5, 6],
@@ -545,10 +550,17 @@ def kcal_extra(registro, bloque):
                if not a.get("deshecho") and a.get("que") == "kcal" and a.get("bloque") == bloque)
 
 
-def propuesta_peso(registro, hoy, bloque):
+def kcal_entrada(bloque, semana_bloque):
+    """kcal que se suman al objetivo esa semana del bloque (empieza en 1)."""
+    return ENTRADA.get(bloque, 0) if semana_bloque == 1 else 0
+
+
+def propuesta_peso(registro, hoy, bloque, semana_bloque=None):
     """None o {tipo, kcal, texto, aplicar(r), deshacer(r)}. La regla tiene que cumplirse
        dos semanas seguidas: media de cada semana frente a la anterior en los últimos
        21 días. Hacen falta 10 pesajes en esos 21 días y 3 por semana."""
+    if semana_bloque is not None and semana_bloque < SEMANAS_MIN:
+        return None
     r = registro or {}
     h = _a_dias(hoy)
 
@@ -571,7 +583,7 @@ def propuesta_peso(registro, hoy, bloque):
     elif bloque in DEFINICION:
         if d1 > -0.15 and d2 > -0.15:
             paso, que = -PASO_KCAL, "no estás bajando de peso"
-        elif d1 < -0.5 and d2 < -0.5:
+        elif d1 < FRENO_DEF and d2 < FRENO_DEF:
             paso, que = PASO_KCAL, "estás bajando demasiado rápido"
     if not paso:
         return None
@@ -586,7 +598,17 @@ def propuesta_peso(registro, hoy, bloque):
         return _con_ajuste(reg, {"f": hoy, "que": "kcal", "bloque": bloque, "antes": {"kcal": k},
                                  "despues": {"kcal": k + paso}, "deshecho": False})
 
+    ritmo = " (%s%s kg/sem)" % ("+" if dr > 0 else "", ("%.2f" % dr).replace(".", ","))
+    if bloque in DEFINICION and paso < 0 and kcal_extra(r, bloque) + paso < -SUELO_DEF:
+        def mantener(reg, ahora=None):
+            k = kcal_extra(reg, bloque)
+            return _con_ajuste(reg, {"f": hoy, "que": "kcal", "bloque": bloque, "antes": {"kcal": k},
+                                     "despues": {"kcal": k}, "deshecho": False})
+        return {"tipo": "peso", "kcal": 0, "tope": True,
+                "texto": "En las últimas dos semanas %s%s, pero ya has recortado %d kcal en este bloque y ese es el tope. "
+                         "Mantén las kcal y no recortes más." % (que, ritmo, SUELO_DEF),
+                "aplicar": mantener, "deshacer": lambda reg: _deshacer_ultimo(reg, hoy, "kcal")}
     return {"tipo": "peso", "kcal": paso,
-            "texto": "En las últimas dos semanas %s (%s%s kg/sem). Prueba %s%d kcal al día."
-                     % (que, "+" if dr > 0 else "", ("%.2f" % dr).replace(".", ","), "+" if paso > 0 else "", paso),
+            "texto": "En las últimas dos semanas %s%s. Prueba %s%d kcal al día."
+                     % (que, ritmo, "+" if paso > 0 else "", paso),
             "aplicar": aplicar, "deshacer": lambda reg: _deshacer_ultimo(reg, hoy, "kcal")}
